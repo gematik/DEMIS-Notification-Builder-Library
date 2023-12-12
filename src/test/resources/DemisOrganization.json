@@ -1,0 +1,11 @@
+{
+  "resourceType": "Organization",
+  "id": "DEMIS",
+  "name": "DEMIS",
+  "contact": [ {
+    "telecom": [ {
+      "system": "email",
+      "value": "demis@rki.de"
+    } ]
+  } ]
+}

@@ -1,0 +1,31 @@
+Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
+European Commission – subsequent versions of the EUPL (the "Licence").
+You may not use this work except in compliance with the Licence.
+
+You find a copy of the Licence in the "Licence" file or at
+https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the Licence is distributed on an "AS IS" basis,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
+In case of changes by gematik find details in the "Readme" file.
+
+See the Licence for the specific language governing permissions and limitations under the Licence.
+
+This project includes:
+  AssertJ Core under Apache License, Version 2.0
+  Byte Buddy (without dependencies) under Apache License, Version 2.0
+  Byte Buddy agent under Apache License, Version 2.0
+  fhir-parser-library under Licensed under the EUPL 1.2
+  JUnit Jupiter API under Eclipse Public License v2.0
+  JUnit Jupiter Engine under Eclipse Public License v2.0
+  JUnit Platform Commons under Eclipse Public License v2.0
+  JUnit Platform Engine API under Eclipse Public License v2.0
+  mockito-core under MIT
+  notification-builder-library under Licensed under the EUPL 1.2
+  Objenesis under Apache License, Version 2.0
+  org.apiguardian:apiguardian-api under The Apache License, Version 2.0
+  org.opentest4j:opentest4j under The Apache License, Version 2.0
+  Project Lombok under The MIT License
+
+

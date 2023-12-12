@@ -1,0 +1,19 @@
+{
+  "resourceType": "Organization",
+  "id": "1.",
+  "identifier": [ {
+    "system": "https://demis.rki.de/fhir/CodeSystem/reportingSite",
+    "value": "1."
+  } ],
+  "name": "Robert Koch-Institut",
+  "telecom": [ {
+    "system": "email",
+    "value": "demis@rki.de"
+  } ],
+  "address": [ {
+    "line": [ "Nordufer 20" ],
+    "city": "Berlin",
+    "postalCode": "13353",
+    "country": "20422"
+  } ]
+}
