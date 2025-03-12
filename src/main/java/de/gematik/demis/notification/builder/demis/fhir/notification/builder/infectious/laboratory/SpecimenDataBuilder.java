@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,12 +19,12 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.SPECIMEN_BASE_URL;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.SYSTEM_SNOMED;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils.internalReference;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDate;
 import static java.util.Objects.requireNonNullElse;
@@ -30,9 +35,22 @@ import static org.hl7.fhir.r4.model.Specimen.SpecimenStatus.UNSATISFACTORY;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import lombok.Setter;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Annotation;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Specimen;
+import org.hl7.fhir.r4.model.Type;
 
 @Setter
 public class SpecimenDataBuilder {
@@ -48,8 +66,53 @@ public class SpecimenDataBuilder {
 
   private Date receivedTime;
   private String metaProfileUrl;
-  private Patient notifiedPerson;
-  private PractitionerRole submittingRole;
+  @CheckForNull private Patient notifiedPerson;
+  @CheckForNull private PractitionerRole submittingRole;
+  private List<Specimen.SpecimenProcessingComponent> processing = new ArrayList<>();
+  private List<Annotation> notes = new ArrayList<>();
+
+  public static Specimen deepCopy(
+      @Nonnull final Specimen original,
+      @Nonnull final Patient subject,
+      @Nonnull final PractitionerRole collection) {
+
+    final SpecimenDataBuilder resultBuilder =
+        new SpecimenDataBuilder()
+            .setMetaProfileUrl(original.getMeta().getProfile().getFirst().getValueAsString())
+            .setSpecimenStatus(original.getStatus())
+            .setSpecimenId(original.getId());
+
+    // type
+    if (original.hasType()) {
+      Coding codingFirstRep = original.getType().getCodingFirstRep();
+      resultBuilder
+          .setTypeCode(codingFirstRep.getCode())
+          .setTypeDisplay(codingFirstRep.getDisplay())
+          .setTypeSystem(codingFirstRep.getSystem());
+    }
+
+    resultBuilder.setNotifiedPerson(subject);
+    resultBuilder.setReceivedTime(original.getReceivedTime());
+    resultBuilder.setSubmittingRole(collection);
+    resultBuilder.setCollectedDate(original.getCollection().getCollectedDateTimeType().getValue());
+
+    // processing
+    if (original.hasProcessing()) {
+      final List<Specimen.SpecimenProcessingComponent> processings =
+          original.getProcessing().stream()
+              .map(Specimen.SpecimenProcessingComponent::copy)
+              .toList();
+      resultBuilder.setProcessing(processings);
+    }
+
+    // note
+    if (original.hasNote()) {
+      final List<Annotation> notes = original.getNote().stream().map(Annotation::copy).toList();
+      resultBuilder.setNotes(notes);
+    }
+
+    return resultBuilder.build();
+  }
 
   public Specimen build() {
     Specimen specimen = new Specimen();
@@ -57,16 +120,22 @@ public class SpecimenDataBuilder {
     specimen.setId(specimenId);
     specimen.setStatus(specimenStatus);
     specimen.setType(new CodeableConcept(new Coding(typeSystem, typeCode, typeDisplay)));
-    specimen.setSubject(new Reference(notifiedPerson));
+    if (notifiedPerson != null) {
+      specimen.setSubject(internalReference(notifiedPerson));
+    }
     specimen.setReceivedTime(receivedTime);
 
     Specimen.SpecimenCollectionComponent specimenCollectionComponent =
         new Specimen.SpecimenCollectionComponent();
-    specimenCollectionComponent.setCollector(new Reference(submittingRole));
+    if (submittingRole != null) {
+      specimenCollectionComponent.setCollector(internalReference(submittingRole));
+    }
     Type collected = new DateTimeType(collectedDate);
     specimenCollectionComponent.setCollected(collected);
     specimen.setCollection(specimenCollectionComponent);
     specimen.setMeta(new Meta().addProfile(metaProfileUrl));
+    specimen.setNote(notes);
+    specimen.setProcessing(processing);
 
     return specimen;
   }

@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,36 +19,51 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIER_ROLE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_SUBMITTING_ROLE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.PractitionerType;
-import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Practitioner;
-import org.hl7.fhir.r4.model.PractitionerRole;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import lombok.Setter;
+import org.hl7.fhir.r4.model.*;
 
-public class PractitionerRoleBuilder {
+public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
 
   private PractitionerType practitionerType = PractitionerType.EMPTY;
 
+  @Setter private String id;
   private Resource practitionerOrFacility;
-  private String metaProfileUrl;
+  private String profileUrl;
+
+  /**
+   * @return a copy of the given {@link PractitionerRole} and the contained resources (e.g. the
+   *     organization)
+   */
+  public static PractitionerRole deepCopy(@Nonnull final PractitionerRole original) {
+    return original.copy();
+  }
+
+  @Override
+  public PractitionerRoleBuilder setDefaults() {
+    if (this.id == null) {
+      setId(generateUuidString());
+    }
+    return this;
+  }
 
   public PractitionerRoleBuilder asNotifierRole() {
-    metaProfileUrl = PROFILE_NOTIFIER_ROLE;
+    profileUrl = PROFILE_NOTIFIER_ROLE;
     return this;
   }
 
   public PractitionerRoleBuilder asSubmittingRole() {
-    metaProfileUrl = PROFILE_SUBMITTING_ROLE;
+    profileUrl = PROFILE_SUBMITTING_ROLE;
     return this;
   }
 
@@ -59,11 +79,11 @@ public class PractitionerRoleBuilder {
     return this;
   }
 
+  @Override
   public PractitionerRole build() {
     PractitionerRole practitionerRole = new PractitionerRole();
-
-    practitionerRole.setMeta(new Meta().addProfile(metaProfileUrl));
-
+    practitionerRole.setId(Objects.requireNonNullElseGet(this.id, Utils::generateUuidString));
+    practitionerRole.setMeta(new Meta().addProfile(profileUrl));
     switch (practitionerType) {
       case ORGANIZATION:
         practitionerRole.setOrganization(new Reference(practitionerOrFacility));
@@ -74,9 +94,6 @@ public class PractitionerRoleBuilder {
       default:
         break;
     }
-
-    practitionerRole.setId(generateUuidString());
-
     return practitionerRole;
   }
 }

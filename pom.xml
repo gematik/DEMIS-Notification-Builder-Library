@@ -6,9 +6,11 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
+    <version>5.4.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
+    <description>This project is used to generate example and test messages in various formats (including FHIR-json, FHIR-xml, HAPI bundle objects)</description>
+    <url>https://github.com/gematik/DEMIS-Notification-Builder-Library</url>
 
     <licenses>
         <license>
@@ -18,18 +20,22 @@
     </licenses>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <fmt.maven.plugin.version>2.21.1</fmt.maven.plugin.version>
-        <enforcer.plugin.version>3.4.1</enforcer.plugin.version>
-        <compiler.plugin.version>3.11.0</compiler.plugin.version>
-        <asm.version>9.6</asm.version>
-        <surefire.plugin.version>3.2.2</surefire.plugin.version>
-        <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
-        <fhir.parser.lib.version>1.0.7</fhir.parser.lib.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.maven.javadoc>3.11.2</version.maven.javadoc>
+        <version.maven-compiler-plugin>3.14.0</version.maven-compiler-plugin>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <fmt.maven.plugin.version>2.25</fmt.maven.plugin.version>
+        <enforcer.plugin.version>3.5.0</enforcer.plugin.version>
+        <asm.version>9.7.1</asm.version>
+        <surefire.plugin.version>3.5.2</surefire.plugin.version>
+        <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
+        <fhir.parser.lib.version>2.4.1</fhir.parser.lib.version>
+        <junit.version>5.12.0</junit.version>
         <sonar.exclusions>
             **/de/gematik/demis/notification/builder/demis/fhir/notification/utils/DemisConstants.java
         </sonar.exclusions>
+        <argLine>-Dnet.bytebuddy.experimental=true</argLine>
     </properties>
 
     <dependencyManagement>
@@ -37,24 +43,19 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>32.1.3-jre</version>
+                <version>33.4.0-jre</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.15.3</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
-                <artifactId>jackson-datatype-jsr310</artifactId>
-                <version>2.15.3</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.17.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
 
-        <!--        fhirBase-->
+        <!-- fhirBase-->
         <dependency>
             <groupId>de.gematik.demis</groupId>
             <artifactId>fhir-parser-library</artifactId>
@@ -63,43 +64,98 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>1.18.36</version>
             <scope>provided</scope>
         </dependency>
 
-        <!--TEST-->
+        <!-- TEST -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.1</version>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
+            <version>3.27.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.7.0</version>
+            <version>5.16.0</version>
             <scope>test</scope>
         </dependency>
-
-
     </dependencies>
 
     <build>
         <finalName>notification-builder-library</finalName>
         <plugins>
-            <!-- Enforce Rules -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.5.0</version>
+                <configuration>
+                    <licenseName>eupl_v1_2</licenseName>
+                    <inceptionYear>2025</inceptionYear>
+                    <organizationName>gematik GmbH</organizationName>
+                    <licenseResolver>classpath://copyright-header/eupl-license</licenseResolver>
+                    <failOnMissingHeader>true</failOnMissingHeader>
+                    <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
+                    <canUpdateCopyright>true</canUpdateCopyright>
+                    <licensesOutputDirectory>${project.basedir}/third-party-licenses</licensesOutputDirectory>
+                    <licensesOutputFile>${project.basedir}/third-party-licenses/licenses.xml</licensesOutputFile>
+                    <forceDownload>false</forceDownload>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/generated/**</exclude>
+                    </excludes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>de.gematik</groupId>
+                        <artifactId>ospo-resources</artifactId>
+                        <version>1.1.0</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>download-licenses</id>
+                        <goals>
+                            <goal>download-licenses</goal>
+                        </goals>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>update-file-header</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check-file-header</id>
+                        <goals>
+                            <goal>check-file-header</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -173,7 +229,6 @@
                             <includes>
                                 <include>**/*IntegrationTest.java</include>
                                 <include>**/*IT.java</include>
-                                <include>**/*Test.java</include>
                                 <include>**/*ApplicationTests.java</include>
                                 <include>**/*ApplicationTest.java</include>
                             </includes>
@@ -204,11 +259,10 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Use latest maven compiler plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler.plugin.version}</version>
+                <version>${version.maven-compiler-plugin}</version>
                 <executions>
                     <execution>
                         <id>default-compile</id>
@@ -235,33 +289,28 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.jasig.maven</groupId>
+                <artifactId>notice-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <configuration>
+                    <noticeTemplate>NOTICE.template</noticeTemplate>
+                    <outputDir>.</outputDir>
+                    <licenseMapping>license-mappings.xml</licenseMapping>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>notice-generation</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-        <pluginManagement>
-            <!-- Call mvn notice:generate to generate a new NOTICE file, when dependencies
-              were changed. Also be sure to run the build on a JDK 8 (contrary to the regular
-              build, which requires JDK 11), e.g set environment variable JAVA_HOME to
-              the root directory of a JDK 8 before starting the build. -->
-            <plugins>
-                <!-- used to generate the NOTICE file -->
-                <plugin>
-                    <groupId>org.jasig.maven</groupId>
-                    <artifactId>maven-notice-plugin</artifactId>
-                    <version>1.1.0</version>
-                    <configuration>
-                        <noticeTemplate>NOTICE.template</noticeTemplate>
-                        <outputDir>.</outputDir>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.glassfish.jaxb</groupId>
-                            <artifactId>jaxb-runtime</artifactId>
-                            <version>2.3.8</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
+
     <distributionManagement>
         <repository>
             <id>releases</id>
@@ -272,4 +321,101 @@
             <url>${snapshotDeploymentRepository}</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>external</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.7</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <stagingProgressTimeoutMinutes>20</stagingProgressTimeoutMinutes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${version.maven.javadoc}</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <scm>
+        <url>https://github.com/gematik/DEMIS-Notification-Builder-Library</url>
+        <connection>scm:git:git://github.com/gematik/DEMIS-Notification-Builder-Library.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:gematik/DEMIS-Notification-Builder-Library.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/gematik/DEMIS-Notification-Builder-Library</url>
+    </issueManagement>
+
+    <organization>
+        <name>gematik GmbH</name>
+        <url>https://www.gematik.de</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>gematik</name>
+            <email>software-development@gematik.de</email>
+            <url>https://gematik.github.io/</url>
+            <organization>gematik GmbH</organization>
+            <organizationUrl>https://www.gematik.de/</organizationUrl>
+        </developer>
+    </developers>
 </project>

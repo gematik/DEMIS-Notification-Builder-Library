@@ -1,0 +1,54 @@
+{
+  "resourceType": "Specimen",
+  "id": "43b3b82f-656f-3e3d-a510-0109771c9e97",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/igs/StructureDefinition/SpecimenSequence"
+    ]
+  },
+  "status": "available",
+  "type": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "258604001",
+        "display": "Upper respiratory swab specimen (specimen)"
+      }
+    ]
+  },
+  "extension": [
+    {
+      "url": "https://demis.rki.de/fhir/igs/StructureDefinition/Isolate",
+      "valueString": "119334006"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/3661f735-d3db-3c22-909d-3a16a7334c1d"
+  },
+  "receivedTime": "2022-12-29T15:40:00+01:00",
+  "collection": {
+    "collectedDateTime": "2022-12-29T09:50:00+01:00"
+  },
+  "processing": [
+    {
+      "description": "ARTICv4",
+      "procedure": {
+        "coding": [
+          {
+            "system": "https://demis.rki.de/fhir/igs/CodeSystem/sequencingStrategy",
+            "code": "amplicon"
+          }
+        ]
+      },
+      "additive": [
+        {
+          "reference": "Substance/8bdf9eb0-ba69-3d54-a228-ecf5f21036e2"
+        },
+        {
+          "reference": "Substance/3c2a47c9-2901-324d-9b4a-98598e34fe35"
+        }
+      ],
+      "timeDateTime": "2023-01-13T10:40:00+01:00"
+    }
+  ]
+}

@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.reports;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,45 +19,101 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.reports;
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDate;
-import static java.util.Objects.requireNonNullElse;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import java.util.Date;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.*;
 
+/** Create composition for bed occupancy report bundle. */
 @Setter
-public class ReportBedOccupancyDataBuilder {
+public class ReportBedOccupancyDataBuilder implements InitializableFhirObjectBuilder {
 
-  private String typeCode;
-  private String typeSystem;
-  private String typeDisplay;
+  private Identifier subject;
+  private Identifier identifier;
+  private PractitionerRole notifierRole;
+  private QuestionnaireResponse statisticInformationBedOccupancy;
 
-  private String categoryCode;
-  private String categorySystem;
-  private String categoryDisplay;
-
-  private String subjectSystem;
-  private String subjectValue;
-
-  private String identifierSystem;
-  private String identifierValue;
-
+  private Coding type;
+  private Coding category;
   private String status;
-
   private String title;
   private String id;
-
   private Date currentDate;
 
-  public Composition buildReportBedOccupancy(
-      PractitionerRole notifierRole, QuestionnaireResponse statisticInformationBedOccupancy) {
+  /**
+   * Set default values for composition:
+   *
+   * <ul>
+   *   <li>id
+   *   <li>identifier as notification ID
+   *   <li>currentDate
+   *   <li>type
+   *   <li>category
+   *   <li>title
+   *   <li>status
+   * </ul>
+   *
+   * @return builder
+   */
+  @Override
+  public ReportBedOccupancyDataBuilder setDefaults() {
+    if (this.id == null) {
+      setId(generateUuidString());
+    }
+    if (this.identifier == null) {
+      setIdentifierAsNotificationId(generateUuidString());
+    }
+    if (this.currentDate == null) {
+      setCurrentDate(getCurrentDate());
+    }
+    if (this.type == null) {
+      setType(new Coding(DemisConstants.LOINC_ORG_SYSTEM, "80563-0", "Report"));
+    }
+    if (this.category == null) {
+      setCategory(
+          new Coding(
+              "https://demis.rki.de/fhir/CodeSystem/reportCategory",
+              "bedOccupancyReport",
+              "Bettenbelegungsstatistik"));
+    }
+    if (this.title == null) {
+      setTitle("Bericht (Krankenhausbettenbelegungsstatistik)");
+    }
+    if (this.status == null) {
+      setStatusStandard(Composition.CompositionStatus.FINAL);
+    }
+    return this;
+  }
+
+  public ReportBedOccupancyDataBuilder setStatusStandard(Composition.CompositionStatus status) {
+    this.status = status.toCode();
+    return this;
+  }
+
+  public ReportBedOccupancyDataBuilder setIdentifierAsNotificationId(String notificationId) {
+    this.identifier = new Identifier();
+    this.identifier.setSystem(DemisConstants.NOTIFICATION_ID_SYSTEM);
+    this.identifier.setValue(notificationId);
+    return this;
+  }
+
+  public ReportBedOccupancyDataBuilder setSubjectAsInekStandortId(String inekStandortId) {
+    this.subject =
+        new Identifier()
+            .setSystem(DemisConstants.PROFILE_INEK_NAMING_SYSTEM)
+            .setValue(inekStandortId);
+    return this;
+  }
+
+  @Override
+  public Composition build() {
     Composition composition = new Composition();
     composition.setId(id);
     addMeta(composition);
@@ -64,95 +125,21 @@ public class ReportBedOccupancyDataBuilder {
     composition.addAuthor(new Reference(notifierRole));
     composition.setTitle(title);
     composition.setDate(currentDate);
-
     Composition.SectionComponent sectionForQuestionnaireResponse =
         new Composition.SectionComponent();
     sectionForQuestionnaireResponse.addEntry(new Reference(statisticInformationBedOccupancy));
     addSectionCoding(composition, sectionForQuestionnaireResponse);
-
     return composition;
   }
 
-  /**
-   * this method contains hardcoded values for gateway use to shorten implementation time. it is not
-   * supposed to use it in any other case.
-   *
-   * @param notifierRole notifierRole object
-   * @param statisticInformationBedOccupancy questionnaire object
-   * @return complete composition with example values and the given objects
-   */
-  public Composition buildReportBedOccupancyForGateway(
-      PractitionerRole notifierRole, QuestionnaireResponse statisticInformationBedOccupancy) {
-    id = requireNonNullElse(id, generateUuidString());
-
-    identifierSystem =
-        requireNonNullElse(
-            identifierSystem, "https://demis.rki.de/fhir/NamingSystem/NotificationId");
-    identifierValue = requireNonNullElse(identifierValue, generateUuidString());
-
-    status = requireNonNullElse(status, "final");
-
-    typeCode = requireNonNullElse(typeCode, "80563-0");
-    typeSystem = requireNonNullElse(typeSystem, "http://loinc.org");
-    typeDisplay = requireNonNullElse(typeDisplay, "Report");
-
-    categoryCode = requireNonNullElse(categoryCode, "bedOccupancyReport");
-    categorySystem =
-        requireNonNullElse(categorySystem, "https://demis.rki.de/fhir/CodeSystem/reportCategory");
-    categoryDisplay = requireNonNullElse(categoryDisplay, "Bettenbelegungsstatistik");
-
-    subjectSystem = requireNonNullElse(subjectSystem, DemisConstants.PROFILE_INEK_NAMING_SYSTEM);
-
-    title = requireNonNullElse(title, "Bericht (Krankenhausbettenbelegungsstatistik)");
-    currentDate = requireNonNullElse(currentDate, getCurrentDate());
-
-    return buildReportBedOccupancy(notifierRole, statisticInformationBedOccupancy);
-  }
-
-  public Composition buildExampleReportBedOccupancy(
-      PractitionerRole notifierRole, QuestionnaireResponse statisticInformationBedOccupancy) {
-    typeCode = requireNonNullElse(typeCode, "80563-0");
-    typeSystem = requireNonNullElse(typeSystem, "http://loinc.org");
-    typeDisplay = requireNonNullElse(typeDisplay, "Report");
-
-    categoryCode = requireNonNullElse(categoryCode, "bedOccupancyReport");
-    categorySystem =
-        requireNonNullElse(categorySystem, "https://demis.rki.de/fhir/CodeSystem/reportCategory");
-    categoryDisplay = requireNonNullElse(categoryDisplay, "Bettenbelegungsstatistik");
-
-    identifierSystem =
-        requireNonNullElse(
-            identifierSystem, "https://demis.rki.de/fhir/NamingSystem/NotificationId");
-    identifierValue = requireNonNullElse(identifierValue, generateUuidString());
-
-    status = requireNonNullElse(status, "final");
-
-    subjectSystem =
-        requireNonNullElse(subjectSystem, "https://demis.rki.de/fhir/NamingSystem/InekStandortId");
-    subjectValue = requireNonNullElse(subjectValue, "772557");
-
-    title = requireNonNullElse(title, "Bericht (Krankenhausbettenbelegungsstatistik)");
-
-    id = requireNonNullElse(id, generateUuidString());
-    currentDate = requireNonNullElse(currentDate, getCurrentDate());
-
-    return buildReportBedOccupancy(notifierRole, statisticInformationBedOccupancy);
-  }
-
   private void addSubjectIdentifier(Composition composition) {
-    Identifier subjectIdentifier = new Identifier();
-    subjectIdentifier.setSystem(subjectSystem);
-    subjectIdentifier.setValue(subjectValue);
     Reference subjectReference = new Reference();
-    subjectReference.setIdentifier(subjectIdentifier);
+    subjectReference.setIdentifier(this.subject);
     composition.setSubject(subjectReference);
   }
 
   private void addIdentifier(Composition composition) {
-    Identifier identifier = new Identifier();
-    identifier.setSystem(identifierSystem);
-    identifier.setValue(identifierValue);
-    composition.setIdentifier(identifier);
+    composition.setIdentifier(this.identifier);
   }
 
   private void addMeta(Composition composition) {
@@ -162,15 +149,11 @@ public class ReportBedOccupancyDataBuilder {
   }
 
   private void addCategoryCoding(Composition composition) {
-    Coding categoryCoding = new Coding(categorySystem, categoryCode, categoryDisplay);
-    CodeableConcept categoryCodeableConcept = new CodeableConcept(categoryCoding);
-    composition.addCategory(categoryCodeableConcept);
+    composition.addCategory(new CodeableConcept(this.category));
   }
 
   private void addTypeCoding(Composition composition) {
-    Coding typeCoding = new Coding(typeSystem, typeCode, typeDisplay);
-    CodeableConcept typeCodeableConcept = new CodeableConcept(typeCoding);
-    composition.setType(typeCodeableConcept);
+    composition.setType(new CodeableConcept(this.type));
   }
 
   private void addSectionCoding(

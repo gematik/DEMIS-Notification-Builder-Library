@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.receipt;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,13 +19,13 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.receipt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.uhn.fhir.context.FhirContext;
+import com.google.common.io.Resources;
+import de.gematik.demis.notification.builder.demis.fhir.notification.test.FhirJsonTestsUtil;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -124,7 +129,7 @@ class ReceiptBuilderTest {
 
     ContactPoint contactPoint = telecomList.get(0);
     assertThat(contactPoint.getSystem()).isEqualTo(ContactPoint.ContactPointSystem.EMAIL);
-    assertThat(contactPoint.getValue()).isEqualTo("demis@rki.de");
+    assertThat(contactPoint.getValue()).isEqualTo("demis-support@rki.de");
 
     assertThat(bundle.getEntry().get(1).getResource()).isEqualTo(organization);
   }
@@ -153,7 +158,7 @@ class ReceiptBuilderTest {
     assertThat(organization.getTelecom()).hasSize(1);
     assertThat(organization.getTelecomFirstRep().getSystem())
         .isEqualTo(ContactPoint.ContactPointSystem.EMAIL);
-    assertThat(organization.getTelecomFirstRep().getValue()).isEqualTo("demis@rki.de");
+    assertThat(organization.getTelecomFirstRep().getValue()).isEqualTo("demis-support@rki.de");
 
     assertThat(organization.getAddress()).hasSize(1);
     assertThat(organization.getAddressFirstRep().getLine()).hasSize(1);
@@ -161,14 +166,13 @@ class ReceiptBuilderTest {
         .isEqualTo("Nordufer 20");
     assertThat(organization.getAddressFirstRep().getPostalCode()).isEqualTo("13353");
     assertThat(organization.getAddressFirstRep().getCity()).isEqualTo("Berlin");
-    assertThat(organization.getAddressFirstRep().getCountry()).isEqualTo("20422");
+    assertThat(organization.getAddressFirstRep().getCountry()).isEqualTo("DE");
 
     assertThat(bundle.getEntry().get(2).getResource()).isEqualTo(organization);
   }
 
   @Test
   void checkStringAfterParsing() throws IOException {
-
     try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
       utilities.when(Utils::generateUuidString).thenReturn("1");
       utilities
@@ -178,20 +182,11 @@ class ReceiptBuilderTest {
                   LocalDateTime.of(2020, 1, 1, 0, 0, 0)
                       .atZone(ZoneId.systemDefault())
                       .toInstant()));
-
       Bundle bundle = new ReceiptBuilder().setRelatesToId("2").createReportReceiptBundle();
-      String actualJson =
-          FhirContext.forR4().newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
-
       String expectedJson =
-          new String(
-              getClass()
-                  .getClassLoader()
-                  .getResourceAsStream("ReportReceiptBundleExample.json")
-                  .readAllBytes(),
-              StandardCharsets.UTF_8);
-
-      assertThat(actualJson).isEqualToIgnoringNewLines(expectedJson);
+          Resources.toString(
+              Resources.getResource("ReportReceiptBundleExample.json"), StandardCharsets.UTF_8);
+      FhirJsonTestsUtil.assertEqualJson(bundle, expectedJson, "Built receipt bundle as JSON");
     }
   }
 }

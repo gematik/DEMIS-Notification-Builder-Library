@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +37,7 @@ class AnswerDataBuilderTest {
         new QuestionnaireResponse.QuestionnaireResponseItemComponent();
 
     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer =
-        new AnswerDataBuilder().buildAnswerWithItem(item);
+        new AnswerDataBuilder().addItem(item).build();
 
     assertThat(answer).isNotNull();
     assertThat(answer.getItem()).hasSize(1);
@@ -44,55 +48,59 @@ class AnswerDataBuilderTest {
   void shouldCreateAnswerWithCoding() {
 
     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer =
-        new AnswerDataBuilder()
-            .setAnswerCodingSystem("System")
-            .setAnswerCodingCode("code")
-            .setAnswerCodingDisplay("display")
-            .buildAnswer();
+        new AnswerDataBuilder().setValueCoding(new Coding("system", "code", "display")).build();
 
     assertThat(answer).isNotNull();
     assertThat(answer.getValue()).isInstanceOf(Coding.class);
-    assertThat(answer.getValueCoding().getDisplay()).isEqualTo("display");
-    assertThat(answer.getValueCoding().getCode()).isEqualTo("code");
-    assertThat(answer.getValueCoding().getSystem()).isEqualTo("System");
+    Coding coding = answer.getValueCoding();
+    assertThat(coding).isNotNull();
+    assertThat(coding.getDisplay()).isEqualTo("display");
+    assertThat(coding.getCode()).isEqualTo("code");
+    assertThat(coding.getSystem()).isEqualTo("system");
   }
 
   @Test
   void shouldCreateAnswerWithCodingOnlyCode() {
 
     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer =
-        new AnswerDataBuilder().setAnswerCodingCode("code").buildAnswer();
+        new AnswerDataBuilder().setValueCoding(new Coding().setCode("code")).build();
 
     assertThat(answer).isNotNull();
     assertThat(answer.getValue()).isInstanceOf(Coding.class);
-    assertThat(answer.getValueCoding().getDisplay()).isNull();
-    assertThat(answer.getValueCoding().getCode()).isEqualTo("code");
-    assertThat(answer.getValueCoding().getSystem()).isNull();
+    Coding coding = answer.getValueCoding();
+    assertThat(coding).isNotNull();
+    assertThat(coding.getDisplay()).isNull();
+    assertThat(coding.getCode()).isEqualTo("code");
+    assertThat(coding.getSystem()).isNull();
   }
 
   @Test
   void shouldCreateAnswerWithCodingOnlySystem() {
 
     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer =
-        new AnswerDataBuilder().setAnswerCodingSystem("System").buildAnswer();
+        new AnswerDataBuilder().setValueCoding(new Coding().setSystem("system")).build();
 
     assertThat(answer).isNotNull();
     assertThat(answer.getValue()).isInstanceOf(Coding.class);
-    assertThat(answer.getValueCoding().getDisplay()).isNull();
-    assertThat(answer.getValueCoding().getCode()).isNull();
-    assertThat(answer.getValueCoding().getSystem()).isEqualTo("System");
+    Coding coding = answer.getValueCoding();
+    assertThat(coding).isNotNull();
+    assertThat(coding.getDisplay()).isNull();
+    assertThat(coding.getCode()).isNull();
+    assertThat(coding.getSystem()).isEqualTo("system");
   }
 
   @Test
   void shouldCreateAnswerWithCodingOnlyDisplay() {
 
     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer =
-        new AnswerDataBuilder().setAnswerCodingDisplay("display").buildAnswer();
+        new AnswerDataBuilder().setValueCoding(new Coding().setDisplay("display")).build();
 
     assertThat(answer).isNotNull();
     assertThat(answer.getValue()).isInstanceOf(Coding.class);
-    assertThat(answer.getValueCoding().getDisplay()).isEqualTo("display");
-    assertThat(answer.getValueCoding().getCode()).isNull();
-    assertThat(answer.getValueCoding().getSystem()).isNull();
+    Coding coding = answer.getValueCoding();
+    assertThat(coding).isNotNull();
+    assertThat(coding.getDisplay()).isEqualTo("display");
+    assertThat(coding.getCode()).isNull();
+    assertThat(coding.getSystem()).isNull();
   }
 }

@@ -1,0 +1,33 @@
+{
+  "resourceType": "Organization",
+  "id": "a42f380e-b23a-3f50-a096-26665a6e4257",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/StructureDefinition/SubmittingFacility"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR",
+      "value": "987654321"
+    }
+  ],
+  "name": "Primärlabor",
+  "telecom": [
+    {
+      "system": "email",
+      "value": "ifsg@primaerlabor-gibt-es-nicht.de",
+      "use": "work"
+    }
+  ],
+  "address": [
+    {
+      "line": [
+        "Dingsweg 321"
+      ],
+      "city": "Berlin",
+      "postalCode": "13055",
+      "country": "20422"
+    }
+  ]
+}

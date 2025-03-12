@@ -1,0 +1,12 @@
+{
+  "resourceType": "PractitionerRole",
+  "id": "d1b92d45-3811-3064-bad7-b3336e70e08c",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/StructureDefinition/SubmittingRole"
+    ]
+  },
+  "organization": {
+    "reference": "Organization/a42f380e-b23a-3f50-a096-26665a6e4257"
+  }
+}

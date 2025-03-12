@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,25 +19,35 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
 
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
-
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.REASON_FOR_TESTING_SYSTEM;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.AMENDED;
 import static org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.CORRECTED;
 import static org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.FINAL;
 import static org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.PRELIMINARY;
 
+import ca.uhn.fhir.context.FhirContext;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
+import de.gematik.demis.notification.builder.demis.fhir.testUtils.TestObjects;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,6 +76,7 @@ class LaboratoryReportDataBuilderTest {
   @Test
   void shouldSetMetaProfileUrl() {
     LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+    laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
     laboratoryReportDataBuilder1.setProfileUrlHelper("CVDP");
     DiagnosticReport diagnosticReport = laboratoryReportDataBuilder1.build();
     assertThat(diagnosticReport.getMeta().getProfile().get(0).getValue())
@@ -71,6 +87,7 @@ class LaboratoryReportDataBuilderTest {
   void shouldSetMetaProfileUrlUpperCase() {
     LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
     laboratoryReportDataBuilder1.setProfileUrlHelper("cvdp");
+    laboratoryReportDataBuilder1.setNotifiedPerson(new Patient());
     DiagnosticReport diagnosticReport = laboratoryReportDataBuilder1.build();
     assertThat(diagnosticReport.getMeta().getProfile().get(0).getValue())
         .isEqualTo("https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportCVDP");
@@ -82,6 +99,7 @@ class LaboratoryReportDataBuilderTest {
       utilities.when(Utils::generateUuidString).thenReturn("1");
       LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
       laboratoryReportDataBuilder1.setDefaultData();
+      laboratoryReportDataBuilder1.setNotifiedPerson(new Patient());
       DiagnosticReport diagnosticReport = laboratoryReportDataBuilder1.build();
       assertThat(diagnosticReport.getCode().getCodingFirstRep().getSystem())
           .isEqualTo("https://demis.rki.de/fhir/CodeSystem/notificationCategory");
@@ -233,6 +251,7 @@ class LaboratoryReportDataBuilderTest {
     @Test
     void shouldSetStatusToPrelimnary() {
       LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+      laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
       laboratoryReportDataBuilder1.setReportStatusToPreliminary();
       assertThat(laboratoryReportDataBuilder1.build().getStatus()).isEqualTo(PRELIMINARY);
     }
@@ -240,6 +259,7 @@ class LaboratoryReportDataBuilderTest {
     @Test
     void shouldSetStatusToFinal() {
       LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+      laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
       laboratoryReportDataBuilder1.setReportStatusToFinal();
       assertThat(laboratoryReportDataBuilder1.build().getStatus()).isEqualTo(FINAL);
     }
@@ -247,6 +267,7 @@ class LaboratoryReportDataBuilderTest {
     @Test
     void shouldSetStatusToAmended() {
       LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+      laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
       laboratoryReportDataBuilder1.setReportStatusToAmended();
       assertThat(laboratoryReportDataBuilder1.build().getStatus()).isEqualTo(AMENDED);
     }
@@ -254,6 +275,7 @@ class LaboratoryReportDataBuilderTest {
     @Test
     void shouldSetStatusToCorrected() {
       LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+      laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
       laboratoryReportDataBuilder1.setReportStatusToCorrected();
       assertThat(laboratoryReportDataBuilder1.build().getStatus()).isEqualTo(CORRECTED);
     }
@@ -261,6 +283,7 @@ class LaboratoryReportDataBuilderTest {
     @Test
     void shouldSetConclusionCodeToDetected() {
       LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+      laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
       laboratoryReportDataBuilder1.setConclusionCodeStatusToDetected();
       assertThat(
               laboratoryReportDataBuilder1
@@ -274,6 +297,7 @@ class LaboratoryReportDataBuilderTest {
     @Test
     void shouldSetConclusionCodeToNotDetected() {
       LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+      laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
       laboratoryReportDataBuilder1.setConclusionCodeStatusToNotDetected();
       assertThat(
               laboratoryReportDataBuilder1
@@ -282,6 +306,154 @@ class LaboratoryReportDataBuilderTest {
                   .getCodingFirstRep()
                   .getCode())
           .isEqualTo("pathogenNotDetected");
+    }
+
+    @Test
+    void shouldSetExtensionReasonForTestingToMicrobiologyScreeningTest() {
+      LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+      laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
+      laboratoryReportDataBuilder1.withReasonForTesting("314074007", "Microbiology screening test");
+
+      final Extension extension =
+          laboratoryReportDataBuilder1.build().getExtensionByUrl(REASON_FOR_TESTING_SYSTEM);
+      assertThat(extension).isNotNull();
+      assertThat(extension.hasValue()).isTrue();
+      if (extension.getValue() instanceof CodeableConcept codeableConcept) {
+        assertThat(codeableConcept.getCodingFirstRep().getCode()).isEqualTo("314074007");
+        assertThat(codeableConcept.getCodingFirstRep().getDisplay())
+            .isEqualTo("Microbiology screening test");
+      } else {
+        fail("Extension value is not a CodeableConcept");
+      }
+    }
+
+    @Test
+    void shouldAddBasedOnToLaboratoryReport() {
+      LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+      laboratoryReportDataBuilder1.setNotifiedPerson(TestObjects.notifiedPerson());
+      laboratoryReportDataBuilder1.addBasedOn("basedOnId");
+      DiagnosticReport diagnosticReport = laboratoryReportDataBuilder1.build();
+      assertThat(diagnosticReport.getBasedOnFirstRep().getIdentifier().getValue())
+          .isEqualTo("basedOnId");
+
+      var parser = FhirContext.forR4Cached().newJsonParser();
+      var diagnosticReportJson = parser.encodeToString(diagnosticReport.getBasedOnFirstRep());
+      assertThat(diagnosticReportJson)
+          .isEqualTo(
+              "{\"type\":\"ServiceRequest\",\"identifier\":{\"system\":\"https://demis.rki.de/fhir/NamingSystem/ServiceRequestId\",\"value\":\"basedOnId\"}}");
+    }
+  }
+
+  @Nested
+  @DisplayName("copyOf method tests")
+  class CopyOfTests {
+    private DiagnosticReport createDiagnosticReport() {
+      DiagnosticReport diagnosticReport = new DiagnosticReport();
+      diagnosticReport.setMeta(new Meta().addProfile("https://example.com/profile"));
+      diagnosticReport.addExtension(
+          new Extension(
+              "http://hl7.org/fhir/StructureDefinition/workflow-reasonCode",
+              new CodeableConcept().setText("Reason for testing")));
+      diagnosticReport.addBasedOn(
+          new Reference()
+              .setType("ServiceRequest")
+              .setIdentifier(new Identifier().setSystem("system").setValue("value")));
+      diagnosticReport.setStatus(DiagnosticReport.DiagnosticReportStatus.FINAL);
+      diagnosticReport.setCode(
+          new CodeableConcept()
+              .addCoding(new Coding().setSystem("system").setCode("code").setDisplay("display")));
+      diagnosticReport.setIssued(new Date());
+      diagnosticReport.setConclusion("Conclusion text");
+      diagnosticReport.setConclusionCode(
+          Collections.singletonList(
+              new CodeableConcept()
+                  .addCoding(
+                      new Coding().setSystem("system").setCode("code").setDisplay("display"))));
+      return diagnosticReport;
+    }
+
+    @Test
+    void shouldCopyMetaProfileUrl() {
+      final DiagnosticReport diagnosticReport =
+          LaboratoryReportDataBuilder.deepCopy(
+              createDiagnosticReport(), TestObjects.notifiedPerson(), List.of());
+      assertThat(diagnosticReport.getMeta().getProfile().get(0).getValue())
+          .isEqualTo("https://example.com/profile");
+    }
+
+    @Test
+    void shouldCopyExtensionReasonForTesting() {
+      final DiagnosticReport diagnosticReport =
+          LaboratoryReportDataBuilder.deepCopy(
+              createDiagnosticReport(), TestObjects.notifiedPerson(), List.of());
+      assertThat(
+              diagnosticReport.getExtensionByUrl(
+                  "http://hl7.org/fhir/StructureDefinition/workflow-reasonCode"))
+          .usingRecursiveComparison()
+          .isEqualTo(diagnosticReport.getExtension().get(0));
+    }
+
+    @Test
+    void shouldCopyBasedOnReference() {
+      final DiagnosticReport diagnosticReport =
+          LaboratoryReportDataBuilder.deepCopy(
+              createDiagnosticReport(), TestObjects.notifiedPerson(), List.of());
+      assertThat(diagnosticReport.getBasedOnFirstRep().getIdentifier().getSystem())
+          .isEqualTo("system");
+      assertThat(diagnosticReport.getBasedOnFirstRep().getIdentifier().getValue())
+          .isEqualTo("value");
+    }
+
+    @Test
+    void shouldCopyStatus() {
+      final DiagnosticReport diagnosticReport =
+          LaboratoryReportDataBuilder.deepCopy(
+              createDiagnosticReport(), TestObjects.notifiedPerson(), List.of());
+      assertThat(diagnosticReport.getStatus())
+          .isEqualTo(DiagnosticReport.DiagnosticReportStatus.FINAL);
+    }
+
+    @Test
+    void shouldCopyCode() {
+      final DiagnosticReport diagnosticReport =
+          LaboratoryReportDataBuilder.deepCopy(
+              createDiagnosticReport(), TestObjects.notifiedPerson(), List.of());
+
+      assertThat(diagnosticReport.getCode().getCodingFirstRep().getSystem()).isEqualTo("system");
+      assertThat(diagnosticReport.getCode().getCodingFirstRep().getCode()).isEqualTo("code");
+      assertThat(diagnosticReport.getCode().getCodingFirstRep().getDisplay()).isEqualTo("display");
+    }
+
+    @Test
+    void shouldCopyIssuedDate() {
+      final DiagnosticReport original = createDiagnosticReport();
+      Date issuedDate = original.getIssued();
+
+      final DiagnosticReport diagnosticReport =
+          LaboratoryReportDataBuilder.deepCopy(original, TestObjects.notifiedPerson(), List.of());
+      assertThat(diagnosticReport.getIssued()).isEqualTo(issuedDate);
+    }
+
+    @Test
+    void shouldCopyConclusion() {
+      final DiagnosticReport diagnosticReport =
+          LaboratoryReportDataBuilder.deepCopy(
+              createDiagnosticReport(), TestObjects.notifiedPerson(), List.of());
+
+      assertThat(diagnosticReport.getConclusion()).isEqualTo("Conclusion text");
+    }
+
+    @Test
+    void shouldCopyConclusionCode() {
+      final DiagnosticReport diagnosticReport =
+          LaboratoryReportDataBuilder.deepCopy(
+              createDiagnosticReport(), TestObjects.notifiedPerson(), List.of());
+      assertThat(diagnosticReport.getConclusionCodeFirstRep().getCodingFirstRep().getSystem())
+          .isEqualTo("system");
+      assertThat(diagnosticReport.getConclusionCodeFirstRep().getCodingFirstRep().getCode())
+          .isEqualTo("code");
+      assertThat(diagnosticReport.getConclusionCodeFirstRep().getCodingFirstRep().getDisplay())
+          .isEqualTo("display");
     }
   }
 }

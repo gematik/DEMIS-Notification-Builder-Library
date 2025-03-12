@@ -1,0 +1,702 @@
+{
+  "resourceType": "Bundle",
+  "id": "1",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/StructureDefinition/NotificationBundleDisease"
+    ]
+  },
+  "identifier": {
+    "system": "https://demis.rki.de/fhir/NamingSystem/NotificationBundleId",
+    "value": "2"
+  },
+  "type": "document",
+  "timestamp": "2023-07-12T13:32:12.000+02:00",
+  "entry": [
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Composition/3",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "3",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/NotificationDiseaseCVDD"
+          ]
+        },
+        "identifier": {
+          "system": "https://demis.rki.de/fhir/NamingSystem/NotificationId",
+          "value": "4"
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "34782-3",
+              "display": "Infectious disease Note"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "https://demis.rki.de/fhir/CodeSystem/notificationType",
+                "code": "6.1_2",
+                "display": "Meldung gemäß IfSG §6 Absatz 1, 2"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/5"
+        },
+        "date": "2023-07-12T13:32:12+02:00",
+        "author": [
+          {
+            "reference": "PractitionerRole/6"
+          }
+        ],
+        "title": "Meldung gemäß §6 Absatz 1, 2 IfSG",
+        "section": [
+          {
+            "title": "disease",
+            "code": {
+              "coding": [
+                {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/sectionCode",
+                  "code": "diagnosis",
+                  "display": "Diagnose"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/7"
+              }
+            ]
+          },
+          {
+            "title": "Meldetatbestandsübergreifende klinische und epidemiologische Angaben",
+            "code": {
+              "coding": [
+                {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/sectionCode",
+                  "code": "generalClinAndEpiInformation",
+                  "display": "Meldetatbestandsübergreifende klinische und epidemiologische Angaben"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "QuestionnaireResponse/8"
+              }
+            ]
+          },
+          {
+            "title": "Meldetatbestandsspezifische klinische und epidemiologische Angaben",
+            "code": {
+              "coding": [
+                {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/sectionCode",
+                  "code": "specificClinAndEpiInformation",
+                  "display": "Meldetatbestandsspezifische klinische und epidemiologische Angaben"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "QuestionnaireResponse/9"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Patient/5",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "5",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/NotifiedPerson"
+          ]
+        },
+        "name": [
+          {
+            "text": "Bertha-Luise Hanna Karin Betroffen",
+            "family": "Betroffen",
+            "given": [
+              "Bertha-Luise",
+              "Hanna",
+              "Karin"
+            ]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1999-06-09",
+        "address": [
+          {
+            "line": [
+              "Berthastraße 123"
+            ],
+            "city": "Betroffenenstadt",
+            "postalCode": "abcde",
+            "country": "20422"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Condition/7",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "7",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/DiseaseCVDD"
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "https://demis.rki.de/fhir/CodeSystem/notificationDiseaseCategory",
+              "code": "cvdd",
+              "display": "Coronavirus-Krankheit-2019 (COVID-19)"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/5"
+        },
+        "onsetDateTime": "2022-01-01",
+        "recordedDate": "2022-01-02",
+        "evidence": [
+          {
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "67782005"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "213257006"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "371820004"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/PractitionerRole/6",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "6",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/NotifierRole"
+          ]
+        },
+        "organization": {
+          "reference": "Organization/10"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Organization/10",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "10",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/NotifierFacility"
+          ]
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "https://demis.rki.de/fhir/CodeSystem/organizationType",
+                "code": "hospital",
+                "display": "Krankenhaus"
+              }
+            ]
+          }
+        ],
+        "name": "TEST Organisation",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "01234567"
+          },
+          {
+            "system": "email",
+            "value": "anna@ansprechpartner.de"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "Krankenhausstraße 1"
+            ],
+            "city": "Buchhorst",
+            "postalCode": "abcde",
+            "country": "20422"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Encounter/11",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "11",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/Hospitalization"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://demis.rki.de/fhir/StructureDefinition/HospitalizationNote",
+            "valueString": "Nach Verlegung auf Normalstation diagnostizierten wir Covid."
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP",
+          "display": "inpatient encounter"
+        },
+        "subject": {
+          "reference": "Patient/5"
+        },
+        "period": {
+          "start": "2022-01-05"
+        },
+        "serviceProvider": {
+          "reference": "Organization/10"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Encounter/12",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "12",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/Hospitalization"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://demis.rki.de/fhir/StructureDefinition/HospitalizationNote",
+            "valueString": "Kritischer Zustand bei Aufnahme"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP",
+          "display": "inpatient encounter"
+        },
+        "serviceType": {
+          "coding": [
+            {
+              "system": "https://demis.rki.de/fhir/CodeSystem/hospitalizationServiceType",
+              "code": "3600",
+              "display": "Intensivmedizin"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/5"
+        },
+        "period": {
+          "start": "2022-01-01",
+          "end": "2022-01-05"
+        },
+        "serviceProvider": {
+          "reference": "Organization/10"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/QuestionnaireResponse/8",
+      "resource": {
+        "resourceType": "QuestionnaireResponse",
+        "id": "8",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/DiseaseInformationCommon"
+          ]
+        },
+        "questionnaire": "https://demis.rki.de/fhir/Questionnaire/DiseaseQuestionsCommon",
+        "status": "completed",
+        "subject": {
+          "reference": "Patient/5"
+        },
+        "item": [
+          {
+            "linkId": "isDead",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer",
+                  "code": "yes",
+                  "display": "Ja"
+                },
+                "item": [
+                  {
+                    "linkId": "deathDate",
+                    "answer": [
+                      {
+                        "valueDate": "2022-01-22"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "linkId": "militaryAffiliation",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/militaryAffiliation",
+                  "code": "memberOfBundeswehr"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "labSpecimenTaken",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer",
+                  "code": "yes",
+                  "display": "Ja"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "hospitalized",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer",
+                  "code": "yes",
+                  "display": "Ja"
+                },
+                "item": [
+                  {
+                    "linkId": "hospitalizedGroup",
+                    "item": [
+                      {
+                        "linkId": "hospitalizedEncounter",
+                        "answer": [
+                          {
+                            "valueReference": {
+                              "reference": "Encounter/11"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "hospitalizedGroup",
+                    "item": [
+                      {
+                        "linkId": "hospitalizedEncounter",
+                        "answer": [
+                          {
+                            "valueReference": {
+                              "reference": "Encounter/12"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "linkId": "infectProtectFacility",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer",
+                  "code": "yes",
+                  "display": "Ja"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "placeExposure",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer",
+                  "code": "yes",
+                  "display": "Ja"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "organDonation",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer",
+                  "code": "yes",
+                  "display": "Ja"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Immunization/13",
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "13",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD"
+          ]
+        },
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://ec.europa.eu/health/documents/community-register/html/",
+              "code": "EU/1/20/1528",
+              "display": "Comirnaty"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/5"
+        },
+        "occurrenceDateTime": "2021-07"
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Immunization/14",
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "14",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD"
+          ]
+        },
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://ec.europa.eu/health/documents/community-register/html/",
+              "code": "ASKU",
+              "display": "nicht ermittelbar"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/5"
+        },
+        "occurrenceDateTime": "2021-11-30"
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Immunization/15",
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "15",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD"
+          ]
+        },
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://ec.europa.eu/health/documents/community-register/html/",
+              "code": "otherVaccine",
+              "display": "Anderer Impfstoff"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/5"
+        },
+        "occurrenceDateTime": "2021-12-25"
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/Immunization/16",
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "16",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD"
+          ]
+        },
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://ec.europa.eu/health/documents/community-register/html/",
+              "code": "EU/1/20/1528",
+              "display": "Comirnaty"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/5"
+        },
+        "occurrenceDateTime": "2021"
+      }
+    },
+    {
+      "fullUrl": "https://demis.rki.de/fhir/QuestionnaireResponse/9",
+      "resource": {
+        "resourceType": "QuestionnaireResponse",
+        "id": "9",
+        "meta": {
+          "profile": [
+            "https://demis.rki.de/fhir/StructureDefinition/DiseaseInformationCVDD"
+          ]
+        },
+        "questionnaire": "https://demis.rki.de/fhir/Questionnaire/DiseaseQuestionsCVDD",
+        "status": "completed",
+        "subject": {
+          "reference": "Patient/5"
+        },
+        "item": [
+          {
+            "linkId": "infectionSource",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor",
+                  "code": "NASK"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "infectionEnvironmentSetting",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor",
+                  "code": "NASK"
+                }
+              }
+            ]
+          },
+          {
+            "linkId": "immunization",
+            "answer": [
+              {
+                "valueCoding": {
+                  "system": "https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer",
+                  "code": "yes",
+                  "display": "Ja"
+                },
+                "item": [
+                  {
+                    "linkId": "immunizationRef",
+                    "answer": [
+                      {
+                        "valueReference": {
+                          "reference": "Immunization/13"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "immunizationRef",
+                    "answer": [
+                      {
+                        "valueReference": {
+                          "reference": "Immunization/14"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "immunizationRef",
+                    "answer": [
+                      {
+                        "valueReference": {
+                          "reference": "Immunization/15"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "immunizationRef",
+                    "answer": [
+                      {
+                        "valueReference": {
+                          "reference": "Immunization/16"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.examples;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.examples;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +29,12 @@ import ca.uhn.fhir.context.FhirContext;
 import de.gematik.demis.fhirparserlibrary.FhirParser;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.NotifierDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.*;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.LaboratoryReportDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NotificationBundleLaboratoryDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NotificationLaboratoryDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.PathogenDetectionDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.SpecimenDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.SubmitterDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.HumanNameDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.OrganizationBuilder;
@@ -38,13 +47,30 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
-import org.hl7.fhir.r4.model.*;
+import java.util.List;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Specimen;
+import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.Type;
 import org.junit.jupiter.api.Test;
 
 class LaboratoryNotificationExamplesTest {
 
-  FhirContext fhirContext = FhirContext.forR4();
-  FhirParser fhirParser = new FhirParser(fhirContext);
+  FhirParser fhirParser = new FhirParser(FhirContext.forR4Cached());
 
   @Test
   void shouldCreateACustomLaboratoyINVPNotification() {
@@ -195,7 +221,7 @@ class LaboratoryNotificationExamplesTest {
     humanNameDataBuilder.setFamilyName(familyName);
     humanNameDataBuilder.addGivenName(givenName);
     humanNameDataBuilder.addPrefix(prefix);
-    HumanName humanName = humanNameDataBuilder.buildHumanName();
+    HumanName humanName = humanNameDataBuilder.build();
     notifiedPersonDataBuilder.setHumanName(humanName);
     // gender
     notifiedPersonDataBuilder.setGender(gender);
@@ -204,14 +230,14 @@ class LaboratoryNotificationExamplesTest {
     telefonNumberExampleBuilder.setValue(telephoneNumber);
     telefonNumberExampleBuilder.setSystem(phone);
     telefonNumberExampleBuilder.setUse(phoneUse);
-    ContactPoint telephoneNumberCP = telefonNumberExampleBuilder.buildContactPoint();
+    ContactPoint telephoneNumberCP = telefonNumberExampleBuilder.build();
     notifiedPersonDataBuilder.addTelecom(telephoneNumberCP);
 
     TelecomDataBuilder emailAddressExampleBuilder = new TelecomDataBuilder();
     emailAddressExampleBuilder.setValue(emailAddress);
     emailAddressExampleBuilder.setSystem(email);
     emailAddressExampleBuilder.setUse(emailUse);
-    ContactPoint emailCP = emailAddressExampleBuilder.buildContactPoint();
+    ContactPoint emailCP = emailAddressExampleBuilder.build();
     notifiedPersonDataBuilder.addTelecom(emailCP);
 
     notifiedPersonDataBuilder.setTelecom(
@@ -233,7 +259,7 @@ class LaboratoryNotificationExamplesTest {
             .build();
     notifiedPersonDataBuilder.addAddress(address);
 
-    Patient notifiedPerson = notifiedPersonDataBuilder.buildNotifiedPerson();
+    Patient notifiedPerson = notifiedPersonDataBuilder.build();
 
     // Notifier
     NotifierDataBuilder notifierDataBuilder = new NotifierDataBuilder();
@@ -260,7 +286,7 @@ class LaboratoryNotificationExamplesTest {
 
     notifierDataBuilder.addNotifierId();
 
-    ContactPoint phoneCP = telecomDataBuilder.buildContactPoint();
+    ContactPoint phoneCP = telecomDataBuilder.build();
     notifierDataBuilder.addNotifierTelecom(phoneCP);
 
     AddressDataBuilder notifierAddressData = new AddressDataBuilder();
@@ -285,7 +311,7 @@ class LaboratoryNotificationExamplesTest {
             .setValue(submitterEmailValue)
             .setUse(submitterEmailUse)
             .setSystem(submitterEmailSystem)
-            .buildContactPoint());
+            .build());
     AddressDataBuilder submitterAddressBuilder = new AddressDataBuilder();
     submitterAddressBuilder.setHouseNumber(submitterHouseNumber);
     submitterAddressBuilder.setStreet(submitterStreet);
@@ -376,12 +402,10 @@ class LaboratoryNotificationExamplesTest {
     notificationLaboratoryDataBuilder.setSectionComponentDisplay(
         notificationLaboratorySectionCompomentyDisplay);
 
-    notificationLaboratoryDataBuilder.addIdentifier();
-    notificationLaboratoryDataBuilder.addNotificationLaboratoryId();
-
-    Composition notificationLaboratory =
-        notificationLaboratoryDataBuilder.buildNotificationLaboratory(
-            notifiedPerson, notifierRole, laboratoryReport);
+    notificationLaboratoryDataBuilder.setNotifiedPerson(notifiedPerson);
+    notificationLaboratoryDataBuilder.setNotifierRole(notifierRole);
+    notificationLaboratoryDataBuilder.setLaboratoryReport(laboratoryReport);
+    Composition notificationLaboratory = notificationLaboratoryDataBuilder.build();
 
     // NotifcationBundleLaboratory
     NotificationBundleLaboratoryDataBuilder notificationBundleLaboratoryDataBuilder =
@@ -391,10 +415,10 @@ class LaboratoryNotificationExamplesTest {
             .setSubmitterRole(submitterRole)
             .setLaboratoryReport(laboratoryReport)
             .setPathogenDetection(Collections.singletonList(pathogenDetection))
-            .setSpecimen(specimen)
+            .setSpecimen(List.of(specimen))
             .setNotificationLaboratory(notificationLaboratory);
 
-    Bundle bundle = notificationBundleLaboratoryDataBuilder.buildLaboratoryBundle();
+    Bundle bundle = notificationBundleLaboratoryDataBuilder.build();
 
     String laboratoryNotificationAsString = fhirParser.encodeToJson(bundle);
     assertThat(bundle).isNotNull();
@@ -536,14 +560,14 @@ class LaboratoryNotificationExamplesTest {
     telefonNumberExampleBuilder.setValue(telephoneNumber);
     telefonNumberExampleBuilder.setSystem(phone);
     telefonNumberExampleBuilder.setUse(phoneUse);
-    ContactPoint telephoneNumberCP = telefonNumberExampleBuilder.buildContactPoint();
+    ContactPoint telephoneNumberCP = telefonNumberExampleBuilder.build();
     notifiedPersonDataBuilder.addTelecom(telephoneNumberCP);
 
     TelecomDataBuilder emailAddressExampleBuilder = new TelecomDataBuilder();
     emailAddressExampleBuilder.setValue(emailAddress);
     emailAddressExampleBuilder.setSystem(email);
     emailAddressExampleBuilder.setUse(emailUse);
-    ContactPoint emailCP = emailAddressExampleBuilder.buildContactPoint();
+    ContactPoint emailCP = emailAddressExampleBuilder.build();
     notifiedPersonDataBuilder.addTelecom(emailCP);
 
     notifiedPersonDataBuilder.setTelecom(
@@ -565,7 +589,7 @@ class LaboratoryNotificationExamplesTest {
             .build();
     notifiedPersonDataBuilder.addAddress(address);
 
-    Patient notifiedPerson = notifiedPersonDataBuilder.buildNotifiedPerson();
+    Patient notifiedPerson = notifiedPersonDataBuilder.build();
 
     // Notifier
     NotifierDataBuilder notifierDataBuilder = new NotifierDataBuilder();
@@ -592,7 +616,7 @@ class LaboratoryNotificationExamplesTest {
 
     notifierDataBuilder.addNotifierId();
 
-    ContactPoint phoneCP = telecomDataBuilder.buildContactPoint();
+    ContactPoint phoneCP = telecomDataBuilder.build();
     notifierDataBuilder.addNotifierTelecom(phoneCP);
 
     AddressDataBuilder notifierAddressData = new AddressDataBuilder();
@@ -614,7 +638,7 @@ class LaboratoryNotificationExamplesTest {
             .setValue(submitterEmailValue)
             .setUse(submitterEmailUse)
             .setSystem(submitterEmailSystem)
-            .buildContactPoint();
+            .build();
 
     Address submitterAddress =
         new AddressDataBuilder()
@@ -628,7 +652,7 @@ class LaboratoryNotificationExamplesTest {
     Organization submitterFacility =
         new OrganizationBuilder()
             .asSubmittingFacility()
-            .setDefaultData()
+            .setDefaults()
             .setFacilityName(submitterName)
             .setTelecomList(Collections.singletonList(submitterTelecom))
             .setAddress(submitterAddress)
@@ -713,10 +737,10 @@ class LaboratoryNotificationExamplesTest {
             .setSubmitterRole(submitterRole)
             .setLaboratoryReport(laboratoryReport)
             .setPathogenDetection(Collections.singletonList(pathogenDetection))
-            .setSpecimen(specimen)
+            .setSpecimen(List.of(specimen))
             .setNotificationLaboratory(notificationLaboratory);
 
-    Bundle bundle = notificationBundleLaboratoryDataBuilder.buildLaboratoryBundle();
+    Bundle bundle = notificationBundleLaboratoryDataBuilder.build();
 
     String laboratoryNotificationAsString = fhirParser.encodeToJson(bundle);
     assertThat(bundle).isNotNull();

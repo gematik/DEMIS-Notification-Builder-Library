@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIER;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_SUBMITTING_PERSON;
@@ -24,18 +28,13 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Setter;
-import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.*;
 
 @Setter
-public class PractitionerBuilder {
+public class PractitionerBuilder implements InitializableFhirObjectBuilder {
 
   public static final String SALUTATION_SYSTEM =
       "https://demis.rki.de/fhir/StructureDefinition/Salutation";
@@ -56,33 +55,37 @@ public class PractitionerBuilder {
   /**
    * sets all relevant notifier data
    *
-   * @return
+   * @return builder
    */
   public PractitionerBuilder asNotifier() {
-    metaProfileUrl = PROFILE_NOTIFIER;
-    isNotifierPrac = true;
+    this.metaProfileUrl = PROFILE_NOTIFIER;
+    this.isNotifierPrac = true;
     return this;
   }
 
   /**
    * sets all relevant submitter data
    *
-   * @return
+   * @return builder
    */
   public PractitionerBuilder asSubmittingPerson() {
-    metaProfileUrl = PROFILE_SUBMITTING_PERSON;
-    isNotifierPrac = false;
+    this.metaProfileUrl = PROFILE_SUBMITTING_PERSON;
+    this.isNotifierPrac = false;
     return this;
   }
 
-  public void setDefaultData() {
-    practitionerId = generateUuidString();
+  @Override
+  public PractitionerBuilder setDefaults() {
+    if (this.practitionerId == null) {
+      this.practitionerId = generateUuidString();
+    }
+    return this;
   }
 
+  @Override
   public Practitioner build() {
-
     Practitioner practitioner = new Practitioner();
-
+    practitioner.setId(Objects.requireNonNullElse(this.practitionerId, generateUuidString()));
     practitioner.addName(practitionerName);
     practitioner.setTelecom(telecomList);
     practitioner.addAddress(address);
@@ -92,10 +95,7 @@ public class PractitionerBuilder {
       t.setValue(new Coding(SALUTATION_SYSTEM, salutationCode, salutationDisplay));
       practitioner.addExtension(t);
     }
-
-    practitioner.setId(practitionerId);
     practitioner.setMeta(new Meta().addProfile(metaProfileUrl));
-
     return practitioner;
   }
 

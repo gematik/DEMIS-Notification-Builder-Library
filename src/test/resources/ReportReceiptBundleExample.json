@@ -60,7 +60,7 @@
       "contact": [ {
         "telecom": [ {
           "system": "email",
-          "value": "demis@rki.de"
+          "value": "demis-support@rki.de"
         } ]
       } ]
     }
@@ -76,13 +76,13 @@
       "name": "Robert Koch-Institut",
       "telecom": [ {
         "system": "email",
-        "value": "demis@rki.de"
+        "value": "demis-support@rki.de"
       } ],
       "address": [ {
         "line": [ "Nordufer 20" ],
         "city": "Berlin",
         "postalCode": "13353",
-        "country": "20422"
+        "country": "DE"
       } ]
     }
   } ]

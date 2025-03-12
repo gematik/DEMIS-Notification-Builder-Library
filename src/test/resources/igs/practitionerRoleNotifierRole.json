@@ -1,0 +1,12 @@
+{
+  "resourceType": "PractitionerRole",
+  "id": "c92c9646-e0c8-3c3d-840c-33e505648a5c",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/StructureDefinition/NotifierRole"
+    ]
+  },
+  "organization": {
+    "reference": "Organization/227a66a4-a2fe-34b9-ad24-55981d0d1d82"
+  }
+}

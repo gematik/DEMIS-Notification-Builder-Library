@@ -1,0 +1,19 @@
+{
+  "resourceType": "Substance",
+  "id": "8bdf9eb0-ba69-3d54-a228-ecf5f21036e2",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/igs/StructureDefinition/AdapterSubstance"
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "https://demis.rki.de/fhir/igs/CodeSystem/sequencingSubstances",
+        "code": "adapter",
+        "display": "Adapter"
+      }
+    ]
+  },
+  "description": "TAGCGAGT"
+}

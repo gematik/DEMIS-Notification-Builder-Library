@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +54,7 @@ class NotifiedPersonDataBuilderTest {
             .buildHumanName();
     notifiedPersonDataBuilder.setHumanName(humanName);
 
-    Patient patient = notifiedPersonDataBuilder.buildExampleNotifiedPerson();
+    Patient patient = notifiedPersonDataBuilder.build();
 
     assertThat(patient.getName()).hasSize(1);
     assertThat(patient.getName().get(0).getFamily()).isEqualTo("FAMILIENNAME");
@@ -62,7 +66,7 @@ class NotifiedPersonDataBuilderTest {
   void shouldSetGender() {
     notifiedPersonDataBuilder.setGender(Enumerations.AdministrativeGender.FEMALE);
 
-    Patient patient = notifiedPersonDataBuilder.buildExampleNotifiedPerson();
+    Patient patient = notifiedPersonDataBuilder.build();
 
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.FEMALE);
   }
@@ -71,7 +75,7 @@ class NotifiedPersonDataBuilderTest {
   void shouldSetNotifiedPersonId() {
     notifiedPersonDataBuilder.setId("SomeId");
 
-    Patient patient = notifiedPersonDataBuilder.buildExampleNotifiedPerson();
+    Patient patient = notifiedPersonDataBuilder.build();
 
     assertThat(patient.getId()).isEqualTo("SomeId");
   }
@@ -85,7 +89,7 @@ class NotifiedPersonDataBuilderTest {
         "current",
         "Derzeitiger Aufenthaltsort");
 
-    Patient patient = notifiedPersonDataBuilder.buildExampleNotifiedPerson();
+    Patient patient = notifiedPersonDataBuilder.build();
 
     assertThat(patient.getAddress()).hasSize(1);
     assertThat(patient.getAddress().get(0)).isEqualTo(someAddress);
@@ -97,20 +101,25 @@ class NotifiedPersonDataBuilderTest {
     Date birthdate = Date.from(localDateHelper.atStartOfDay(ZoneId.systemDefault()).toInstant());
     notifiedPersonDataBuilder.setBirthdate(birthdate);
 
-    Patient patient = notifiedPersonDataBuilder.buildExampleNotifiedPerson();
+    Patient patient = notifiedPersonDataBuilder.build();
 
     assertThat(patient.getBirthDate()).isEqualTo(birthdate);
   }
 
   @Test
-  void shouldSetIdWithSetDefault() {
+  void setDefaults_shouldSetValues() {
     try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
       utilities.when(Utils::generateUuidString).thenReturn("SomeId");
-      notifiedPersonDataBuilder.setDefaultValues();
-
-      Patient patient = notifiedPersonDataBuilder.buildExampleNotifiedPerson();
-
+      notifiedPersonDataBuilder.setDefaults();
+      Patient patient = notifiedPersonDataBuilder.build();
       assertThat(patient.getId()).isEqualTo("SomeId");
     }
+  }
+
+  @Test
+  void setDefaults_shouldKeepValues() {
+    String id = "init-id";
+    Patient patient = new NotifiedPersonDataBuilder().setId(id).setDefaults().build();
+    assertThat(patient.getId()).isEqualTo(id);
   }
 }

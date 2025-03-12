@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hl7.fhir.r4.model.Specimen.SpecimenStatus.AVAILABLE;
@@ -25,6 +29,12 @@ import static org.hl7.fhir.r4.model.Specimen.SpecimenStatus.UNAVAILABLE;
 import static org.hl7.fhir.r4.model.Specimen.SpecimenStatus.UNSATISFACTORY;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
+import de.gematik.demis.notification.builder.demis.fhir.testUtils.TestObjects;
+import java.util.Date;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Specimen;
@@ -120,6 +130,101 @@ class SpecimenDataBuilderTest {
       SpecimenDataBuilder specimenDataBuilder1 = new SpecimenDataBuilder();
       specimenDataBuilder1.setStatusToEnteredinerror();
       assertThat(specimenDataBuilder1.build().getStatus()).isEqualTo(ENTEREDINERROR);
+    }
+  }
+
+  @Nested
+  @DisplayName("copy of method tests")
+  class CopyOfTest {
+    private Specimen createSpecimen() {
+      Specimen specimen = new Specimen();
+      specimen.setMeta(new Meta().addProfile("https://example.com/profile"));
+      specimen.setStatus(Specimen.SpecimenStatus.AVAILABLE);
+      specimen.setType(
+          new CodeableConcept().addCoding(new Coding("typeSystem", "typeCode", "typeDisplay")));
+      specimen.setReceivedTime(new Date());
+      Specimen.SpecimenCollectionComponent collection = new Specimen.SpecimenCollectionComponent();
+      collection.setCollected(new DateTimeType(new Date()));
+      specimen.setCollection(collection);
+      specimen.addProcessing().setDescription("processing");
+      specimen.addNote().setText("note");
+      return specimen;
+    }
+
+    @Test
+    void shouldCopyMetaProfileUrl() {
+      Specimen originalSpecimen = createSpecimen();
+
+      final Specimen result =
+          SpecimenDataBuilder.deepCopy(
+              originalSpecimen, TestObjects.notifiedPerson(), TestObjects.submitter());
+      assertThat(result.getMeta().getProfile().getFirst().getValue())
+          .isEqualTo("https://example.com/profile");
+    }
+
+    @Test
+    void shouldCopyStatus() {
+      Specimen originalSpecimen = createSpecimen();
+
+      final Specimen result =
+          SpecimenDataBuilder.deepCopy(
+              originalSpecimen, TestObjects.notifiedPerson(), TestObjects.submitter());
+      assertThat(result.getStatus()).isEqualTo(Specimen.SpecimenStatus.AVAILABLE);
+    }
+
+    @Test
+    void shouldCopyType() {
+      Specimen originalSpecimen = createSpecimen();
+
+      final Specimen result =
+          SpecimenDataBuilder.deepCopy(
+              originalSpecimen, TestObjects.notifiedPerson(), TestObjects.submitter());
+      assertThat(result.getType().getCodingFirstRep().getSystem()).isEqualTo("typeSystem");
+      assertThat(result.getType().getCodingFirstRep().getCode()).isEqualTo("typeCode");
+      assertThat(result.getType().getCodingFirstRep().getDisplay()).isEqualTo("typeDisplay");
+    }
+
+    @Test
+    void shouldCopyReceivedTime() {
+      Specimen originalSpecimen = createSpecimen();
+      Date receivedTime = originalSpecimen.getReceivedTime();
+
+      final Specimen result =
+          SpecimenDataBuilder.deepCopy(
+              originalSpecimen, TestObjects.notifiedPerson(), TestObjects.submitter());
+      assertThat(result.getReceivedTime()).isEqualTo(receivedTime);
+    }
+
+    @Test
+    void shouldCopyCollectedDate() {
+      Specimen originalSpecimen = createSpecimen();
+      Date collectedDate = originalSpecimen.getCollection().getCollectedDateTimeType().getValue();
+
+      final Specimen result =
+          SpecimenDataBuilder.deepCopy(
+              originalSpecimen, TestObjects.notifiedPerson(), TestObjects.submitter());
+      assertThat(result.getCollection().getCollectedDateTimeType().getValue())
+          .isEqualTo(collectedDate);
+    }
+
+    @Test
+    void shouldCopyProcessing() {
+      Specimen originalSpecimen = createSpecimen();
+
+      final Specimen result =
+          SpecimenDataBuilder.deepCopy(
+              originalSpecimen, TestObjects.notifiedPerson(), TestObjects.submitter());
+      assertThat(result.getProcessingFirstRep().getDescription()).isEqualTo("processing");
+    }
+
+    @Test
+    void shouldCopyNotes() {
+      Specimen originalSpecimen = createSpecimen();
+
+      final Specimen result =
+          SpecimenDataBuilder.deepCopy(
+              originalSpecimen, TestObjects.notifiedPerson(), TestObjects.submitter());
+      assertThat(result.getNoteFirstRep().getText()).isEqualTo("note");
     }
   }
 }

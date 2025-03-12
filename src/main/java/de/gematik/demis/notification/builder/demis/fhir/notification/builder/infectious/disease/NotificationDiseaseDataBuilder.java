@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,86 +19,177 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
 
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease;
-
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.*;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_NOTIFICATION_TYPE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_SECTION_CODE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_NOTIFICATION_ID;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
-import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import lombok.Setter;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.QuestionnaireResponse;
+import org.hl7.fhir.r4.model.Reference;
 
+/** Composition builder of disease notification */
 @Setter
-public class NotificationDiseaseDataBuilder {
+public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBuilder {
+
+  private static final String PROFILE_URL =
+      "https://demis.rki.de/fhir/StructureDefinition/NotificationDisease";
 
   private String id;
   private String profileUrl;
   private String status;
-  private String typeSystem;
-  private String typeCode;
-  private String typeDisplay;
+  private Coding type;
   private String title;
   private DateTimeType date;
-  private String diseaseSystem;
-  private String diseaseCode;
-  private String diseaseDisplay;
-  private String commonDiseaseInformationSystem;
-  private String commonDiseaseInformationCode;
-  private String commonDiseaseInformationDisplay;
-  private String specificDiseaseInformationSystem;
-  private String specificDiseaseInformationCode;
-  private String specificDiseaseInformationDisplay;
-  private String identifierSystem;
-  private String identifierValue;
-  private String categorySystem;
-  private String categoryCode;
-  private String categoryDisplay;
+  private Identifier identifier;
+  private Coding category;
 
-  public Composition buildNotificationDisease(
-      Patient notifiedPerson,
-      PractitionerRole notifierRole,
-      Condition disease,
-      QuestionnaireResponse commonQuestionnaireResponse,
-      QuestionnaireResponse specificQuestionnaireResponse) {
+  private Patient notifiedPerson;
+  private PractitionerRole notifierRole;
+  private Condition disease;
+  private QuestionnaireResponse commonQuestionnaireResponse;
+  private QuestionnaireResponse specificQuestionnaireResponse;
 
+  @Override
+  public Composition build() {
     Composition composition = new Composition();
-
-    id = requireNonNullElse(id, generateUuidString());
-    composition.setId(id);
-
+    addId(composition);
     addTitle(composition);
     addDate(composition);
     addIdentifier(composition);
-
-    addMetaProfileIfSet(composition);
-    addStatusIfSet(composition);
+    addMetaProfile(composition);
+    addStatus(composition);
     addType(composition);
     addCategory(composition);
-
-    composition.setSubject(new Reference(notifiedPerson));
-    composition.addAuthor(new Reference(notifierRole));
-
-    addDiseaseSection(disease, composition);
-    addCommonQuestionnaireResponse(commonQuestionnaireResponse, composition);
-    addSpecificQuestionnaireResponse(specificQuestionnaireResponse, composition);
-
+    addSubject(composition);
+    addNotifierRole(composition);
+    addDiseaseSections(composition);
     return composition;
   }
 
+  /**
+   * Set default values:
+   *
+   * <ul>
+   *   <li>title
+   *   <li>document type
+   *   <li>document category
+   *   <li>ID
+   *   <li>notification ID
+   *   <li>status
+   *   <li>date
+   * </ul>
+   */
+  @Override
+  public NotificationDiseaseDataBuilder setDefaults() {
+    if (this.id == null) {
+      setId(generateUuidString());
+    }
+    if (this.title == null) {
+      setTitle(DemisConstants.DISEASE_COMPOSITION_TITLE);
+    }
+    if (this.type == null) {
+      setType(
+          new Coding(
+              DemisConstants.NOTIFICATION_STANDARD_TYPE_SYSTEM,
+              DemisConstants.NOTIFICATION_STANDARD_TYPE_CODE,
+              DemisConstants.NOTIFICATION_STANDARD_TYPE_DISPLAY));
+    }
+    if (this.category == null) {
+      setCategory(
+          new Coding(
+              CODE_SYSTEM_NOTIFICATION_TYPE,
+              DemisConstants.DISEASE_NOTIFICATION_TYPE_CODE,
+              DemisConstants.DISEASE_NOTIFICATION_TYPE_DISPLAY));
+    }
+    if (this.identifier == null) {
+      setIdentifierAsNotificationId(generateUuidString());
+    }
+    if (this.status == null) {
+      setStatus("final");
+    }
+    if (this.date == null) {
+      setDate(DateTimeType.now());
+    }
+    return this;
+  }
+
+  public NotificationDiseaseDataBuilder setStatus(Composition.CompositionStatus status) {
+    this.status = status.name();
+    return this;
+  }
+
+  public NotificationDiseaseDataBuilder setStatus(String status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * Set identifier with notification ID value
+   *
+   * @param notificationId notification ID
+   * @return builder
+   */
+  public NotificationDiseaseDataBuilder setIdentifierAsNotificationId(String notificationId) {
+    this.identifier =
+        new Identifier().setSystem(NAMING_SYSTEM_NOTIFICATION_ID).setValue(notificationId);
+    return this;
+  }
+
+  public NotificationDiseaseDataBuilder setProfileUrlByDisease(String disease) {
+    setProfileUrl(
+        NotificationBundleDiseaseDataBuilder.createDiseaseSpecificUrl(PROFILE_URL, disease));
+    return this;
+  }
+
+  private void addDiseaseSections(Composition composition) {
+    addDiseaseSection(this.disease, composition);
+    addCommonInformationSection(this.commonQuestionnaireResponse, composition);
+    if (this.specificQuestionnaireResponse != null) {
+      addSpecificInformationSection(this.specificQuestionnaireResponse, composition);
+    }
+  }
+
+  private void addSubject(Composition composition) {
+    if (this.notifiedPerson != null) {
+      composition.setSubject(new Reference(this.notifiedPerson));
+    }
+  }
+
+  private void addNotifierRole(Composition composition) {
+    if (this.notifierRole != null) {
+      composition.addAuthor(new Reference(this.notifierRole));
+    }
+  }
+
+  private void addId(Composition composition) {
+    composition.setId(this.id);
+  }
+
   private void addCategory(Composition composition) {
-    if (isNotBlank(categoryCode) || isNotBlank(categoryDisplay) || isNotBlank(categorySystem)) {
-      composition.addCategory(
-          new CodeableConcept(new Coding(categorySystem, categoryCode, categoryDisplay)));
+    if (this.category != null) {
+      composition.addCategory(new CodeableConcept(this.category));
     }
   }
 
   private void addIdentifier(Composition composition) {
-    if (isNotBlank(identifierSystem) || isNotBlank(identifierValue)) {
-      composition.setIdentifier(
-          new Identifier().setValue(identifierValue).setSystem(identifierSystem));
+    if (this.identifier != null) {
+      composition.setIdentifier(this.identifier);
     }
   }
 
@@ -109,21 +205,7 @@ public class NotificationDiseaseDataBuilder {
     }
   }
 
-  private void addSpecificQuestionnaireResponse(
-      QuestionnaireResponse specificQuestionnaireResponse, Composition composition) {
-    composition.addSection(
-        new Composition.SectionComponent()
-            .setTitle("Meldetatbestandsspezifische klinische und epidemiologische Angaben")
-            .setCode(
-                new CodeableConcept(
-                    new Coding(
-                        specificDiseaseInformationSystem,
-                        specificDiseaseInformationCode,
-                        specificDiseaseInformationDisplay)))
-            .addEntry(new Reference(specificQuestionnaireResponse)));
-  }
-
-  private void addCommonQuestionnaireResponse(
+  private void addCommonInformationSection(
       QuestionnaireResponse commonQuestionnaireResponse, Composition composition) {
     composition.addSection(
         new Composition.SectionComponent()
@@ -131,85 +213,50 @@ public class NotificationDiseaseDataBuilder {
             .setCode(
                 new CodeableConcept(
                     new Coding(
-                        commonDiseaseInformationSystem,
-                        commonDiseaseInformationCode,
-                        commonDiseaseInformationDisplay)))
+                        CODE_SYSTEM_SECTION_CODE,
+                        DemisConstants.DISEASE_SECTION_COMMON_CODE,
+                        DemisConstants.DISEASE_SECTION_COMMON_DISPLAY)))
             .addEntry(new Reference(commonQuestionnaireResponse)));
+  }
+
+  private void addSpecificInformationSection(
+      QuestionnaireResponse specificQuestionnaireResponse, Composition composition) {
+    composition.addSection(
+        new Composition.SectionComponent()
+            .setTitle("Meldetatbestandsspezifische klinische und epidemiologische Angaben")
+            .setCode(
+                new CodeableConcept(
+                    new Coding(
+                        CODE_SYSTEM_SECTION_CODE,
+                        DemisConstants.DISEASE_SECTION_SPECIFIC_CODE,
+                        DemisConstants.DISEASE_SECTION_SPECIFIC_DISPLAY)))
+            .addEntry(new Reference(specificQuestionnaireResponse)));
   }
 
   private void addDiseaseSection(Condition disease, Composition composition) {
     composition.addSection(
         new Composition.SectionComponent()
             .setTitle("disease")
-            .setCode(new CodeableConcept(new Coding(diseaseSystem, diseaseCode, diseaseDisplay)))
+            .setCode(
+                new CodeableConcept(new Coding(CODE_SYSTEM_SECTION_CODE, "diagnosis", "Diagnose")))
             .addEntry(new Reference(disease)));
   }
 
   private void addType(Composition composition) {
-    Coding typeCoding = new Coding(typeSystem, typeCode, typeDisplay);
-    composition.setType(new CodeableConcept(typeCoding));
+    if (this.type != null) {
+      composition.setType(new CodeableConcept(this.type));
+    }
   }
 
-  private void addStatusIfSet(Composition composition) {
+  private void addStatus(Composition composition) {
     if (isNotBlank(status)) {
       composition.setStatus(Composition.CompositionStatus.valueOf(status.toUpperCase()));
     }
   }
 
-  private void addMetaProfileIfSet(Composition composition) {
+  private void addMetaProfile(Composition composition) {
     if (isNotBlank(profileUrl)) {
       composition.setMeta(new Meta().addProfile(profileUrl));
     }
-  }
-
-  public Composition buildExampleCVDDNotificationDisease(
-      Patient notifiedPerson,
-      PractitionerRole notifierRole,
-      Condition disease,
-      QuestionnaireResponse commonQuestionnaireResponse,
-      QuestionnaireResponse specificQuestionnaireResponse) {
-
-    profileUrl = requireNonNullElse(profileUrl, PROFILE_NOTIFICATION_DISEASE);
-    status = requireNonNullElse(status, "final");
-    typeSystem = requireNonNullElse(typeSystem, "http://loinc.org");
-    typeCode = requireNonNullElse(typeCode, "34782-3");
-    typeDisplay = requireNonNullElse(typeDisplay, "Infectious disease Note");
-
-    title = requireNonNullElse(title, "Meldung gemäß §6 Absatz 1, 2 IfSG");
-    date = requireNonNullElse(date, new DateTimeType("2022-03-10"));
-
-    identifierSystem = requireNonNullElse(identifierSystem, NAMING_SYSTEM_NOTIFICATION_ID);
-    identifierValue = requireNonNullElse(identifierValue, generateUuidString());
-
-    categorySystem = requireNonNullElse(categorySystem, CODE_SYSTEM_NOTIFICATION_TYPE);
-    categoryCode = requireNonNullElse(categoryCode, "6.1_2");
-    categoryDisplay = requireNonNullElse(categoryDisplay, "Meldung gemäß IfSG §6 Absatz 1, 2");
-
-    disease =
-        requireNonNullElse(
-            disease, new DiseaseDataBuilder().buildCVDDexampleDisease(notifiedPerson));
-
-    title = requireNonNullElse(title, "Meldung gemäß Absatz 1, 2 IfSG");
-
-    diseaseSystem = CODE_SYSTEM_SECTION_CODE;
-    diseaseCode = "diagnosis";
-    diseaseDisplay = "Diagnose";
-
-    commonDiseaseInformationSystem = CODE_SYSTEM_SECTION_CODE;
-    commonDiseaseInformationCode = "generalClinAndEpiInformation";
-    commonDiseaseInformationDisplay =
-        "Meldetatbestandsübergreifende klinische und epidemiologische Angaben";
-
-    specificDiseaseInformationSystem = CODE_SYSTEM_SECTION_CODE;
-    specificDiseaseInformationCode = "specificClinAndEpiInformation";
-    specificDiseaseInformationDisplay =
-        "Meldetatbestandsspezifische klinische und epidemiologische Angaben";
-
-    return buildNotificationDisease(
-        notifiedPerson,
-        notifierRole,
-        disease,
-        commonQuestionnaireResponse,
-        specificQuestionnaireResponse);
   }
 }

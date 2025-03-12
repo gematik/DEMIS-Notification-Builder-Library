@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,47 +19,62 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_CODE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_DISPLAY;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDate;
+import static org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.APPENDS;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import java.util.Date;
+import javax.annotation.CheckForNull;
+import lombok.Getter;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
-import org.hl7.fhir.r4.model.Reference;
 
-public class CompositionBuilder<T extends CompositionBuilder<T>> {
+@Getter
+public abstract class CompositionBuilder<T extends CompositionBuilder> {
 
-  protected String typeSystem;
-  protected String typeCode;
-  protected String typeDisplay;
-  protected String title;
-  protected String notificationId;
-  protected Patient notifiedPerson;
-  protected PractitionerRole notifierRole;
-  protected Composition.CompositionStatus compositionStatus;
-  protected String codeAndCategorySystem;
-  protected String codeAndCategoryCode;
-  protected String codeAndCategoryDisplay;
-  protected Date date;
-  protected String identifierSystem;
-  protected String identifierValue;
-  protected String metaUrl;
-  protected String relatesTo;
+  private String typeSystem;
+  private String typeCode;
+  private String typeDisplay;
+  private String title;
+  private String notificationId;
+  @CheckForNull private Patient notifiedPerson;
+  @CheckForNull private PractitionerRole notifierRole;
+  private Composition.CompositionStatus compositionStatus;
+  private String codeAndCategorySystem;
+  private String codeAndCategoryCode;
+  private String codeAndCategoryDisplay;
+  private Date date;
+  private String identifierSystem;
+  private String identifierValue;
+  private String metaUrl;
+  private String relatesTo;
+  private Composition.DocumentRelationshipType relatesToCode = APPENDS;
+  private String relatesToReferenceType = "Composition";
 
-  public CompositionBuilder<T> setRelatesToNotificationId(String relatesTo) {
+  public T setRelatesToNotificationId(String relatesTo) {
     this.relatesTo = relatesTo;
-    return this;
+    return (T) this;
+  }
+
+  public T setRelatesToCode(Composition.DocumentRelationshipType relatesToCode) {
+    this.relatesToCode = relatesToCode;
+    return (T) this;
+  }
+
+  public T setRelatesToReferenceType(String relatesToReferenceType) {
+    this.relatesToReferenceType = relatesToReferenceType;
+    return (T) this;
   }
 
   public T setMetaUrl(String metaUrl) {
@@ -132,7 +152,7 @@ public class CompositionBuilder<T extends CompositionBuilder<T>> {
     return (T) this;
   }
 
-  protected void setDefaultdData() {
+  protected void setDefaultData() {
     // standard type code/system for laboratory notification
     typeSystem = NOTIFICATION_STANDARD_TYPE_SYSTEM;
     typeCode = NOTIFICATION_STANDARD_TYPE_CODE;
@@ -140,6 +160,8 @@ public class CompositionBuilder<T extends CompositionBuilder<T>> {
     date = getCurrentDate();
     identifierValue = generateUuidString();
     notificationId = generateUuidString();
+
+    metaUrl = getDefaultProfileUrl();
   }
 
   protected Composition build() {
@@ -147,8 +169,12 @@ public class CompositionBuilder<T extends CompositionBuilder<T>> {
     newComposition.setTitle(title);
     newComposition.setId(notificationId);
     newComposition.setStatus(compositionStatus);
-    newComposition.setSubject(new Reference(notifiedPerson));
-    newComposition.addAuthor(new Reference(notifierRole));
+    if (notifiedPerson != null) {
+      newComposition.setSubject(ReferenceUtils.internalReference(notifiedPerson));
+    }
+    if (notifierRole != null) {
+      newComposition.addAuthor(ReferenceUtils.internalReference(notifierRole));
+    }
     newComposition.setMeta(new Meta().addProfile(metaUrl));
 
     Coding codeAndCategroyCoding =
@@ -184,4 +210,6 @@ public class CompositionBuilder<T extends CompositionBuilder<T>> {
     this.compositionStatus = Composition.CompositionStatus.ENTEREDINERROR;
     return (T) this;
   }
+
+  protected abstract String getDefaultProfileUrl();
 }

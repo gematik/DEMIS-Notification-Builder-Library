@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,12 +19,12 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.gematik.demis.notification.builder.demis.fhir.testUtils.TestObjects;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Patient;
@@ -96,10 +101,11 @@ class NotificationLaboratoryDataBuilderTest {
 
   @Test
   void shouldSetMandatoryFieldsAsGiven() {
+    notificationLaboratoryDataBuilder.setNotifiedPerson(notifiedPerson);
+    notificationLaboratoryDataBuilder.setNotifierRole(notifierRole);
+    notificationLaboratoryDataBuilder.setLaboratoryReport(laboratoryReport);
 
-    Composition composition =
-        notificationLaboratoryDataBuilder.buildExampleComposition(
-            notifiedPerson, notifierRole, laboratoryReport);
+    Composition composition = notificationLaboratoryDataBuilder.build();
 
     assertThat(composition.getSubject().getResource()).isEqualTo(notifiedPerson);
     assertThat(composition.getAuthor()).hasSize(1);
@@ -117,9 +123,7 @@ class NotificationLaboratoryDataBuilderTest {
     notificationLaboratoryDataBuilder.setTypeDisplay("typeDisplay");
     notificationLaboratoryDataBuilder.setTypeSystem("typeSystem");
 
-    Composition composition =
-        notificationLaboratoryDataBuilder.buildExampleComposition(
-            notifiedPerson, notifierRole, laboratoryReport);
+    Composition composition = notificationLaboratoryDataBuilder.build();
 
     assertThat(composition.getType().getCoding()).hasSize(1);
     assertThat(composition.getType().getCoding().get(0).getDisplay()).isEqualTo("typeDisplay");
@@ -134,9 +138,7 @@ class NotificationLaboratoryDataBuilderTest {
     notificationLaboratoryDataBuilder.setCodeAndCategorySystem("codeAndCategorySystem");
     notificationLaboratoryDataBuilder.setCodeAndCategoryDisplay("codeAndCategoryDisplay");
 
-    Composition composition =
-        notificationLaboratoryDataBuilder.buildExampleComposition(
-            notifiedPerson, notifierRole, laboratoryReport);
+    Composition composition = notificationLaboratoryDataBuilder.build();
 
     assertThat(composition.getCategory()).hasSize(1);
     assertThat(composition.getCategory().get(0).getCoding()).hasSize(1);
@@ -154,9 +156,7 @@ class NotificationLaboratoryDataBuilderTest {
     notificationLaboratoryDataBuilder.setIdentifierSystem("identifierSystem");
     notificationLaboratoryDataBuilder.setIdentifierValue("identifierValue");
 
-    Composition composition =
-        notificationLaboratoryDataBuilder.buildExampleComposition(
-            notifiedPerson, notifierRole, laboratoryReport);
+    Composition composition = notificationLaboratoryDataBuilder.build();
 
     assertThat(composition.getIdentifier().getSystem()).isEqualTo("identifierSystem");
     assertThat(composition.getIdentifier().getValue()).isEqualTo("identifierValue");
@@ -167,9 +167,7 @@ class NotificationLaboratoryDataBuilderTest {
 
     notificationLaboratoryDataBuilder.setCompositionStatus(Composition.CompositionStatus.AMENDED);
 
-    Composition composition =
-        notificationLaboratoryDataBuilder.buildExampleComposition(
-            notifiedPerson, notifierRole, laboratoryReport);
+    Composition composition = notificationLaboratoryDataBuilder.build();
 
     assertThat(composition.getStatus()).isEqualTo(Composition.CompositionStatus.AMENDED);
   }
@@ -179,9 +177,7 @@ class NotificationLaboratoryDataBuilderTest {
 
     notificationLaboratoryDataBuilder.setNotificationId("someId");
 
-    Composition composition =
-        notificationLaboratoryDataBuilder.buildExampleComposition(
-            notifiedPerson, notifierRole, laboratoryReport);
+    Composition composition = notificationLaboratoryDataBuilder.build();
 
     assertThat(composition.getId()).isEqualTo("someId");
   }
@@ -202,5 +198,77 @@ class NotificationLaboratoryDataBuilderTest {
     assertThat(reference.getIdentifier().getValue()).isEqualTo("someIdentifier");
     assertThat(reference.getIdentifier().getSystem())
         .isEqualTo("https://demis.rki.de/fhir/NamingSystem/NotificationId");
+  }
+
+  @Test
+  @DisplayName("should set section component system, code, and display")
+  void shouldSetSectionComponentSystemCodeAndDisplay() {
+    notificationLaboratoryDataBuilder.setSectionComponentSystem("system");
+    notificationLaboratoryDataBuilder.setSectionComponentCode("code");
+    notificationLaboratoryDataBuilder.setSectionComponentDisplay("display");
+    notificationLaboratoryDataBuilder.setLaboratoryReport(TestObjects.laboratoryReport());
+
+    Composition composition = notificationLaboratoryDataBuilder.build();
+
+    assertThat(composition.getSectionFirstRep().getCode().getCodingFirstRep().getSystem())
+        .isEqualTo("system");
+    assertThat(composition.getSectionFirstRep().getCode().getCodingFirstRep().getCode())
+        .isEqualTo("code");
+    assertThat(composition.getSectionFirstRep().getCode().getCodingFirstRep().getDisplay())
+        .isEqualTo("display");
+  }
+
+  @Test
+  void thatSectionComponentCodingIsOnlySetWhenLaboratoryReportPresent() {
+    notificationLaboratoryDataBuilder.setSectionComponentSystem("system");
+    notificationLaboratoryDataBuilder.setSectionComponentCode("code");
+    notificationLaboratoryDataBuilder.setSectionComponentDisplay("display");
+
+    Composition composition = notificationLaboratoryDataBuilder.build();
+
+    assertThat(composition.getSectionFirstRep().getCode().getCodingFirstRep().getSystem()).isNull();
+    assertThat(composition.getSectionFirstRep().getCode().getCodingFirstRep().getCode()).isNull();
+    assertThat(composition.getSectionFirstRep().getCode().getCodingFirstRep().getDisplay())
+        .isNull();
+  }
+
+  @Test
+  @DisplayName("should set laboratory report reference in section component")
+  void shouldSetLaboratoryReportReferenceInSectionComponent() {
+    notificationLaboratoryDataBuilder.setLaboratoryReport(laboratoryReport);
+
+    Composition composition = notificationLaboratoryDataBuilder.build();
+
+    assertThat(composition.getSectionFirstRep().getEntryFirstRep().getResource())
+        .isEqualTo(laboratoryReport);
+  }
+
+  @Test
+  @DisplayName("should set default values when setDefault is called")
+  void shouldSetDefaultValuesWhenSetDefaultIsCalled() {
+    notificationLaboratoryDataBuilder.setDefault();
+
+    Composition composition = notificationLaboratoryDataBuilder.build();
+
+    assertThat(composition.getIdentifier().getSystem())
+        .isEqualTo("https://demis.rki.de/fhir/NamingSystem/NotificationId");
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getSystem())
+        .isEqualTo("http://loinc.org");
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getCode())
+        .isEqualTo("11502-2");
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getDisplay())
+        .isEqualTo("Laboratory report");
+  }
+
+  @Test
+  @DisplayName("should set meta profile URL")
+  void shouldSetMetaProfileUrl() {
+    notificationLaboratoryDataBuilder.setDefault();
+
+    Composition composition = notificationLaboratoryDataBuilder.build();
+
+    assertThat(composition.getMeta().getProfile())
+        .extracting("value")
+        .contains("https://demis.rki.de/fhir/StructureDefinition/NotificationLaboratory");
   }
 }

@@ -1,0 +1,37 @@
+{
+  "resourceType": "DiagnosticReport",
+  "id": "2e24f26e-c450-301c-ac1e-da2205a69e39",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/igs/StructureDefinition/LaboratoryReportSequence"
+    ]
+  },
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "system": "https://demis.rki.de/fhir/CodeSystem/notificationCategory",
+        "code": "cvdp"
+      }
+    ]
+  },
+  "conclusionCode": [
+    {
+      "coding": [
+        {
+          "system": "https://demis.rki.de/fhir/CodeSystem/conclusionCode",
+          "code": "pathogenDetected"
+        }
+      ]
+    }
+  ],
+  "subject": {
+    "reference": "Patient/3661f735-d3db-3c22-909d-3a16a7334c1d"
+  },
+  "issued": "2023-01-14T08:15:00.000+01:00",
+  "result": [
+    {
+      "reference": "Observation/30aefd63-f71c-39b2-9191-8c162310c9c2"
+    }
+  ]
+}
