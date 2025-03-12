@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,37 +19,91 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.ParserHelper;
-import org.hl7.fhir.r4.model.Bundle;
+import java.util.Collections;
+import java.util.List;
+import org.hl7.fhir.r4.model.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class NotificationBundleDiseaseDataBuilderTest {
 
-  @Test
-  void shouldCreateCVDDDiseaseNotification() {
+  private NotificationBundleDiseaseDataBuilder builder;
 
-    NotificationBundleDiseaseDataBuilder builder = new NotificationBundleDiseaseDataBuilder();
-    Bundle bundle = builder.buildExampleCVDDDiseaseBundle();
-    ParserHelper parserHelper = new ParserHelper();
-    String s = parserHelper.parseNotificationToJson(bundle);
-    assertThat(s)
-        .contains(
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/NotificationBundleDisease\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/NotificationDiseaseCVDD\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/NotifiedPerson\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/DiseaseCVDD\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/NotifierRole\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/NotifierFacility\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/Hospitalization\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/DiseaseInformationCommon\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/DiseaseInformationCVDD\" ]",
-            "\"profile\": [ \"https://demis.rki.de/fhir/StructureDefinition/NotificationBundleDisease\" ]");
+  @BeforeEach
+  void createMinimalBuilder() {
+    this.builder = new NotificationBundleDiseaseDataBuilder();
+    this.builder.setNotifiedPerson(new Patient());
+    this.builder.setDisease(new Condition());
+    this.builder.setCommonInformation(new QuestionnaireResponse());
+    this.builder.setSpecificInformation(new QuestionnaireResponse());
+  }
+
+  @Test
+  void testImmunizationSetters() {
+    Immunization i1 = new Immunization();
+    Immunization i2 = new Immunization();
+    assertThat(this.builder.addImmunization(i1)).isSameAs(this.builder);
+    assertThat(this.builder.setImmunizations(Collections.singletonList(i2))).isSameAs(this.builder);
+    List<Immunization> immunizations =
+        builder.build().getEntry().stream()
+            .map(Bundle.BundleEntryComponent::getResource)
+            .filter(Immunization.class::isInstance)
+            .map(Immunization.class::cast)
+            .toList();
+    assertThat(immunizations).containsExactly(i2);
+  }
+
+  @Test
+  void testHospitalizationSetters() {
+    Encounter e1 = new Encounter();
+    Encounter e2 = new Encounter();
+    assertThat(this.builder.addHospitalization(e1)).isSameAs(this.builder);
+    assertThat(this.builder.setHospitalizations(Collections.singletonList(e2)))
+        .isSameAs(this.builder);
+    List<Encounter> hospitalizations =
+        builder.build().getEntry().stream()
+            .map(Bundle.BundleEntryComponent::getResource)
+            .filter(Encounter.class::isInstance)
+            .map(Encounter.class::cast)
+            .toList();
+    assertThat(hospitalizations).containsExactly(e2);
+  }
+
+  @Test
+  void testOrganizationSetters() {
+    Organization o1 = new Organization();
+    Organization o2 = new Organization();
+    assertThat(this.builder.addOrganization(o1)).isSameAs(this.builder);
+    assertThat(this.builder.setOrganizations(Collections.singletonList(o2))).isSameAs(this.builder);
+    List<Organization> organizations =
+        builder.build().getEntry().stream()
+            .map(Bundle.BundleEntryComponent::getResource)
+            .filter(Organization.class::isInstance)
+            .map(Organization.class::cast)
+            .toList();
+    assertThat(organizations).containsExactly(o2);
+  }
+
+  @Test
+  void build_shouldHandleMissingSpecificQuestionnaireAndCreateComposition() {
+    Condition condition = new Condition();
+    condition
+        .getMeta()
+        .addProfile(NotificationBundleDiseaseDataBuilder.CONDITION_PROFILE_PREFIX + "CVDD");
+    this.builder.setDisease(condition);
+    this.builder.setSpecificInformation(null);
+    Composition composition = this.builder.createComposition().build();
+    assertThat(composition.getMeta().getProfile().getFirst().getValue())
+        .as("composition profile URL contains category")
+        .isEqualTo("https://demis.rki.de/fhir/StructureDefinition/NotificationDiseaseCVDD");
+    assertThat(composition.getSection()).hasSize(2);
+    this.builder.setNotificationDisease(composition);
+    Bundle bundle = this.builder.build();
+    assertThat(bundle).isNotNull();
   }
 }

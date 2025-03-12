@@ -1,0 +1,74 @@
+{
+  "resourceType": "Composition",
+  "id": "4a19589d-3ae8-3439-baea-b2e0f60a98b2",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/igs/StructureDefinition/NotificationSequence"
+    ]
+  },
+  "identifier": {
+    "system": "https://demis.rki.de/fhir/NamingSystem/NotificationId",
+    "value": "d1c9252a-9809-4f17-bc59-16d6b2abaaae"
+  },
+  "status": "final",
+  "type": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "34782-3",
+        "display": "Infectious disease Note"
+      }
+    ]
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "11502-2",
+          "display": "Laboratory report"
+        }
+      ]
+    }
+  ],
+  "subject": {
+    "reference": "Patient/3661f735-d3db-3c22-909d-3a16a7334c1d"
+  },
+  "date": "2023-01-14T08:16:00+01:00",
+  "author": [
+    {
+      "reference": "PractitionerRole/c92c9646-e0c8-3c3d-840c-33e505648a5c"
+    }
+  ],
+  "title": "Sequenzmeldung",
+  "relatesTo": [
+    {
+      "code": "appends",
+      "targetReference": {
+        "type": "Composition",
+        "identifier": {
+          "system": "https://demis.rki.de/fhir/NamingSystem/NotificationId",
+          "value": "f8585efb-1872-4a4f-b88d-8c889e93487b"
+        }
+      }
+    }
+  ],
+  "section": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "11502-2",
+            "display": "Laboratory report"
+          }
+        ]
+      },
+      "entry": [
+        {
+          "reference": "DiagnosticReport/2e24f26e-c450-301c-ac1e-da2205a69e39"
+        }
+      ]
+    }
+  ]
+}

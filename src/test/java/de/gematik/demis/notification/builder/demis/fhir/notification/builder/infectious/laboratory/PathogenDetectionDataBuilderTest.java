@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hl7.fhir.r4.model.Observation.ObservationStatus.AMENDED;
@@ -318,6 +322,135 @@ class PathogenDetectionDataBuilderTest {
           .isEqualTo("Negative");
       assertThat(observation.getInterpretationFirstRep().getCodingFirstRep().getSystem())
           .isEqualTo("http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation");
+    }
+  }
+
+  @Nested
+  @DisplayName("test copy of observation method")
+  class CopyOfTests {
+    private Observation createObservation() {
+      Observation observation = new Observation();
+      observation.setMeta(new Meta().addProfile("https://example.com/profile"));
+      observation.setStatus(Observation.ObservationStatus.FINAL);
+      observation.addCategory(
+          new CodeableConcept()
+              .addCoding(new Coding("categorySystem", "categoryCode", "categoryDisplay")));
+      observation.setCode(
+          new CodeableConcept()
+              .addCoding(
+                  new Coding(
+                      "observationCodeSystem", "observationCodeCode", "observationCodeDisplay")));
+      observation.setValue(new Quantity().setValue(500).setUnit("unit"));
+      observation.addInterpretation(
+          new CodeableConcept()
+              .addCoding(
+                  new Coding(
+                      "interpretationSystem", "interpretationCode", "interpretationDisplay")));
+      observation.setMethod(
+          new CodeableConcept()
+              .addCoding(new Coding("methodSystem", "methodCode", "methodDisplay")));
+      observation.addNote().setText("note");
+      return observation;
+    }
+
+    @Test
+    void shouldCopyMetaProfileUrl() {
+      Observation originalObservation = createObservation();
+
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getMeta().getProfile().get(0).getValue())
+          .isEqualTo("https://example.com/profile");
+    }
+
+    @Test
+    void shouldCopyStatus() {
+      Observation originalObservation = createObservation();
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getStatus()).isEqualTo(Observation.ObservationStatus.FINAL);
+    }
+
+    @Test
+    void shouldCopyCategory() {
+      Observation originalObservation = createObservation();
+
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getCategoryFirstRep().getCodingFirstRep().getSystem())
+          .isEqualTo("categorySystem");
+      assertThat(result.getCategoryFirstRep().getCodingFirstRep().getCode())
+          .isEqualTo("categoryCode");
+      assertThat(result.getCategoryFirstRep().getCodingFirstRep().getDisplay())
+          .isEqualTo("categoryDisplay");
+    }
+
+    @Test
+    void shouldCopyCode() {
+      Observation originalObservation = createObservation();
+
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getCode().getCodingFirstRep().getSystem())
+          .isEqualTo("observationCodeSystem");
+      assertThat(result.getCode().getCodingFirstRep().getCode()).isEqualTo("observationCodeCode");
+      assertThat(result.getCode().getCodingFirstRep().getDisplay())
+          .isEqualTo("observationCodeDisplay");
+    }
+
+    @Test
+    void shouldCopyValueQuantity() {
+      Observation originalObservation = createObservation();
+
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getValueQuantity().getValue().intValue()).isEqualTo(500);
+      assertThat(result.getValueQuantity().getUnit()).isEqualTo("unit");
+    }
+
+    @Test
+    void shouldCopyValueCodeableConcept() {
+      Observation originalObservation = createObservation();
+      originalObservation.setValue(
+          new CodeableConcept().addCoding(new Coding("valueSystem", "valueCode", "valueDisplay")));
+
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getValueCodeableConcept().getCodingFirstRep().getCode())
+          .isEqualTo("valueCode");
+    }
+
+    @Test
+    void shouldCopyInterpretation() {
+      Observation originalObservation = createObservation();
+
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getInterpretationFirstRep().getCodingFirstRep().getSystem())
+          .isEqualTo("interpretationSystem");
+      assertThat(result.getInterpretationFirstRep().getCodingFirstRep().getCode())
+          .isEqualTo("interpretationCode");
+      assertThat(result.getInterpretationFirstRep().getCodingFirstRep().getDisplay())
+          .isEqualTo("interpretationDisplay");
+    }
+
+    @Test
+    void shouldCopyMethod() {
+      Observation originalObservation = createObservation();
+
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getMethod().getCodingFirstRep().getSystem()).isEqualTo("methodSystem");
+      assertThat(result.getMethod().getCodingFirstRep().getCode()).isEqualTo("methodCode");
+      assertThat(result.getMethod().getCodingFirstRep().getDisplay()).isEqualTo("methodDisplay");
+    }
+
+    @Test
+    void shouldCopyNote() {
+      Observation originalObservation = createObservation();
+      final Observation result =
+          PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
+      assertThat(result.getNoteFirstRep().getText()).isEqualTo("note");
     }
   }
 }

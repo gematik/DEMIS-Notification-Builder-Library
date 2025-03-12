@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.reports;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,13 +19,13 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.reports;
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 import static java.util.Objects.requireNonNullElse;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.IntegerType;
@@ -28,26 +33,51 @@ import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.QuestionnaireResponse;
 
 @Setter
-public class StatisticInformationBedOccupancyDataBuilder {
+public class StatisticInformationBedOccupancyDataBuilder implements InitializableFhirObjectBuilder {
+
+  static final String QUESTIONNAIRE_URL =
+      "https://demis.rki.de/fhir/Questionnaire/StatisticQuestionsBedOccupancy";
 
   private String id;
   private String questionnaire;
   private String status;
+  private String profileUrl;
   private Integer numberOperableBedsGeneralWardAdultsValue;
   private Integer numberOccupiedBedsGeneralWardAdultsValue;
   private Integer numberOperableBedsGeneralWardChildrenValue;
   private Integer numberOccupiedBedsGeneralWardChildrenValue;
 
-  private String profilUrl;
+  /**
+   * Set default values for bed occupancy FHIR object, questionnaire response:
+   *
+   * <ul>
+   *   <li>id
+   *   <li>questionnaire
+   *   <li>status
+   *   <li>profileUrl
+   * </ul>
+   *
+   * @return builder
+   */
+  @Override
+  public StatisticInformationBedOccupancyDataBuilder setDefaults() {
+    if (this.id == null) {
+      setId(generateUuidString());
+    }
+    if (this.profileUrl == null) {
+      setProfileUrl(DemisConstants.PROFILE_STATISTIC_INFORMATION_BED_OCCUPANCY);
+    }
+    if (this.questionnaire == null) {
+      setQuestionnaire(QUESTIONNAIRE_URL);
+    }
+    if (this.status == null) {
+      setStatus("completed");
+    }
+    return this;
+  }
 
   public QuestionnaireResponse buildExampleStatisticInformationBedOccupancy() {
-
-    id = requireNonNullElse(id, generateUuidString());
-    questionnaire =
-        requireNonNullElse(
-            questionnaire,
-            "https://demis.rki.de/fhir/Questionnaire/StatisticQuestionsBedOccupancy");
-    status = requireNonNullElse(status, "completed");
+    setDefaults();
     numberOperableBedsGeneralWardAdultsValue =
         requireNonNullElse(numberOperableBedsGeneralWardAdultsValue, 250);
     numberOccupiedBedsGeneralWardAdultsValue =
@@ -56,38 +86,35 @@ public class StatisticInformationBedOccupancyDataBuilder {
         requireNonNullElse(numberOperableBedsGeneralWardChildrenValue, 50);
     numberOccupiedBedsGeneralWardChildrenValue =
         requireNonNullElse(numberOccupiedBedsGeneralWardChildrenValue, 37);
-
-    profilUrl =
-        requireNonNullElse(profilUrl, DemisConstants.PROFILE_STATISTIC_INFORMATION_BED_OCCUPANCY);
-
-    return buildStatisticInformationBedOccupancy();
+    return build();
   }
 
-  public QuestionnaireResponse buildStatisticInformationBedOccupancyForGateway() {
-    id = requireNonNullElse(id, generateUuidString());
-    questionnaire =
-        requireNonNullElse(
-            questionnaire,
-            "https://demis.rki.de/fhir/Questionnaire/StatisticQuestionsBedOccupancy");
-    status = requireNonNullElse(status, "completed");
-    profilUrl =
-        requireNonNullElse(profilUrl, DemisConstants.PROFILE_STATISTIC_INFORMATION_BED_OCCUPANCY);
-    return buildStatisticInformationBedOccupancy();
-  }
-
-  public QuestionnaireResponse buildStatisticInformationBedOccupancy() {
+  @Override
+  public QuestionnaireResponse build() {
     QuestionnaireResponse questionnaireResponse = new QuestionnaireResponse();
-
     questionnaireResponse.setId(id);
-    questionnaireResponse.setMeta(new Meta().addProfile(profilUrl));
+    questionnaireResponse.setMeta(new Meta().addProfile(profileUrl));
     questionnaireResponse.setQuestionnaire(questionnaire);
     questionnaireResponse.setStatus(
         QuestionnaireResponse.QuestionnaireResponseStatus.fromCode(status));
+    addStatistics(questionnaireResponse);
+    return questionnaireResponse;
+  }
 
+  public StatisticInformationBedOccupancyDataBuilder setStatusStandard(
+      QuestionnaireResponse.QuestionnaireResponseStatus status) {
+    this.status = status.toCode();
+    return this;
+  }
+
+  private void addStatistics(QuestionnaireResponse questionnaireResponse) {
     if (numberOperableBedsGeneralWardAdultsValue != null) {
       questionnaireResponse.addItem(
           createItem(
               "numberOperableBedsGeneralWardAdults", numberOperableBedsGeneralWardAdultsValue));
+    }
+    if (numberOccupiedBedsGeneralWardAdultsValue == null) {
+      throw new IllegalStateException("number of occupied beds in general ward for adults is null");
     }
     questionnaireResponse.addItem(
         createItem(
@@ -97,11 +124,13 @@ public class StatisticInformationBedOccupancyDataBuilder {
           createItem(
               "numberOperableBedsGeneralWardChildren", numberOperableBedsGeneralWardChildrenValue));
     }
+    if (numberOccupiedBedsGeneralWardChildrenValue == null) {
+      throw new IllegalStateException(
+          "number of occupied beds in general ward for children is null");
+    }
     questionnaireResponse.addItem(
         createItem(
             "numberOccupiedBedsGeneralWardChildren", numberOccupiedBedsGeneralWardChildrenValue));
-
-    return questionnaireResponse;
   }
 
   private QuestionnaireResponse.QuestionnaireResponseItemComponent createItem(

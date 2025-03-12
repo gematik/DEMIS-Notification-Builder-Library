@@ -1,0 +1,63 @@
+{
+  "resourceType": "MolecularSequence",
+  "id": "26038f18-8c2d-3ad7-90e6-f52cfd779262",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/igs/StructureDefinition/Sequence"
+    ]
+  },
+  "extension": [
+    {
+      "url": "https://demis.rki.de/fhir/igs/StructureDefinition/SequenceAuthor",
+      "valueString": "Ralf Dürrwald, Stephan Fuchs, Stefan Kroeger, Marianne Wedde, Oliver Drechsel, Aleksandar Radonic, Rene Kmiecinski, Thorsten Wolff"
+    },
+    {
+      "url": "https://demis.rki.de/fhir/igs/StructureDefinition/SequencingReason",
+      "valueCoding": {
+        "system": "http://snomed.info/sct",
+        "code": "255226008"
+      }
+    },
+    {
+      "url": "https://demis.rki.de/fhir/igs/StructureDefinition/SequenceDocumentReference",
+      "valueReference": {
+        "reference": "https://demis.rki.de/fhir/DocumentReference/ecd3f1f0-b6b6-46e0-b721-2d9869ab8195",
+        "type": "DocumentReference"
+      }
+    }
+  ],
+  "identifier": [
+    {
+      "value": "A384"
+    }
+  ],
+  "type": "dna",
+  "coordinateSystem": 0,
+  "specimen": {
+    "reference": "Specimen/43b3b82f-656f-3e3d-a510-0109771c9e97"
+  },
+  "device": {
+    "reference": "Device/b075aba8-edcb-38f7-973a-6ba64b240a3e"
+  },
+  "performer": {
+    "reference": "Organization/227a66a4-a2fe-34b9-ad24-55981d0d1d82"
+  },
+  "repository": [
+    {
+      "extension": [
+        {
+          "url": "https://demis.rki.de/fhir/igs/StructureDefinition/SequenceUploadDate",
+          "valueDateTime": "2023-02-10"
+        },
+        {
+          "url": "https://demis.rki.de/fhir/igs/StructureDefinition/SequenceUploadSubmitter",
+          "valueString": "O Drechsel"
+        }
+      ],
+      "type": "login",
+      "url": "https://pubmlst.org/2348234",
+      "name": "gisaid",
+      "datasetId": "EPI_ISL_16883504"
+    }
+  ]
+}

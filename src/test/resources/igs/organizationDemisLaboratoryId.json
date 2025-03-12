@@ -1,0 +1,44 @@
+{
+  "resourceType": "Organization",
+  "id": "227a66a4-a2fe-34b9-ad24-55981d0d1d82",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/StructureDefinition/NotifierFacility"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://demis.rki.de/fhir/NamingSystem/DemisLaboratoryId",
+      "value": "10285"
+    }
+  ],
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "https://demis.rki.de/fhir/CodeSystem/organizationType",
+          "code": "refLab",
+          "display": "Einrichtung der Spezialdiagnostik"
+        }
+      ]
+    }
+  ],
+  "name": "Nationales Referenzzentrum für Influenza, FG17, RKI",
+  "telecom": [
+    {
+      "system": "email",
+      "value": "NRZ-Influenza@rki.de",
+      "use": "work"
+    }
+  ],
+  "address": [
+    {
+      "line": [
+        "Seestr. 10"
+      ],
+      "city": "Berlin",
+      "postalCode": "13353",
+      "country": "20422"
+    }
+  ]
+}

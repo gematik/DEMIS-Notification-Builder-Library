@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,15 +60,23 @@ class PractitionerBuilderTest {
   }
 
   @Test
-  void shouldCreateWithDefaultValues() {
+  void setDefaults_shouldSetValues() {
     try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
       utilities.when(Utils::generateUuidString).thenReturn("1");
       PractitionerBuilder practitionerBuilder = new PractitionerBuilder();
-      practitionerBuilder.setDefaultData();
+      practitionerBuilder.setDefaults();
       Practitioner practitioner = practitionerBuilder.build();
 
       assertThat(practitioner.getId()).isEqualTo("1");
     }
+  }
+
+  @Test
+  void setDefaults_shouldKeepValues() {
+    String practitionerId = "init-id";
+    Practitioner practitioner =
+        new PractitionerBuilder().setPractitionerId(practitionerId).setDefaults().build();
+    assertThat(practitioner.getId()).isEqualTo(practitionerId);
   }
 
   @Test

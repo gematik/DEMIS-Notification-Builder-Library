@@ -13,19 +13,46 @@ In case of changes by gematik find details in the "Readme" file.
 See the Licence for the specific language governing permissions and limitations under the Licence.
 
 This project includes:
-  AssertJ Core under Apache License, Version 2.0
+  Apache Commons Codec under Apache License, Version 2.0
+  Apache Commons IO under Apache-2.0
+  Apache Commons Lang under Apache-2.0
+  Apache Commons Text under Apache License, Version 2.0
+  AssertJ Core under Apache-2.0
   Byte Buddy (without dependencies) under Apache License, Version 2.0
   Byte Buddy agent under Apache License, Version 2.0
+  Checker Qual under The MIT License
+  error-prone annotations under Apache 2.0
   fhir-parser-library under Licensed under the EUPL 1.2
+  FindBugs-jsr305 under The Apache Software License, Version 2.0
+  Guava InternalFutureFailureAccess and InternalFutures under The Apache Software License, Version 2.0
+  Guava ListenableFuture only under The Apache Software License, Version 2.0
+  Guava: Google Core Libraries for Java under Apache License, Version 2.0
+  HAPI FHIR - Core Library under Apache Software License 2.0
+  HAPI FHIR - ServiceLoaders - Caching API under Apache Software License 2.0
+  HAPI FHIR Structures - FHIR R4 under Apache Software License 2.0
+  ICU4J under Unicode/ICU License
+  J2ObjC Annotations under Apache License, Version 2.0
+  Jackson datatype: JSR310 under The Apache Software License, Version 2.0
+  Jackson-annotations under The Apache Software License, Version 2.0
+  Jackson-core under The Apache Software License, Version 2.0
+  jackson-databind under The Apache Software License, Version 2.0
+  Jakarta Annotations API under EPL 2.0 or GPL2 w/ CPE
+  JCL 1.2 implemented over SLF4J under Apache License, Version 2.0
   JUnit Jupiter API under Eclipse Public License v2.0
   JUnit Jupiter Engine under Eclipse Public License v2.0
+  JUnit Jupiter Params under Eclipse Public License v2.0
   JUnit Platform Commons under Eclipse Public License v2.0
   JUnit Platform Engine API under Eclipse Public License v2.0
   mockito-core under MIT
   notification-builder-library under Licensed under the EUPL 1.2
   Objenesis under Apache License, Version 2.0
+  OpenTelemetry Instrumentation for Java under The Apache License, Version 2.0
+  OpenTelemetry Java under The Apache License, Version 2.0
   org.apiguardian:apiguardian-api under The Apache License, Version 2.0
+  org.hl7.fhir.r4 under Apache Software License 2.0
+  org.hl7.fhir.utilities under Apache Software License 2.0
   org.opentest4j:opentest4j under The Apache License, Version 2.0
   Project Lombok under The MIT License
+  SLF4J API Module under MIT License
 
 

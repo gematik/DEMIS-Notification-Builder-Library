@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,24 +19,24 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
 
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.HumanName;
 
 @Setter
-public class HumanNameDataBuilder {
+public class HumanNameDataBuilder implements FhirObjectBuilder {
+
   private String familyName;
   private List<String> givenEntry;
   private HumanName.NameUse use;
   private List<String> prefixList;
-
   private String text;
-
   private Salutation salutation;
 
   public HumanName buildExampleHumanName() {
@@ -40,28 +45,40 @@ public class HumanNameDataBuilder {
     return buildHumanName();
   }
 
-  public HumanName buildHumanName() {
-    HumanName humanName = new HumanName();
+  public static HumanName with(
+      final String prefix, final String givenName, final String familyName) {
+    return new HumanNameDataBuilder()
+        .setFamilyName(familyName)
+        .addPrefix(prefix)
+        .addGivenName(givenName)
+        .build();
+  }
 
+  @Override
+  public HumanName build() {
+    final var humanName = new HumanName();
     if (familyName != null) {
       humanName.setFamily(familyName);
     }
-    if (givenEntry != null) {
-      givenEntry.forEach(humanName::addGiven);
-    }
-
+    givenNames().forEach(humanName::addGiven);
     if (use != null) {
       humanName.setUse(use);
     }
-
-    if (prefixList != null) {
-      prefixList.forEach(humanName::addPrefix);
-    }
-
+    prefixes().forEach(humanName::addPrefix);
     createText();
     humanName.setText(text);
-
     return humanName;
+  }
+
+  /**
+   * Build human name FHIR object
+   *
+   * @return human name
+   * @deprecated Will be removed in version 4.x, use {@link HumanNameDataBuilder#build()} instead
+   */
+  @Deprecated(since = "3.0.2")
+  public HumanName buildHumanName() {
+    return build();
   }
 
   public HumanNameDataBuilder addPrefix(String prefix) {
@@ -82,7 +99,6 @@ public class HumanNameDataBuilder {
 
   private void createText() {
     List<String> allStrings = new ArrayList<>();
-
     if (salutation != null) {
       switch (salutation) {
         case MR:
@@ -95,19 +111,26 @@ public class HumanNameDataBuilder {
           throw new IllegalStateException("unkown salutation type: " + salutation);
       }
     }
-    if (prefixList != null) {
-      prefixList.forEach(allStrings::add);
-    }
-
-    if (givenEntry != null) {
-      givenEntry.forEach(allStrings::add);
-    }
-
+    prefixes().forEach(allStrings::add);
+    givenNames().forEach(allStrings::add);
     if (familyName != null) {
       allStrings.add(familyName);
     }
-
     text = String.join(" ", allStrings);
+  }
+
+  private List<String> prefixes() {
+    if (this.prefixList == null) {
+      return Collections.emptyList();
+    }
+    return this.prefixList.stream().filter(Objects::nonNull).toList();
+  }
+
+  private List<String> givenNames() {
+    if (this.givenEntry == null) {
+      return Collections.emptyList();
+    }
+    return this.givenEntry.stream().filter(Objects::nonNull).toList();
   }
 
   public enum Salutation {

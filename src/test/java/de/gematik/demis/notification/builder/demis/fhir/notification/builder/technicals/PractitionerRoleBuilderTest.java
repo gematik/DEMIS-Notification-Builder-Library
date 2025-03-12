@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,5 +67,19 @@ class PractitionerRoleBuilderTest {
         new PractitionerRoleBuilder().withPractitioner(practitioner).build();
 
     assertThat(practitionerRole.getPractitioner().getResource()).isEqualTo(practitioner);
+  }
+
+  @Test
+  void setDefaults_shouldSetValues() {
+    PractitionerRole practitionerRole = new PractitionerRoleBuilder().setDefaults().build();
+    assertThat(practitionerRole.getId()).isNotNull();
+  }
+
+  @Test
+  void setDefaults_shouldKeepValues() {
+    String id = "init-id";
+    PractitionerRole practitionerRole =
+        new PractitionerRoleBuilder().setId(id).setDefaults().build();
+    assertThat(practitionerRole.getId()).isEqualTo(id);
   }
 }

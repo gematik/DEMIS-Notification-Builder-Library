@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,15 +19,11 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.NotifierDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.HumanNameDataBuilder;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -50,22 +51,24 @@ class NotificationBundleLaboratoryDataBuilderTest {
     PractitionerRole notifierRole = new PractitionerRole();
     Organization notifierFacility = new Organization();
     notifierRole.setOrganization(new Reference(notifierFacility));
-    Composition notificationLaboratory = new Composition();
 
     // when
     NotificationBundleLaboratoryDataBuilder builder = new NotificationBundleLaboratoryDataBuilder();
     builder
         .setDefaults()
+        .setId("specificId")
+        .setIdentifierAsNotificationBundleId("specificIdentifier");
+
+    Composition composition = new NotificationLaboratoryDataBuilder().build();
+
+    builder
         .setNotifiedPerson(notifiedPerson)
         .setSubmitterRole(submitterRole)
-        .setSpecimen(specimen)
+        .setSpecimen(List.of(specimen))
         .setPathogenDetection(pathogenDetectionList)
         .setLaboratoryReport(laboratoryReport)
-        // now from superclass
         .setNotifierRole(notifierRole)
-        .setNotificationLaboratory(notificationLaboratory)
-        .setBundleId("specificId")
-        .setBundleIdentifier("specificIdentifier");
+        .setNotificationLaboratory(composition);
     Bundle bundle = builder.build();
 
     assertThat(bundle.getEntry())
@@ -79,7 +82,7 @@ class NotificationBundleLaboratoryDataBuilderTest {
             onePathogenDetection,
             specimen,
             laboratoryReport,
-            notificationLaboratory);
+            composition);
     assertThat(bundle.getId()).isEqualTo("specificId");
     assertThat(bundle.getIdentifier().getValue()).isEqualTo("specificIdentifier");
     assertThat(bundle.getIdentifier().getSystem())
@@ -88,78 +91,51 @@ class NotificationBundleLaboratoryDataBuilderTest {
     assertThat(bundle.getTimestamp()).isInstanceOf(Date.class);
   }
 
-  /**
-   * this test creates the same notification that the createStandardLaboratoryNotificationBundle
-   * method from LaboratoryNotificationCreationService would create.
-   */
   @Test
-  void exampleStandardLaboratoryNotificationfromInputWithStandardBuilder() {
+  void thatAdditionalEntriesAreAppendedToTheEnd() {
+    // GIVEN a bundle
+    final Patient notifiedPerson = new Patient();
+    final Specimen specimen = new Specimen();
+    final Observation onePathogenDetection = new Observation().setSpecimen(new Reference(specimen));
+    final DiagnosticReport laboratoryReport =
+        new DiagnosticReport().addResult(new Reference(onePathogenDetection));
+    final PractitionerRole notifierRole = new PractitionerRole();
+    final Organization notifierFacility = new Organization();
+    notifierRole.setOrganization(new Reference(notifierFacility));
 
-    NotificationBundleLaboratoryDataBuilder notificationBundleLaboratoryDataBuilder =
+    final Organization additionalEntry = new Organization();
+
+    // WHEN I use defaults
+    final NotificationBundleLaboratoryDataBuilder builder =
         new NotificationBundleLaboratoryDataBuilder();
+    builder
+        .setDefaults()
+        .setId("specificId")
+        .setIdentifierAsNotificationBundleId("specificIdentifier");
 
-    Patient notifiedPerson = new NotifiedPersonDataBuilder().buildExampleNotifiedPerson();
-    notificationBundleLaboratoryDataBuilder.setNotifiedPerson(notifiedPerson);
-    PractitionerRole submitterRole = new SubmitterDataBuilder().buildExampleSubmitterFacilityData();
-    notificationBundleLaboratoryDataBuilder.setSubmitterRole(submitterRole);
-    Specimen specimen =
-        new SpecimenDataBuilder().buildExampleSpecimen(notifiedPerson, submitterRole);
-    notificationBundleLaboratoryDataBuilder.setSpecimen(specimen);
-    Observation pathogenDetection =
-        new PathogenDetectionDataBuilder().buildPathogenDetection(notifiedPerson, specimen);
-    notificationBundleLaboratoryDataBuilder.setPathogenDetection(
-        Collections.singletonList(pathogenDetection));
-    DiagnosticReport laboratoryReport =
-        new LaboratoryReportDataBuilder()
-            .buildExampleCVDPLaboratoryReport(notifiedPerson, pathogenDetection);
-    notificationBundleLaboratoryDataBuilder.setLaboratoryReport(laboratoryReport);
-    PractitionerRole notifierRole = new NotifierDataBuilder().buildLaboratoryExampleNotifierData();
-    notificationBundleLaboratoryDataBuilder.setNotifierRole(notifierRole);
+    final Composition composition = new NotificationLaboratoryDataBuilder().build();
 
-    Composition notificationLaboratory =
-        new NotificationLaboratoryDataBuilder()
-            .buildExampleComposition(notifiedPerson, notifierRole, laboratoryReport);
-    notificationBundleLaboratoryDataBuilder.setNotificationLaboratory(notificationLaboratory);
+    // AND I begin by adding additional entries
+    builder.addAdditionalEntry(additionalEntry);
+    // AND then set the remaining information
+    builder
+        .setNotificationLaboratory(composition)
+        .setSpecimen(List.of(specimen))
+        .setLaboratoryReport(laboratoryReport)
+        .setNotifierRole(notifierRole)
+        .setNotifiedPerson(notifiedPerson);
+    Bundle bundle = builder.build();
 
-    Bundle bundle = notificationBundleLaboratoryDataBuilder.buildExampleLaboratoryBundle();
-
-    assertThat(bundle.getEntry()).hasSize(9);
-    Composition actualNotificationLaboratory = (Composition) bundle.getEntry().get(0).getResource();
-    assertThat(actualNotificationLaboratory).isEqualTo(notificationLaboratory);
-    assertThat(actualNotificationLaboratory.getAuthor().get(0).getResource())
-        .isEqualTo(notifierRole);
-    assertThat(actualNotificationLaboratory.getSubject().getResource()).isEqualTo(notifiedPerson);
-    assertThat(actualNotificationLaboratory.getSection().get(0).getEntry().get(0).getResource())
-        .isEqualTo(laboratoryReport);
-  }
-
-  /**
-   * this method shows how to set the name and the gender to other values than the standard value.
-   * all other values stay equal to the standard values.
-   */
-  @Test
-  void exampleWithNotStandardInputForNotifiedPerson() {
-
-    NotificationBundleLaboratoryDataBuilder notificationBundleLaboratoryDataBuilder =
-        new NotificationBundleLaboratoryDataBuilder();
-
-    NotifiedPersonDataBuilder notifiedPersonDataBuilder = new NotifiedPersonDataBuilder();
-    HumanName personName =
-        new HumanNameDataBuilder()
-            .setFamilyName("Lauterbach")
-            .addGivenName("Nele")
-            .buildHumanName();
-    notifiedPersonDataBuilder.setHumanName(personName);
-    notifiedPersonDataBuilder.setGender(Enumerations.AdministrativeGender.FEMALE);
-    Patient notifiedPerson = notifiedPersonDataBuilder.buildExampleNotifiedPerson();
-    notificationBundleLaboratoryDataBuilder.setNotifiedPerson(notifiedPerson);
-
-    Bundle bundle = notificationBundleLaboratoryDataBuilder.buildExampleLaboratoryBundle();
-
-    assertThat(bundle.getEntry()).hasSize(9);
-    Composition notificationLaboratory = (Composition) bundle.getEntry().get(0).getResource();
-    Patient resource = (Patient) notificationLaboratory.getSubject().getResource();
-    assertThat(resource.getName().get(0)).isEqualTo(personName);
-    assertThat(resource.getGender()).isEqualTo(Enumerations.AdministrativeGender.FEMALE);
+    // THEN a specific order is established
+    assertThat(bundle.getEntry())
+        .extracting("resource")
+        .containsExactly(
+            composition,
+            notifiedPerson,
+            notifierRole,
+            notifierFacility,
+            specimen,
+            laboratoryReport,
+            additionalEntry);
   }
 }

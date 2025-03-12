@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.reports;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,14 +19,12 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.reports;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.NotifierDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import java.util.List;
 import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
@@ -29,48 +32,44 @@ import org.junit.jupiter.api.Test;
 class ReportBundleDataBuilderTest {
 
   @Test
-  void shouldCreateBundleExample() {
-
-    Bundle bundle = new ReportBundleDataBuilder().buildExampleReportBundle();
-
-    assertThat(bundle).isNotNull();
-  }
-
-  @Test
   void shouldCreateBundleWithGivenData() {
-    ReportBundleDataBuilder reportBundleDataBuilder = new ReportBundleDataBuilder();
+    ReportBundleDataBuilder builder = new ReportBundleDataBuilder();
+    builder.setDefaults();
 
-    reportBundleDataBuilder.setProfileReportBundle(DemisConstants.PROFILE_REPORT_BUNDLE);
-    PractitionerRole notiferRole = new NotifierDataBuilder().buildReportExampleNotifierData();
-    reportBundleDataBuilder.setNotifierRole(notiferRole);
-    QuestionnaireResponse statisticInformationBedOccupancy =
+    String notificationBundleId = "notificationBundleId";
+    builder.setIdentifierAsNotificationBundleId(notificationBundleId);
+
+    PractitionerRole notifierRole = new NotifierDataBuilder().buildReportExampleNotifierData();
+    builder.setNotifierRole(notifierRole);
+
+    QuestionnaireResponse bedOccupancy =
         new StatisticInformationBedOccupancyDataBuilder()
             .buildExampleStatisticInformationBedOccupancy();
-    reportBundleDataBuilder.setStatisticInformationBedOccupancy(statisticInformationBedOccupancy);
+    builder.setStatisticInformationBedOccupancy(bedOccupancy);
 
-    Composition reportBedOccupancy =
-        new ReportBedOccupancyDataBuilder()
-            .buildReportBedOccupancy(notiferRole, statisticInformationBedOccupancy);
-    reportBundleDataBuilder.setReportBedOccupancy(reportBedOccupancy);
+    ReportBedOccupancyDataBuilder composition = new ReportBedOccupancyDataBuilder();
+    composition.setDefaults();
+    composition.setSubjectAsInekStandortId("subject");
+    composition.setStatisticInformationBedOccupancy(bedOccupancy);
+    composition.setNotifierRole(notifierRole);
+    builder.setReportBedOccupancy(composition.build());
 
-    reportBundleDataBuilder.setIdentifierValue("ExampleValueForId");
+    Bundle bundle = builder.build();
 
-    Bundle bundle = reportBundleDataBuilder.buildReportBundle();
-
-    assertThat(bundle.getIdentifier().getValue()).isEqualTo("ExampleValueForId");
-
-    List<Bundle.BundleEntryComponent> entry = bundle.getEntry();
-    Resource expectedComposition = entry.get(0).getResource();
-    assertThat(expectedComposition).isInstanceOf(Composition.class).isEqualTo(reportBedOccupancy);
-    Resource expectedNotifierOrganization = entry.get(1).getResource();
+    // verify
+    assertThat(bundle.getIdentifier().getValue()).isEqualTo(notificationBundleId);
+    List<Bundle.BundleEntryComponent> actualEntries = bundle.getEntry();
+    Resource expectedComposition = actualEntries.get(0).getResource();
+    assertThat(expectedComposition).isInstanceOf(Composition.class);
+    Resource expectedNotifierRole = actualEntries.get(1).getResource();
+    assertThat(expectedNotifierRole).isInstanceOf(PractitionerRole.class).isEqualTo(notifierRole);
+    Resource expectedNotifierOrganization = actualEntries.get(2).getResource();
     assertThat(expectedNotifierOrganization)
         .isInstanceOf(Organization.class)
-        .isEqualTo(notiferRole.getOrganization().getResource());
-    Resource expectedNotifierRole = entry.get(2).getResource();
-    assertThat(expectedNotifierRole).isInstanceOf(PractitionerRole.class).isEqualTo(notiferRole);
-    Resource expectedQuestionnaireResponse = entry.get(3).getResource();
+        .isEqualTo(notifierRole.getOrganization().getResource());
+    Resource expectedQuestionnaireResponse = actualEntries.get(3).getResource();
     assertThat(expectedQuestionnaireResponse)
         .isInstanceOf(QuestionnaireResponse.class)
-        .isEqualTo(statisticInformationBedOccupancy);
+        .isEqualTo(bedOccupancy);
   }
 }

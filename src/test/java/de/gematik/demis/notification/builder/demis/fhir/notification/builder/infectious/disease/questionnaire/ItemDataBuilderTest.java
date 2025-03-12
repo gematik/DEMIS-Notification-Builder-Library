@@ -1,6 +1,11 @@
-/*
- * Copyright [2023], gematik GmbH
- *
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire;
+
+/*-
+ * #%L
+ * notification-builder-library
+ * %%
+ * Copyright (C) 2025 gematik GmbH
+ * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
  * You may not use this work except in compliance with the Licence.
@@ -14,9 +19,8 @@
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ * #L%
  */
-
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +36,7 @@ class ItemDataBuilderTest {
         new QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent();
 
     QuestionnaireResponse.QuestionnaireResponseItemComponent item =
-        new ItemDataBuilder().setLinkId("linkId").buildEntryItem(answer);
+        new ItemDataBuilder().setLinkId("linkId").addAnswer(answer).build();
 
     assertThat(item).isNotNull();
     assertThat(item.getLinkId()).isEqualTo("linkId");
@@ -45,7 +49,7 @@ class ItemDataBuilderTest {
         new QuestionnaireResponse.QuestionnaireResponseItemComponent();
 
     QuestionnaireResponse.QuestionnaireResponseItemComponent questionnaireResponseItemComponent =
-        new ItemDataBuilder().buildItemWithItem(anotherItem);
+        new ItemDataBuilder().addItem(anotherItem).build();
 
     assertThat(questionnaireResponseItemComponent.getItem()).hasSize(1);
     assertThat(questionnaireResponseItemComponent.getItem().get(0)).isEqualTo(anotherItem);
@@ -59,7 +63,7 @@ class ItemDataBuilderTest {
         new QuestionnaireResponse.QuestionnaireResponseItemComponent();
 
     QuestionnaireResponse.QuestionnaireResponseItemComponent questionnaireResponseItemComponent =
-        new ItemDataBuilder().buildItemWithItem(asList(anotherItem1, anotherItem2));
+        new ItemDataBuilder().setItems(asList(anotherItem1, anotherItem2)).build();
 
     assertThat(questionnaireResponseItemComponent.getItem())
         .containsExactly(anotherItem1, anotherItem2);
@@ -67,27 +71,26 @@ class ItemDataBuilderTest {
 
   @Test
   void shouldCreateItemWithAnswer() {
-    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent anotherItem =
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer =
         new QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent();
 
     QuestionnaireResponse.QuestionnaireResponseItemComponent questionnaireResponseItemComponent =
-        new ItemDataBuilder().buildItemWithAnswer(anotherItem);
+        new ItemDataBuilder().addAnswer(answer).build();
 
     assertThat(questionnaireResponseItemComponent.getAnswer()).hasSize(1);
-    assertThat(questionnaireResponseItemComponent.getAnswer().get(0)).isEqualTo(anotherItem);
+    assertThat(questionnaireResponseItemComponent.getAnswer().get(0)).isEqualTo(answer);
   }
 
   @Test
   void shouldCreateItemWithAnswerList() {
-    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent anotherItem1 =
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer1 =
         new QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent();
-    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent anotherItem2 =
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent answer2 =
         new QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent();
 
     QuestionnaireResponse.QuestionnaireResponseItemComponent questionnaireResponseItemComponent =
-        new ItemDataBuilder().buildItemWithAnswer(asList(anotherItem1, anotherItem2));
+        new ItemDataBuilder().setAnswers(asList(answer1, answer2)).build();
 
-    assertThat(questionnaireResponseItemComponent.getAnswer())
-        .containsExactly(anotherItem1, anotherItem2);
+    assertThat(questionnaireResponseItemComponent.getAnswer()).containsExactly(answer1, answer2);
   }
 }

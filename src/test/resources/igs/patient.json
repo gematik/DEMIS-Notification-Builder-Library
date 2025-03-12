@@ -1,0 +1,25 @@
+{
+  "resourceType": "Patient",
+  "id": "3661f735-d3db-3c22-909d-3a16a7334c1d",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonNotByName"
+    ]
+  },
+  "gender": "male",
+  "birthDate": "1978-09",
+  "address": [
+    {
+      "extension": [
+        {
+          "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",
+          "valueCoding": {
+            "system": "https://demis.rki.de/fhir/CodeSystem/addressUse",
+            "code": "primary"
+          }
+        }
+      ],
+      "postalCode": "130"
+    }
+  ]
+}

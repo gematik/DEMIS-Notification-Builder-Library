@@ -1,0 +1,23 @@
+{
+  "resourceType": "Device",
+  "id": "b075aba8-edcb-38f7-973a-6ba64b240a3e",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/igs/StructureDefinition/SequencingDevice"
+    ]
+  },
+  "deviceName": [
+    {
+      "name": "GridION",
+      "type": "model-name"
+    }
+  ],
+  "type": {
+    "coding": [
+      {
+        "system": "https://demis.rki.de/fhir/igs/CodeSystem/sequencingPlatform",
+        "code": "oxford_nanopore"
+      }
+    ]
+  }
+}
