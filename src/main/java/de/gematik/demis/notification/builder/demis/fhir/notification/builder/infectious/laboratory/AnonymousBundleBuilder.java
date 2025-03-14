@@ -25,6 +25,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonAnonymousDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
@@ -85,5 +86,10 @@ public class AnonymousBundleBuilder extends NotificationBundleLaboratoryDataBuil
     builder.setSubmitterRole(submitter);
 
     return builder.build();
+  }
+
+  @Override
+  protected String getDefaultProfileUrl() {
+    return DemisConstants.PROFILE_NOTIFICATION_BUNDLE_LABORATORY_ANONYMOUS;
   }
 }
