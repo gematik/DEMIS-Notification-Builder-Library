@@ -52,6 +52,7 @@ class ReferenceUtilsTest {
 
     final Reference reference = ReferenceUtils.internalReference(resource);
     assertThat(reference.getReference()).isEqualTo("urn:uuid:20998fdc-0af8-4276-b099-5997534f1e5e");
+    assertThat(reference.getResource()).isSameAs(resource);
   }
 
   @Test
@@ -61,5 +62,6 @@ class ReferenceUtilsTest {
 
     final Reference reference = ReferenceUtils.internalReference(resource);
     assertThat(reference.getReference()).isEqualTo("Patient/123");
+    assertThat(reference.getResource()).isSameAs(resource);
   }
 }
