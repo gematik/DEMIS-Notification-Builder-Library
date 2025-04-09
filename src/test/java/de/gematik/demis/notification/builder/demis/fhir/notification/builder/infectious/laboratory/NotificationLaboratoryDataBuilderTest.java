@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -46,8 +50,11 @@ class NotificationLaboratoryDataBuilderTest {
   static void setUpAll() {
 
     notifiedPerson = new Patient();
+    notifiedPerson.setId("1");
     notifierRole = new PractitionerRole();
+    notifierRole.setId("2");
     laboratoryReport = new DiagnosticReport();
+    laboratoryReport.setId("3");
   }
 
   @BeforeEach
@@ -62,6 +69,7 @@ class NotificationLaboratoryDataBuilderTest {
     NotificationLaboratoryDataBuilder builder = new NotificationLaboratoryDataBuilder();
     builder.setDefault();
     DiagnosticReport laboratoryReport1 = new DiagnosticReport();
+    laboratoryReport1.setId("123");
     builder.setLaboratoryReport(laboratoryReport1);
 
     Composition composition = builder.build();

@@ -19,13 +19,19 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import ca.uhn.fhir.context.FhirVersionEnum;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,7 +42,15 @@ import java.util.List;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,8 +71,11 @@ class BundleDataBuilderTest {
 
     String profileUrl = "test-profile-url";
     Composition notificationLaboratory = new Composition();
+    notificationLaboratory.setId("1");
     PractitionerRole practitionerRole = new PractitionerRole();
+    practitionerRole.setId("2");
     Practitioner practitioner = new Practitioner();
+    practitioner.setId("3");
     practitionerRole.setPractitioner(new Reference(practitioner));
 
     BundleDataBuilder b =
@@ -109,7 +126,9 @@ class BundleDataBuilderTest {
   @Test
   void shouldAddPractitionerWhenSet() {
     PractitionerRole practitionerRole = new PractitionerRole();
+    practitionerRole.setId("1");
     Practitioner practitioner = new Practitioner();
+    practitioner.setId("2");
     practitionerRole.setPractitioner(new Reference(practitioner));
 
     TestBundleDataBuilder builder = new TestBundleDataBuilder();
@@ -124,7 +143,9 @@ class BundleDataBuilderTest {
   @Test
   void shouldAddOrganizationWhenSet() {
     PractitionerRole practitionerRole = new PractitionerRole();
+    practitionerRole.setId("2");
     Organization organization = new Organization();
+    organization.setId("1");
     practitionerRole.setOrganization(new Reference(organization));
 
     TestBundleDataBuilder builder = new TestBundleDataBuilder();
@@ -235,6 +256,7 @@ class BundleDataBuilderTest {
       TestBundleDataBuilder builder = new TestBundleDataBuilder();
 
       PractitionerRole notifierRole = new PractitionerRole();
+      notifierRole.setId("1");
       builder.setPractitionerRole(notifierRole);
 
       List<Bundle.BundleEntryComponent> entries = builder.build().getEntry();
@@ -247,10 +269,54 @@ class BundleDataBuilderTest {
       TestBundleDataBuilder builder = new TestBundleDataBuilder();
 
       Composition notificationLaboratory = new Composition();
+      notificationLaboratory.setId("1");
       builder.setResource(notificationLaboratory);
 
       List<Bundle.BundleEntryComponent> entries = builder.build().getEntry();
       assertThat(entries).extracting("resource").containsOnly(notificationLaboratory);
+    }
+  }
+
+  @Test
+  void thatCreateFullUrlThrowsNPEForMissingId() {
+    // Assumption: parsing a bundle without ids and only full urls will lead to a FhirParser setting
+    // Ids based on
+    // fullUrl on the resource.
+    final Patient resource = new Patient();
+    assertThatExceptionOfType(NullPointerException.class)
+        .isThrownBy(
+            () -> {
+              BundleDataBuilder.createFullUrl(resource);
+            });
+  }
+
+  @Nested
+  class CreateFullUrlTests {
+    @Test
+    void thatCreateFullUrlWorksWithUrnUuid() {
+      final Patient resource = new Patient();
+      resource.setId("urn:uuid:20998fdc-0af8-4276-b099-5997534f1e5e");
+
+      final String fullUrl = BundleDataBuilder.createFullUrl(resource);
+      assertThat(fullUrl).isEqualTo("urn:uuid:20998fdc-0af8-4276-b099-5997534f1e5e");
+    }
+
+    @Test
+    void thatCreateFullUrlWorksWithNullResourceType() {
+      final Patient resource = new Patient();
+      resource.setId("null/123");
+
+      final String fullUrl = BundleDataBuilder.createFullUrl(resource);
+      assertThat(fullUrl).isEqualTo(DemisConstants.DEMIS_RKI_DE_FHIR + "Patient/123");
+    }
+
+    @Test
+    void thatCreateFullUrlWorksWithLocalId() {
+      final Patient resource = new Patient();
+      resource.setId("123");
+
+      final String fullUrl = BundleDataBuilder.createFullUrl(resource);
+      assertThat(fullUrl).isEqualTo(DemisConstants.DEMIS_RKI_DE_FHIR + "Patient/123");
     }
   }
 }

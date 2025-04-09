@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -47,7 +51,6 @@ import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import lombok.Setter;
-import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -90,6 +93,7 @@ public class LaboratoryReportDataBuilder {
       @Nonnull final Patient subject,
       @Nonnull final Collection<Observation> observations) {
     final LaboratoryReportDataBuilder result = new LaboratoryReportDataBuilder();
+    result.setLaboratoryId(original.getId());
 
     final Coding codingFirstRep = original.getCode().getCodingFirstRep();
     result.setCodeCode(codingFirstRep.getCode());
@@ -113,10 +117,6 @@ public class LaboratoryReportDataBuilder {
 
     result.setNotifiedPerson(subject);
     result.setPathogenDetections(observations);
-
-    final IIdType idElement = original.getIdElement();
-    final String join = String.join("/", idElement.getResourceType(), idElement.getIdPart());
-    result.setLaboratoryId(join);
 
     result.setExtensionList(getExtensions(original));
     result.setBasedOnReferenceList(getBasedOnReferences(original));

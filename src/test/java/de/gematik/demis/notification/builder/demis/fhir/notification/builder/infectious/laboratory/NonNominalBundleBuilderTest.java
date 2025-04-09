@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -178,6 +182,70 @@ class NonNominalBundleBuilderTest {
 
     final String expected =
         Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal-expected.json"));
+
+    final String result = iParser.encodeResourceToString(copy);
+    assertThat(result).isEqualToIgnoringNewLines(expected);
+  }
+
+  @Test
+  void thatProcessingWithUrnUuidWorks() throws IOException {
+    final String source =
+        Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid.json"));
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    final Bundle original = (Bundle) iParser.parseResource(source);
+    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+
+    final String expected =
+        Files.readString(
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-expected.json"));
+
+    final String result = iParser.encodeResourceToString(copy);
+    assertThat(result).isEqualToIgnoringNewLines(expected);
+  }
+
+  @Test
+  void thatProcessingWithUrnUuidAndRegularIdsMixedWorks() throws IOException {
+    // GIVEN a bundle that makes use of urn:uuid: and regular ids (e.g. Composition/...)
+    final String source =
+        Files.readString(
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-mixed.json"));
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    final Bundle original = (Bundle) iParser.parseResource(source);
+    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+
+    final String expected =
+        Files.readString(
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-mixed-expected.json"));
+
+    final String result = iParser.encodeResourceToString(copy);
+    assertThat(result).isEqualToIgnoringNewLines(expected);
+  }
+
+  @Test
+  void thatProcessingResourcesWithoutIdWorks() throws IOException {
+    // A test to verify that parsing a bundle without ids, will add the fullurl as id to the
+    // resource so we can
+    // process it
+    //
+    // GIVEN a bundle that has no id fields on the resources
+    final String source =
+        Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal-no-ids.json"));
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    final Bundle original = (Bundle) iParser.parseResource(source);
+    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+
+    // NOTE: it's okay if this test breaks should you change either the input or the output. Just
+    // make sure you
+    // adjust accordingly.
+    final String expected =
+        Files.readString(
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-expected.json"));
 
     final String result = iParser.encodeResourceToString(copy);
     assertThat(result).isEqualToIgnoringNewLines(expected);

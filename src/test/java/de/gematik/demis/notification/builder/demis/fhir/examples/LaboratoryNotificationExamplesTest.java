@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.examples;
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -216,6 +220,7 @@ class LaboratoryNotificationExamplesTest {
 
     // NotifiedPerson
     NotifiedPersonDataBuilder notifiedPersonDataBuilder = new NotifiedPersonDataBuilder();
+    notifiedPersonDataBuilder.setDefaults();
     // name
     HumanNameDataBuilder humanNameDataBuilder = new HumanNameDataBuilder();
     humanNameDataBuilder.setFamilyName(familyName);
@@ -381,6 +386,7 @@ class LaboratoryNotificationExamplesTest {
 
     NotificationLaboratoryDataBuilder notificationLaboratoryDataBuilder =
         new NotificationLaboratoryDataBuilder();
+    notificationLaboratoryDataBuilder.setDefault();
     notificationLaboratoryDataBuilder.setCompositionStatus(compositionStatus);
     notificationLaboratoryDataBuilder.setTypeCode(notificationLaboratoryTypeCode);
     notificationLaboratoryDataBuilder.setTypeDisplay(notificationLaboratoryTypeDisplay);
@@ -410,6 +416,7 @@ class LaboratoryNotificationExamplesTest {
     // NotifcationBundleLaboratory
     NotificationBundleLaboratoryDataBuilder notificationBundleLaboratoryDataBuilder =
         new NotificationBundleLaboratoryDataBuilder()
+            .setDefaults()
             .setNotifiedPerson(notifiedPerson)
             .setNotifierRole(notifierRole)
             .setSubmitterRole(submitterRole)

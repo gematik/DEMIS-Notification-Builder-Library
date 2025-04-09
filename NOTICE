@@ -20,11 +20,10 @@ This project includes:
   AssertJ Core under Apache-2.0
   Byte Buddy (without dependencies) under Apache License, Version 2.0
   Byte Buddy agent under Apache License, Version 2.0
-  Checker Qual under The MIT License
   error-prone annotations under Apache 2.0
   fhir-parser-library under Licensed under the EUPL 1.2
   FindBugs-jsr305 under The Apache Software License, Version 2.0
-  Guava InternalFutureFailureAccess and InternalFutures under The Apache Software License, Version 2.0
+  Guava InternalFutureFailureAccess and InternalFutures under Apache License, Version 2.0
   Guava ListenableFuture only under The Apache Software License, Version 2.0
   Guava: Google Core Libraries for Java under Apache License, Version 2.0
   HAPI FHIR - Core Library under Apache Software License 2.0
@@ -38,6 +37,7 @@ This project includes:
   jackson-databind under The Apache Software License, Version 2.0
   Jakarta Annotations API under EPL 2.0 or GPL2 w/ CPE
   JCL 1.2 implemented over SLF4J under Apache License, Version 2.0
+  JSpecify annotations under The Apache License, Version 2.0
   JUnit Jupiter API under Eclipse Public License v2.0
   JUnit Jupiter Engine under Eclipse Public License v2.0
   JUnit Jupiter Params under Eclipse Public License v2.0

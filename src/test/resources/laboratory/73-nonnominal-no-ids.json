@@ -1,6 +1,6 @@
 {
   "resourceType": "Bundle",
-  "id": "555-42-23-5",
+  "id": "5167610d-9926-48b7-a27a-85b9a92893cc",
   "meta": {
     "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationBundleLaboratoryNonNominal" ],
     "tag": [ {
@@ -16,10 +16,9 @@
   "type": "document",
   "timestamp": "2024-03-14T14:45:00.000+01:00",
   "entry": [ {
-    "fullUrl": "https://demis.rki.de/fhir/Composition/555-42-23-13",
+    "fullUrl": "urn:uuid:c3da3c5c-0a40-4b5c-9151-7f4544b921e3",
     "resource": {
       "resourceType": "Composition",
-      "id": "555-42-23-13",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationLaboratoryNonNominal" ]
       },
@@ -43,11 +42,11 @@
         } ]
       } ],
       "subject": {
-        "reference": "Patient/555-42-23-7"
+        "reference": "urn:uuid:58b26b0f-ee2d-42f2-9dd9-56c8223fcbd0"
       },
       "date": "2024-03-14T14:45:00+01:00",
       "author": [ {
-        "reference": "PractitionerRole/555-42-23-2"
+        "reference": "urn:uuid:4c12f797-1662-4ebe-bd43-f0ecf756c745"
       } ],
       "title": "Erregernachweismeldung",
       "relatesTo": [ {
@@ -69,15 +68,14 @@
           } ]
         },
         "entry": [ {
-          "reference": "DiagnosticReport/555-42-23-11"
+          "reference": "urn:uuid:255e7f4e-4e48-4cad-91f8-c9be7e6fafc7"
         } ]
       } ]
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Patient/555-42-23-7",
+    "fullUrl": "urn:uuid:58b26b0f-ee2d-42f2-9dd9-56c8223fcbd0",
     "resource": {
       "resourceType": "Patient",
-      "id": "555-42-23-7",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonNotByName" ]
       },
@@ -97,22 +95,20 @@
       } ]
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/PractitionerRole/555-42-23-2",
+    "fullUrl": "urn:uuid:4c12f797-1662-4ebe-bd43-f0ecf756c745",
     "resource": {
       "resourceType": "PractitionerRole",
-      "id": "555-42-23-2",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifierRole" ]
       },
       "organization": {
-        "reference": "Organization/555-42-23-1"
+        "reference": "urn:uuid:2064abeb-cf42-4e16-bfbd-1e4da0a1377b"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Organization/555-42-23-1",
+    "fullUrl": "urn:uuid:2064abeb-cf42-4e16-bfbd-1e4da0a1377b",
     "resource": {
       "resourceType": "Organization",
-      "id": "555-42-23-1",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifierFacility" ]
       },
@@ -151,22 +147,20 @@
       } ]
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/PractitionerRole/555-42-23-4",
+    "fullUrl": "urn:uuid:2ed49de9-20df-4a48-96ac-3d11cf854847",
     "resource": {
       "resourceType": "PractitionerRole",
-      "id": "555-42-23-4",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/SubmittingRole" ]
       },
       "organization": {
-        "reference": "Organization/555-42-23-3"
+        "reference": "urn:uuid:89ed729e-b6d0-46de-b098-36153d9a61b0"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Organization/555-42-23-3",
+    "fullUrl": "urn:uuid:89ed729e-b6d0-46de-b098-36153d9a61b0",
     "resource": {
       "resourceType": "Organization",
-      "id": "555-42-23-3",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/SubmittingFacility" ]
       },
@@ -202,10 +196,9 @@
       } ]
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Specimen/555-42-23-8",
+    "fullUrl": "urn:uuid:7109d731-da8d-463a-85c9-5fdd71e5d83b",
     "resource": {
       "resourceType": "Specimen",
-      "id": "555-42-23-8",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/SpecimenHIVP" ]
       },
@@ -217,21 +210,20 @@
         } ]
       },
       "subject": {
-        "reference": "Patient/555-42-23-7"
+        "reference": "urn:uuid:58b26b0f-ee2d-42f2-9dd9-56c8223fcbd0"
       },
       "receivedTime": "2022-02-20T00:00:00+01:00",
       "collection": {
         "collector": {
-          "reference": "PractitionerRole/555-42-23-4"
+          "reference": "urn:uuid:2ed49de9-20df-4a48-96ac-3d11cf854847"
         },
         "collectedDateTime": "2022-02-19T00:00:00+01:00"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Observation/555-42-23-9",
+    "fullUrl": "urn:uuid:3efd0ecb-5c7d-4b7e-9e7b-34ce3070057d",
     "resource": {
       "resourceType": "Observation",
-      "id": "555-42-23-9",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/PathogenDetectionHIVP" ]
       },
@@ -251,7 +243,7 @@
         } ]
       },
       "subject": {
-        "reference": "Patient/555-42-23-7"
+        "reference": "urn:uuid:58b26b0f-ee2d-42f2-9dd9-56c8223fcbd0"
       },
       "valueCodeableConcept": {
         "coding": [ {
@@ -274,14 +266,13 @@
         } ]
       },
       "specimen": {
-        "reference": "Specimen/555-42-23-8"
+        "reference": "urn:uuid:7109d731-da8d-463a-85c9-5fdd71e5d83b"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Observation/555-42-23-10",
+    "fullUrl": "urn:uuid:08835380-54e5-4115-82c2-435d929a3803",
     "resource": {
       "resourceType": "Observation",
-      "id": "555-42-23-10",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/PathogenDetectionHIVP" ]
       },
@@ -301,7 +292,7 @@
         } ]
       },
       "subject": {
-        "reference": "Patient/555-42-23-7"
+        "reference": "urn:uuid:58b26b0f-ee2d-42f2-9dd9-56c8223fcbd0"
       },
       "valueCodeableConcept": {
         "coding": [ {
@@ -324,14 +315,13 @@
         } ]
       },
       "specimen": {
-        "reference": "Specimen/555-42-23-8"
+        "reference": "urn:uuid:7109d731-da8d-463a-85c9-5fdd71e5d83b"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/DiagnosticReport/555-42-23-11",
+    "fullUrl": "urn:uuid:255e7f4e-4e48-4cad-91f8-c9be7e6fafc7",
     "resource": {
       "resourceType": "DiagnosticReport",
-      "id": "555-42-23-11",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportHIVP" ]
       },
@@ -351,111 +341,19 @@
         } ]
       },
       "subject": {
-        "reference": "Patient/555-42-23-7"
+        "reference": "urn:uuid:58b26b0f-ee2d-42f2-9dd9-56c8223fcbd0"
       },
       "issued": "2024-03-14T14:45:00.000+01:00",
       "result": [ {
-        "reference": "Observation/555-42-23-9"
+        "reference": "urn:uuid:3efd0ecb-5c7d-4b7e-9e7b-34ce3070057d"
       }, {
-        "reference": "Observation/555-42-23-10"
+        "reference": "urn:uuid:08835380-54e5-4115-82c2-435d929a3803"
       } ],
       "conclusionCode": [ {
         "coding": [ {
           "system": "https://demis.rki.de/fhir/CodeSystem/conclusionCode",
           "code": "pathogenDetected"
         } ]
-      } ]
-    }
-  }, {
-    "fullUrl": "https://demis.rki.de/fhir/Provenance/0161eba5-e6b2-401f-8966-2d1559abca56",
-    "resource": {
-      "resourceType": "Provenance",
-      "id": "0161eba5-e6b2-401f-8966-2d1559abca56",
-      "meta": {
-        "profile": [ "https://demis.rki.de/fhir/StructureDefinition/DemisProvenance" ]
-      },
-      "target": [ {
-        "reference": "Composition/555-42-23-13"
-      } ],
-      "recorded": "2024-04-11T13:44:46.765+02:00",
-      "activity": {
-        "coding": [ {
-          "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
-          "code": "CREATE"
-        } ]
-      },
-      "agent": [ {
-        "extension": [ {
-          "url": null,
-          "valueCodeableConcept": {
-            "coding": [ {
-              "system": "https://demis.rki.de/fhir/CodeSystem/levelOfAssurance",
-              "code": "substantial"
-            } ]
-          }
-        }, {
-          "url": null,
-          "valueCodeableConcept": {
-            "coding": [ {
-              "system": "https://demis.rki.de/fhir/CodeSystem/organizationType",
-              "code": "1.2.276.0.76.4.53"
-            } ]
-          }
-        } ],
-        "type": {
-          "coding": [ {
-            "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
-            "code": "performer"
-          } ]
-        },
-        "role": [ {
-          "coding": [ {
-            "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
-            "code": "AUT"
-          } ]
-        } ],
-        "who": {
-          "type": "organization",
-          "identifier": {
-            "type": {
-              "coding": [ {
-                "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                "code": "AN"
-              } ]
-            },
-            "system": "urn.ietf:rfc:3986",
-            "value": "urn:uuid:9569bc96-6c32-469c-9907-f8579ef3df70"
-          }
-        },
-        "onBehalfOf": {
-          "type": "organization",
-          "identifier": {
-            "type": {
-              "coding": [ {
-                "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                "code": "PRN"
-              } ]
-            },
-            "system": "https://gematik.de/fhir/sid/telematik-id",
-            "value": "5-2-123494546"
-          }
-        }
-      } ],
-      "entity": [ {
-        "role": "source",
-        "what": {
-          "type": "Endpoint",
-          "identifier": {
-            "type": {
-              "coding": [ {
-                "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                "code": "RI"
-              } ]
-            },
-            "system": "https://demis.rki.de/fhir/sid/DemisClientId",
-            "value": "meldeportal"
-          }
-        }
       } ]
     }
   } ]

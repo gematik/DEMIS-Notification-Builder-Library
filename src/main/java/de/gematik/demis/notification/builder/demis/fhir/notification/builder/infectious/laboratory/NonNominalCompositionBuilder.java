@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -43,7 +47,7 @@ public class NonNominalCompositionBuilder extends NotificationLaboratoryDataBuil
       @Nonnull final DiagnosticReport diagnosticReport) {
     final NonNominalCompositionBuilder builder = new NonNominalCompositionBuilder();
     builder.setMetaUrl(original.getMeta().getProfile().getFirst().getValueAsString());
-    builder.setNotificationId(original.getIdElement().getIdPart());
+    builder.setNotificationId(original.getId());
 
     final Coding codingFirstRep = original.getType().getCodingFirstRep();
     builder.setTypeCode(codingFirstRep);

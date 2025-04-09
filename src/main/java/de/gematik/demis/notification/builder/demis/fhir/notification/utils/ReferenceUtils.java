@@ -19,9 +19,14 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder;
 import java.util.Objects;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -34,16 +39,29 @@ public final class ReferenceUtils {
     throw new NotImplementedException("you shall not use this constructor");
   }
 
+  /**
+   * @deprecated Use {@link
+   *     de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder#createFullUrl(Resource)}
+   */
   public static String getFullUrl(Resource resource) {
-    return DemisConstants.DEMIS_RKI_DE_FHIR + createText(resource);
-  }
-
-  private static String createText(Resource resource) {
-    return resource.getResourceType().toString() + "/" + resource.getId();
+    return BundleDataBuilder.createFullUrl(resource);
   }
 
   public static Reference internalReference(final Resource toReference) {
     final IIdType idElement = toReference.getIdElement();
+    /*
+     It's legal to have a bundle with resources that are only identified by their full url. In that case we don't have
+     to have an id. The problem is that we don't have the bundle context available when we build references. Usually
+     this shouldn't happen with Bundles build Gematik-internally. However, external providers might send us such Bundles.
+     When dealing with these you'll have to ensure that you set an id based on the full url.
+    */
+    Objects.requireNonNull(
+        idElement.getValue(),
+        "Can't build a reference when IIdType#value is null. Did you ensure you set an id?");
+    if (idElement.getValue().startsWith("urn:uuid:")) {
+      return new Reference(idElement.getValue());
+    }
+
     /*
      Some builders only set the idPart and previously extracted the resource type from the resource directly
      it's probably a better id to take all id elements from a single source (the IdType). But adjusting the builders

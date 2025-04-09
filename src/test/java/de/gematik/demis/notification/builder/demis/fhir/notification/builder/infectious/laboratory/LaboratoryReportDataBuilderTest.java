@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -87,7 +91,9 @@ class LaboratoryReportDataBuilderTest {
   void shouldSetMetaProfileUrlUpperCase() {
     LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
     laboratoryReportDataBuilder1.setProfileUrlHelper("cvdp");
-    laboratoryReportDataBuilder1.setNotifiedPerson(new Patient());
+    final Patient patient = new Patient();
+    patient.setId("123");
+    laboratoryReportDataBuilder1.setNotifiedPerson(patient);
     DiagnosticReport diagnosticReport = laboratoryReportDataBuilder1.build();
     assertThat(diagnosticReport.getMeta().getProfile().get(0).getValue())
         .isEqualTo("https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportCVDP");
@@ -99,7 +105,9 @@ class LaboratoryReportDataBuilderTest {
       utilities.when(Utils::generateUuidString).thenReturn("1");
       LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
       laboratoryReportDataBuilder1.setDefaultData();
-      laboratoryReportDataBuilder1.setNotifiedPerson(new Patient());
+      final Patient notifiedPerson1 = new Patient();
+      notifiedPerson1.setId("123");
+      laboratoryReportDataBuilder1.setNotifiedPerson(notifiedPerson1);
       DiagnosticReport diagnosticReport = laboratoryReportDataBuilder1.build();
       assertThat(diagnosticReport.getCode().getCodingFirstRep().getSystem())
           .isEqualTo("https://demis.rki.de/fhir/CodeSystem/notificationCategory");
@@ -113,6 +121,7 @@ class LaboratoryReportDataBuilderTest {
   void shouldBuildWithGivenData() {
     LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
     Patient patient = new Patient();
+    patient.setId("123");
 
     laboratoryReportDataBuilder1.setNotifiedPerson(patient);
     Date date = new Date();
@@ -124,6 +133,7 @@ class LaboratoryReportDataBuilderTest {
     laboratoryReportDataBuilder1.setConclusionCodeCode("conclusionCode");
     laboratoryReportDataBuilder1.setConclusionCodeDisplay("conclusionDisplay");
     Observation pathogenDetection1 = new Observation();
+    pathogenDetection1.setId("321");
     laboratoryReportDataBuilder1.setPathogenDetections(
         Collections.singletonList(pathogenDetection1));
 

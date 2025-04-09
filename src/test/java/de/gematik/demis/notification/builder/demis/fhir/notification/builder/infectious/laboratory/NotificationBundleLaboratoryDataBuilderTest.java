@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -27,7 +31,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Specimen;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,16 +53,24 @@ class NotificationBundleLaboratoryDataBuilderTest {
   void createCompleteBundleWithStandardData() {
     // given
     Patient notifiedPerson = new Patient();
+    notifiedPerson.setId("n1");
     PractitionerRole submitterRole = new PractitionerRole();
+    submitterRole.setId("s1");
     Practitioner submitter = new Practitioner();
+    submitter.setId("s2");
     submitterRole.setPractitioner(new Reference(submitter));
     Specimen specimen = new Specimen();
+    specimen.setId("s3");
     Observation onePathogenDetection = new Observation().setSpecimen(new Reference(specimen));
+    onePathogenDetection.setId("p1");
     List<Observation> pathogenDetectionList = Collections.singletonList(onePathogenDetection);
     DiagnosticReport laboratoryReport =
         new DiagnosticReport().addResult(new Reference(onePathogenDetection));
+    laboratoryReport.setId("l1");
     PractitionerRole notifierRole = new PractitionerRole();
+    notifierRole.setId("nr1");
     Organization notifierFacility = new Organization();
+    notifierFacility.setId("nf1");
     notifierRole.setOrganization(new Reference(notifierFacility));
 
     // when
@@ -59,7 +80,7 @@ class NotificationBundleLaboratoryDataBuilderTest {
         .setId("specificId")
         .setIdentifierAsNotificationBundleId("specificIdentifier");
 
-    Composition composition = new NotificationLaboratoryDataBuilder().build();
+    Composition composition = new NotificationLaboratoryDataBuilder().setDefault().build();
 
     builder
         .setNotifiedPerson(notifiedPerson)
@@ -95,15 +116,22 @@ class NotificationBundleLaboratoryDataBuilderTest {
   void thatAdditionalEntriesAreAppendedToTheEnd() {
     // GIVEN a bundle
     final Patient notifiedPerson = new Patient();
+    notifiedPerson.setId("n1");
     final Specimen specimen = new Specimen();
+    specimen.setId("s1");
     final Observation onePathogenDetection = new Observation().setSpecimen(new Reference(specimen));
+    onePathogenDetection.setId("p1");
     final DiagnosticReport laboratoryReport =
         new DiagnosticReport().addResult(new Reference(onePathogenDetection));
+    laboratoryReport.setId("l1");
     final PractitionerRole notifierRole = new PractitionerRole();
+    notifierRole.setId("nr1");
     final Organization notifierFacility = new Organization();
+    notifierFacility.setId("nf1");
     notifierRole.setOrganization(new Reference(notifierFacility));
 
     final Organization additionalEntry = new Organization();
+    additionalEntry.setId("a1");
 
     // WHEN I use defaults
     final NotificationBundleLaboratoryDataBuilder builder =
@@ -113,7 +141,7 @@ class NotificationBundleLaboratoryDataBuilderTest {
         .setId("specificId")
         .setIdentifierAsNotificationBundleId("specificIdentifier");
 
-    final Composition composition = new NotificationLaboratoryDataBuilder().build();
+    final Composition composition = new NotificationLaboratoryDataBuilder().setDefault().build();
 
     // AND I begin by adding additional entries
     builder.addAdditionalEntry(additionalEntry);
