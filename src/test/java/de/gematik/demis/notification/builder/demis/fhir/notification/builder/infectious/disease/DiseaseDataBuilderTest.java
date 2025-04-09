@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -41,6 +45,7 @@ public final class DiseaseDataBuilderTest {
 
   public static DiseaseDataBuilder createCvddBuilder() {
     DiseaseDataBuilder disease = new DiseaseDataBuilder();
+    disease.setDefaults();
     disease.setProfileUrl(PROFILE_DISEASE_CVDD);
     disease.setVerificationStatus(
         new Coding().setSystem(CODE_SYSTEM_CONDITION_VERIFICATION_STATUS).setCode("confirmed"));

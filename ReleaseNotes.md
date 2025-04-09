@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## Release 5.5.1
+* Updated ospo-resources for adding additional notes and disclaimer
+
 ## Release 5.4.0
 * Updated OSPO-Guidelines and checks
 * Add handling for Maven-Central release

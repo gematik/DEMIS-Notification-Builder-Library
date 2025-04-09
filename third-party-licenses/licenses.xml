@@ -141,10 +141,10 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>failureaccess</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.3</version>
       <licenses>
         <license>
-          <name>The Apache Software License, Version 2.0</name>
+          <name>Apache License, Version 2.0</name>
           <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
           <distribution>repo</distribution>
           <file>the apache software license, version 2.0 - license-2.0.txt</file>
@@ -154,7 +154,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>33.4.0-jre</version>
+      <version>33.4.6-jre</version>
       <licenses>
         <license>
           <name>Apache License, Version 2.0</name>
@@ -376,22 +376,21 @@
       </licenses>
     </dependency>
     <dependency>
-      <groupId>org.checkerframework</groupId>
-      <artifactId>checker-qual</artifactId>
-      <version>3.43.0</version>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <version>1.0.0</version>
       <licenses>
         <license>
-          <name>The MIT License</name>
-          <url>http://opensource.org/licenses/MIT</url>
-          <distribution>repo</distribution>
-          <file>the mit license - mit.html</file>
+          <name>The Apache License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+          <file>the apache software license, version 2.0 - license-2.0.txt</file>
         </license>
       </licenses>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>5.12.0</version>
+      <version>5.12.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -403,7 +402,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.12.0</version>
+      <version>5.12.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -415,7 +414,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <version>5.12.0</version>
+      <version>5.12.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -427,7 +426,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-commons</artifactId>
-      <version>1.12.0</version>
+      <version>1.12.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -439,7 +438,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-engine</artifactId>
-      <version>1.12.0</version>
+      <version>1.12.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -451,7 +450,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.16.0</version>
+      <version>5.16.1</version>
       <licenses>
         <license>
           <name>MIT</name>

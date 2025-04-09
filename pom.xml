@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>5.5.0</version>
+    <version>5.6.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json, FHIR-xml, HAPI bundle objects)</description>
@@ -28,10 +28,10 @@
         <fmt.maven.plugin.version>2.25</fmt.maven.plugin.version>
         <enforcer.plugin.version>3.5.0</enforcer.plugin.version>
         <asm.version>9.7.1</asm.version>
-        <surefire.plugin.version>3.5.2</surefire.plugin.version>
-        <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
+        <surefire.plugin.version>3.5.3</surefire.plugin.version>
+        <jacoco.plugin.version>0.8.13</jacoco.plugin.version>
         <fhir.parser.lib.version>2.4.1</fhir.parser.lib.version>
-        <junit.version>5.12.0</junit.version>
+        <junit.version>5.12.1</junit.version>
         <sonar.exclusions>
             **/de/gematik/demis/notification/builder/demis/fhir/notification/utils/DemisConstants.java
         </sonar.exclusions>
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.4.0-jre</version>
+                <version>33.4.6-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.16.0</version>
+            <version>5.16.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -130,7 +130,7 @@
                     <dependency>
                         <groupId>de.gematik</groupId>
                         <artifactId>ospo-resources</artifactId>
-                        <version>1.1.0</version>
+                        <version>1.2.0</version>
                     </dependency>
                 </dependencies>
                 <executions>

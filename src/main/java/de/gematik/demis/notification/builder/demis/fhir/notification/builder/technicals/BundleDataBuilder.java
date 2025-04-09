@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -29,11 +33,18 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Resource;
 
 @Setter
 @Slf4j
@@ -63,10 +74,15 @@ public abstract class BundleDataBuilder implements InitializableFhirObjectBuilde
    *
    * @param resource resource
    * @return full URL, like: <code>
-   * https://demis.rki.de/fhir/Organization/9d6c3dcd-cba3-4fcc-9eae-6b7b19e60148</code>
+   * https://demis.rki.de/fhir/Organization/9d6c3dcd-cba3-4fcc-9eae-6b7b19e60148</code> or <code>
+   *     urn:uuid:45e4eee9-bf7f-472f-bdd3-3d8731b71c9f</code>
    */
   public static String createFullUrl(Resource resource) {
     /*
+     * Creating resources using FHIR parsers will create IdElements. Our own library doesn't do that. We first opt to look
+     * at the IdType created by FHIR due to the finer access control on id elements. If that fails we fallback to look at
+     * the resource for the necessary information.
+     *
      * Only our builders create FHIR resources without setting the resource type. A resource obtained through other
      * means (e.g. using an object parsed from JSON/XML) will return fullUrls for resource.getId(). This will
      * lead to broken fullUrls -> e.g. https://demis.../ResourceType/ResourceType/Id.
@@ -75,17 +91,18 @@ public abstract class BundleDataBuilder implements InitializableFhirObjectBuilde
      * However, we prefer to reference the IdType now, as that also works well when interacting with other code, e.g.
      * to create correct references.
      */
-    if (resource.getIdElement() != null && resource.getIdElement().getResourceType() != null) {
-      return DemisConstants.DEMIS_RKI_DE_FHIR
-          + resource.getIdElement().getResourceType()
-          + "/"
-          + resource.getIdElement().getIdPart();
+    final IdType idElement = resource.getIdElement();
+    if (idElement.getValue().startsWith("urn:uuid")) {
+      return idElement.getValue();
     }
 
-    return DemisConstants.DEMIS_RKI_DE_FHIR
-        + resource.getResourceType().toString()
-        + "/"
-        + resource.getId();
+    String resourceType = idElement.getResourceType();
+    if (!idElement.hasResourceType() || Objects.equals(resourceType, "null")) {
+      resourceType = resource.getResourceType().toString();
+    }
+
+    final String resourceId = Objects.requireNonNullElse(idElement.getIdPart(), resource.getId());
+    return DemisConstants.DEMIS_RKI_DE_FHIR + resourceType + "/" + resourceId;
   }
 
   @Override

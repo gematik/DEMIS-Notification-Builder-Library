@@ -1,4 +1,4 @@
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
+package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 /*-
  * #%L
@@ -27,34 +27,39 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.Test;
 
-class AnonymousBundleBuilderTest {
+class ReferenceUtilsTest {
 
   @Test
-  void thatExistingAnonymousBundleRemainsUnchanged() throws IOException {
-    // GIVEN a bundle with NonNominal profiles and a notified person
+  void thatNPEIsThrown() {
+    final Patient resource = new Patient();
+    assertThatExceptionOfType(NullPointerException.class)
+        .isThrownBy(
+            () -> {
+              ReferenceUtils.internalReference(resource);
+            });
+  }
 
-    // THEN
-    final String source =
-        Files.readString(Path.of("src/test/resources/laboratory/73-anonymous.json"));
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
+  @Test
+  void canDealWithUrnUuid() {
+    final Patient resource = new Patient();
+    resource.setId("urn:uuid:20998fdc-0af8-4276-b099-5997534f1e5e");
 
-    final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = AnonymousBundleBuilder.deepCopy(original);
+    final Reference reference = ReferenceUtils.internalReference(resource);
+    assertThat(reference.getReference()).isEqualTo("urn:uuid:20998fdc-0af8-4276-b099-5997534f1e5e");
+  }
 
-    final String expected =
-        Files.readString(Path.of("src/test/resources/laboratory/73-anonymous-expected.json"));
+  @Test
+  void convertIdToLocalId() {
+    final Patient resource = new Patient();
+    resource.setId("123");
 
-    final String result = iParser.encodeResourceToString(copy);
-    assertThat(result).isEqualToIgnoringNewLines(expected);
+    final Reference reference = ReferenceUtils.internalReference(resource);
+    assertThat(reference.getReference()).isEqualTo("Patient/123");
   }
 }

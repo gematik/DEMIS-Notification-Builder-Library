@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -29,7 +33,14 @@ import static org.hl7.fhir.r4.model.Observation.ObservationStatus.FINAL;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.math.BigDecimal;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Specimen;
+import org.hl7.fhir.r4.model.Type;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +58,9 @@ class PathogenDetectionDataBuilderTest {
   @BeforeAll
   static void setUpAll() {
     notifiedPerson = new Patient();
+    notifiedPerson.setId("1");
     specimen = new Specimen();
+    specimen.setId("2");
   }
 
   @BeforeEach
@@ -98,9 +111,11 @@ class PathogenDetectionDataBuilderTest {
     PathogenDetectionDataBuilder pathogenDetectionDataBuilder1 = new PathogenDetectionDataBuilder();
 
     Patient patient = new Patient();
+    patient.setId("123");
     pathogenDetectionDataBuilder1.setNotifiedPerson(patient);
 
     Specimen specimen1 = new Specimen();
+    specimen1.setId("124");
     pathogenDetectionDataBuilder1.setSpecimen(specimen1);
 
     Coding coding = new Coding();
@@ -330,6 +345,7 @@ class PathogenDetectionDataBuilderTest {
   class CopyOfTests {
     private Observation createObservation() {
       Observation observation = new Observation();
+      observation.setId("123");
       observation.setMeta(new Meta().addProfile("https://example.com/profile"));
       observation.setStatus(Observation.ObservationStatus.FINAL);
       observation.addCategory(

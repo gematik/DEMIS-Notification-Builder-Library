@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -57,6 +61,8 @@ public final class DemisConstants {
       DEMIS_RKI_DE_FHIR + "StructureDefinition/SubmittingRole";
   public static final String PROFILE_LABORATORY_REPORT_CVDP =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/LaboratoryReportCVDP";
+  public static final String PROFILE_PROVENANCE =
+      DEMIS_RKI_DE_FHIR + "StructureDefinition/DemisProvenance";
   public static final String PROFILE_PATHOGEN_DETECTION_CVDP =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/PathogenDetectionCVDP";
   public static final String PROFILE_SPECIMEN_CVDP =

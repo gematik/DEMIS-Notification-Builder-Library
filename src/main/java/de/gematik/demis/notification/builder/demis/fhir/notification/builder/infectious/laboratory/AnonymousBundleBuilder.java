@@ -19,22 +19,18 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
-import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonAnonymousDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Composition;
-import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Observation;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.PractitionerRole;
-import org.hl7.fhir.r4.model.Specimen;
 
 public class AnonymousBundleBuilder extends NotificationBundleLaboratoryDataBuilder {
 
@@ -61,29 +57,13 @@ public class AnonymousBundleBuilder extends NotificationBundleLaboratoryDataBuil
     builder.setLastUpdated(originalBundle.getMeta().getLastUpdated());
     builder.setTimestamp(originalBundle.getTimestamp());
 
-    final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle.getEntry());
-    final Patient subject = NotifiedPersonAnonymousDataBuilder.deepCopy(ctx.subject());
-    final PractitionerRole submitter = PractitionerRoleBuilder.deepCopy(ctx.submitter());
-    final PractitionerRole notifier = PractitionerRoleBuilder.deepCopy(ctx.notifier());
-
-    final Bundles.ObservationCopyResult observationCopyResult =
-        Bundles.copyObservations(ctx.observations(), subject, submitter);
-    final ImmutableSet<Observation> copiedObservations = observationCopyResult.observations();
-    final ImmutableSet<Specimen> copiedSpecimen = observationCopyResult.specimen();
-
-    final DiagnosticReport diagnosticReport =
-        LaboratoryReportDataBuilder.deepCopy(ctx.diagnosticReport(), subject, copiedObservations);
-    final Composition composition =
-        AnonymousCompositionBuilder.deepCopy(
-            ctx.composition(), notifier, subject, diagnosticReport);
-
-    builder.setSpecimen(copiedSpecimen);
-    builder.setPathogenDetection(copiedObservations);
-    builder.setLaboratoryReport(diagnosticReport);
-    builder.setNotificationLaboratory(composition);
-    builder.setNotifiedPerson(subject);
-    builder.setNotifierRole(notifier);
-    builder.setSubmitterRole(submitter);
+    BundleBuilderContext.from(originalBundle.getEntry())
+        .copyWith(
+            NotifiedPersonAnonymousDataBuilder::deepCopy,
+            (composition, copy) ->
+                AnonymousCompositionBuilder.deepCopy(
+                    composition, copy.notifier(), copy.subject(), copy.diagnosticReport()))
+        .applyTo(builder);
 
     return builder.build();
   }

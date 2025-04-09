@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -85,8 +89,8 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
   }
 
   @Override
-  public InitializableFhirObjectBuilder setDefaults() {
-    return null;
+  public PatientBuilder setDefaults() {
+    return this;
   }
 
   @Override

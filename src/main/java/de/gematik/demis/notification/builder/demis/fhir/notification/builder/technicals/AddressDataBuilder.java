@@ -19,6 +19,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * In case of changes by gematik find details in the "Readme" file.
  *
  * See the Licence for the specific language governing permissions and limitations under the Licence.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  * #L%
  */
 
@@ -32,7 +36,6 @@ import java.util.List;
 import java.util.SequencedCollection;
 import lombok.AccessLevel;
 import lombok.Setter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Extension;
@@ -81,19 +84,19 @@ public class AddressDataBuilder implements FhirObjectBuilder {
    * copied, but only 3 letters of the postal code remain.
    */
   public static SequencedCollection<Address> copyOfRedactedAddress(
-      final Collection<Address> original) {
-    return original.stream()
-        .map(address -> Pair.of(address, AddressDataBuilder.copyOnlyPostalCode(address)))
-        .filter(
-            p ->
-                p.getRight()
-                    .hasPostalCode()) // Don't need addresses without postal code, they'd be empty
-        .map(
-            p -> {
-              AddressDataBuilder.copyExtensions(p.getLeft(), p.getRight());
-              return p.getRight();
-            })
-        .toList();
+      final Collection<Address> originals) {
+
+    final ArrayList<Address> result = new ArrayList<>(originals.size());
+    for (final Address original : originals) {
+      if (original.hasPostalCode() || original.hasCountry()) {
+        final Address redactedCopy = AddressDataBuilder.copyOnlyPostalCode(original);
+        redactedCopy.setCountry(original.getCountry());
+        AddressDataBuilder.copyExtensions(original, redactedCopy);
+        result.add(redactedCopy);
+      }
+    }
+
+    return result;
   }
 
   /**
