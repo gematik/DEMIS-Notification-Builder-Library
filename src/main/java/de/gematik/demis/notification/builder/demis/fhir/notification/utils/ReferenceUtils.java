@@ -58,20 +58,23 @@ public final class ReferenceUtils {
     Objects.requireNonNull(
         idElement.getValue(),
         "Can't build a reference when IIdType#value is null. Did you ensure you set an id?");
+    final Reference result;
     if (idElement.getValue().startsWith("urn:uuid:")) {
-      return new Reference(idElement.getValue());
-    }
+      result = new Reference(idElement.getValue());
+    } else {
 
-    /*
-     Some builders only set the idPart and previously extracted the resource type from the resource directly
-     it's probably a better id to take all id elements from a single source (the IdType). But adjusting the builders
-     might break too much client code.
-    */
-    final String resourceType =
-        String.valueOf(
-            Objects.requireNonNullElse(idElement.getResourceType(), toReference.getResourceType()));
-    final String join = String.join("/", resourceType, idElement.getIdPart());
-    final Reference result = new Reference(join);
+      /*
+       Some builders only set the idPart and previously extracted the resource type from the resource directly
+       it's probably a better id to take all id elements from a single source (the IdType). But adjusting the builders
+       might break too much client code.
+      */
+      final String resourceType =
+          String.valueOf(
+              Objects.requireNonNullElse(
+                  idElement.getResourceType(), toReference.getResourceType()));
+      final String join = String.join("/", resourceType, idElement.getIdPart());
+      result = new Reference(join);
+    }
     result.setResource(toReference);
     return result;
   }

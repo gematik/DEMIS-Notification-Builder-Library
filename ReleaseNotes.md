@@ -2,6 +2,14 @@
 
 # Release-Notes notification-builder-library
 
+## Release 5.6.1
+
+* Bugfix: reference utils now set resource for `urn:uuid:` references correctly
+
+## Release 5.6.0
+
+* Allow processing resources using only `urn:uuid:` references
+
 ## Release 5.5.1
 * Updated ospo-resources for adding additional notes and disclaimer
 
