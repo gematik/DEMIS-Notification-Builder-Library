@@ -250,6 +250,10 @@ public class LaboratoryReportDataBuilder {
     return this;
   }
 
+  protected String getDefaultProfileUrl() {
+    return LABORATORY_REPORT_BASE_URL;
+  }
+
   /**
    * Add the reason for testing to the laboratory report.
    *
@@ -274,7 +278,7 @@ public class LaboratoryReportDataBuilder {
    * @return this builder
    */
   public LaboratoryReportDataBuilder setProfileUrlHelper(String pathogenCode) {
-    metaProfileUrl = LABORATORY_REPORT_BASE_URL + pathogenCode.toUpperCase();
+    metaProfileUrl = getDefaultProfileUrl() + pathogenCode.toUpperCase();
     return this;
   }
 

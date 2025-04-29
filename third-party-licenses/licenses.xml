@@ -154,7 +154,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>33.4.6-jre</version>
+      <version>33.4.8-jre</version>
       <licenses>
         <license>
           <name>Apache License, Version 2.0</name>
@@ -390,7 +390,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>5.12.1</version>
+      <version>5.12.2</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -402,7 +402,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.12.1</version>
+      <version>5.12.2</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -414,7 +414,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <version>5.12.1</version>
+      <version>5.12.2</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -426,7 +426,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-commons</artifactId>
-      <version>1.12.1</version>
+      <version>1.12.2</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -438,7 +438,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-engine</artifactId>
-      <version>1.12.1</version>
+      <version>1.12.2</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -450,7 +450,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.16.1</version>
+      <version>5.17.0</version>
       <licenses>
         <license>
           <name>MIT</name>
@@ -488,7 +488,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.36</version>
+      <version>1.18.38</version>
       <licenses>
         <license>
           <name>The MIT License</name>
