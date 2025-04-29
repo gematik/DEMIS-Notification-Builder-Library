@@ -2,6 +2,11 @@
 
 # Release-Notes notification-builder-library
 
+## Release 5.7.0
+
+* Added Builder for LaboratoryReportNonNominal for §7.3 notifications.
+* Updated dependencies
+
 ## Release 5.6.1
 
 * Bugfix: reference utils now set resource for `urn:uuid:` references correctly

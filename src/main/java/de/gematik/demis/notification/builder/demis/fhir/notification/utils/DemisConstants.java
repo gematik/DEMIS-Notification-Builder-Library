@@ -240,6 +240,8 @@ public final class DemisConstants {
 
   public static final String LABORATORY_REPORT_BASE_URL =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/LaboratoryReport";
+  public static final String LABORATORY_REPORT_NON_NOMINAL_BASE_URL =
+      DEMIS_RKI_DE_FHIR + "StructureDefinition/LaboratoryReportNonNominal";
   public static final String SPECIMEN_BASE_URL = DEMIS_RKI_DE_FHIR + "StructureDefinition/Specimen";
   public static final String ADDRESS_USE_URL = DEMIS_RKI_DE_FHIR + "StructureDefinition/AddressUse";
 

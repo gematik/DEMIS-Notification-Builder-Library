@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>5.6.1</version>
+    <version>5.7.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json, FHIR-xml, HAPI bundle objects)</description>
@@ -27,11 +27,11 @@
         <maven.compiler.target>21</maven.compiler.target>
         <fmt.maven.plugin.version>2.25</fmt.maven.plugin.version>
         <enforcer.plugin.version>3.5.0</enforcer.plugin.version>
-        <asm.version>9.7.1</asm.version>
+        <asm.version>9.8</asm.version>
         <surefire.plugin.version>3.5.3</surefire.plugin.version>
         <jacoco.plugin.version>0.8.13</jacoco.plugin.version>
         <fhir.parser.lib.version>2.4.1</fhir.parser.lib.version>
-        <junit.version>5.12.1</junit.version>
+        <junit.version>5.12.2</junit.version>
         <sonar.exclusions>
             **/de/gematik/demis/notification/builder/demis/fhir/notification/utils/DemisConstants.java
         </sonar.exclusions>
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.4.6-jre</version>
+                <version>33.4.8-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.36</version>
+            <version>1.18.38</version>
             <scope>provided</scope>
         </dependency>
 
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.16.1</version>
+            <version>5.17.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
