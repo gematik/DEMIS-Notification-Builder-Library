@@ -2,6 +2,10 @@
 
 # Release-Notes notification-builder-library
 
+## Release 5.8.0
+* Added CustomEvaluationContext to be used by services through NBL library.
+* Update dependencies
+
 ## Release 5.7.0
 
 * Added Builder for LaboratoryReportNonNominal for §7.3 notifications.
