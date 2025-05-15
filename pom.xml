@@ -6,10 +6,12 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>5.7.0</version>
+    <version>5.8.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
-    <description>This project is used to generate example and test messages in various formats (including FHIR-json, FHIR-xml, HAPI bundle objects)</description>
+    <description>This project is used to generate example and test messages in various formats (including FHIR-json,
+        FHIR-xml, HAPI bundle objects)
+    </description>
     <url>https://github.com/gematik/DEMIS-Notification-Builder-Library</url>
 
     <licenses>
@@ -25,12 +27,12 @@
         <version.maven-compiler-plugin>3.14.0</version.maven-compiler-plugin>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <fmt.maven.plugin.version>2.25</fmt.maven.plugin.version>
+        <fmt.maven.plugin.version>2.27</fmt.maven.plugin.version>
         <enforcer.plugin.version>3.5.0</enforcer.plugin.version>
         <asm.version>9.8</asm.version>
         <surefire.plugin.version>3.5.3</surefire.plugin.version>
         <jacoco.plugin.version>0.8.13</jacoco.plugin.version>
-        <fhir.parser.lib.version>2.4.1</fhir.parser.lib.version>
+        <fhir.parser.lib.version>2.4.2</fhir.parser.lib.version>
         <junit.version>5.12.2</junit.version>
         <sonar.exclusions>
             **/de/gematik/demis/notification/builder/demis/fhir/notification/utils/DemisConstants.java
@@ -50,56 +52,32 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.17.0</version>
             </dependency>
+
+            <!-- HAPI FHIR -->
+            <dependency>
+                <groupId>ca.uhn.hapi.fhir</groupId>
+                <artifactId>hapi-fhir-base</artifactId>
+                <version>7.6.1</version>
+            </dependency>
+            <dependency>
+                <groupId>ca.uhn.hapi.fhir</groupId>
+                <artifactId>hapi-fhir-structures-r4</artifactId>
+                <version>7.6.1</version>
+            </dependency>
+
+            <!-- HL7 -->
+            <dependency>
+                <groupId>ca.uhn.hapi.fhir</groupId>
+                <artifactId>org.hl7.fhir.r4</artifactId>
+                <version>6.5.21</version>
+            </dependency>
+            <dependency>
+                <groupId>ca.uhn.hapi.fhir</groupId>
+                <artifactId>org.hl7.fhir.utilities</artifactId>
+                <version>6.5.21</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-
-        <!-- fhirBase-->
-        <dependency>
-            <groupId>de.gematik.demis</groupId>
-            <artifactId>fhir-parser-library</artifactId>
-            <version>${fhir.parser.lib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.38</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- TEST -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.27.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.17.0</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <finalName>notification-builder-library</finalName>
@@ -396,8 +374,81 @@
     <scm>
         <url>https://github.com/gematik/DEMIS-Notification-Builder-Library</url>
         <connection>scm:git:git://github.com/gematik/DEMIS-Notification-Builder-Library.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:gematik/DEMIS-Notification-Builder-Library.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com:gematik/DEMIS-Notification-Builder-Library.git
+        </developerConnection>
     </scm>
+
+    <dependencies>
+
+        <!--         fhirBase-->
+        <dependency>
+            <groupId>de.gematik.demis</groupId>
+            <artifactId>fhir-parser-library</artifactId>
+            <version>${fhir.parser.lib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.38</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--         UCUM Library -->
+        <dependency>
+            <groupId>org.fhir</groupId>
+            <artifactId>ucum</artifactId>
+            <version>1.0.9</version>
+        </dependency>
+
+        <!--         caching -->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-caching-caffeine</artifactId>
+            <version>7.6.1</version> <!-- Align with your HAPI FHIR version -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- TEST -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>4.0.0-M1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.17.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <issueManagement>
         <system>GitHub</system>
