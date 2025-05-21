@@ -39,10 +39,24 @@ import org.junit.jupiter.api.Test;
 class CopyStrategyFactoryTest {
 
   @Test
-  void thatNonNominalBundlesAreRecognized() {
+  void thatNonNominalLaboratoryBundlesAreRecognized() {
     final Bundle nonNominalBundle = new NonNominalBundleBuilder().setDefaults().build();
     final Optional<CopyStrategy<Bundle>> result = CopyStrategyFactory.getInstance(nonNominalBundle);
     assertThat(result).containsInstanceOf(NonNominalCopyStrategy.class);
+  }
+
+  @Test
+  void thatNonNominalDiseaseBundlesAreRecognized() {
+    final Bundle nonNominalBundle =
+        new de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease
+                .NonNominalBundleBuilder()
+            .setDefaults()
+            .build();
+    final Optional<CopyStrategy<Bundle>> result = CopyStrategyFactory.getInstance(nonNominalBundle);
+    assertThat(result)
+        .containsInstanceOf(
+            de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease
+                .NonNominalCopyStrategy.class);
   }
 
   @Test

@@ -1,4 +1,4 @@
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.copy;
+package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 /*-
  * #%L
@@ -26,10 +26,37 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.co
  * #L%
  */
 
+import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Provenance;
 
-public interface CopyStrategy<E extends IBaseResource> {
+/** Utility methods to extract and transform {@link Provenance}. */
+public class Provenances {
+
+  private Provenances() {}
+
+  /**
+   * Attempt to find a provenance resource in the given entries.
+   *
+   * @return Empty if none or more than one Provenance resource are found.
+   */
   @Nonnull
-  E copy();
+  public static Optional<Provenance> from(
+      @Nonnull final List<Bundle.BundleEntryComponent> entries) {
+    final List<Provenance> provenance =
+        entries.stream()
+            .map(Bundle.BundleEntryComponent::getResource)
+            .filter(Metas.hasProfile(DemisConstants.PROFILE_PROVENANCE))
+            .filter(Provenance.class::isInstance)
+            .map(Provenance.class::cast)
+            .toList();
+
+    if (provenance.size() != 1) {
+      return Optional.empty();
+    }
+
+    return Optional.of(provenance.getFirst());
+  }
 }

@@ -1,4 +1,4 @@
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.copy;
+package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 /*-
  * #%L
@@ -26,10 +26,27 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.co
  * #L%
  */
 
+import java.util.function.Predicate;
 import javax.annotation.Nonnull;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Composition;
 
-public interface CopyStrategy<E extends IBaseResource> {
+public class CodeableConcepts {
+  private CodeableConcepts() {}
+
+  /**
+   * @return A predicate to match the given system and code on the codeable concept associated with
+   *     {@link org.hl7.fhir.r4.model.Composition.SectionComponent}s
+   */
   @Nonnull
-  E copy();
+  public static Predicate<Composition.SectionComponent> hasCode(
+      @Nonnull final String system, @Nonnull final String code) {
+    return section -> {
+      if (!section.hasCode()) {
+        return false;
+      }
+
+      return section.getCode().getCoding().stream()
+          .anyMatch(coding -> system.equals(coding.getSystem()) && code.equals(coding.getCode()));
+    };
+  }
 }

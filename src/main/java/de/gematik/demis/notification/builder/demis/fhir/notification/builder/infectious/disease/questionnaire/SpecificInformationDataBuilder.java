@@ -28,10 +28,13 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.NotificationBundleDiseaseDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import java.util.Collection;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.QuestionnaireResponse;
 
 /**
@@ -49,6 +52,28 @@ public class SpecificInformationDataBuilder extends QuestionnaireResponseBuilder
       "https://demis.rki.de/fhir/Questionnaire/DiseaseQuestions";
   private static final String IMMUNIZATION_LINK_ID = "immunization";
   private static final String IMMUNIZATION_REFERENCES_LINK_ID = "immunizationRef";
+
+  /**
+   * @param notifiedPerson Ensure that only a copy of the resource is passed.
+   */
+  @Nonnull
+  public static QuestionnaireResponse deepCopy(
+      @Nonnull final QuestionnaireResponse original, @Nonnull final Patient notifiedPerson) {
+    final QuestionnaireResponseBuilder result =
+        new SpecificInformationDataBuilder()
+            .setQuestionnaireUrl(original.getQuestionnaire())
+            .setId(original.getId())
+            .setItems(
+                original.getItem().stream()
+                    .map(QuestionnaireResponse.QuestionnaireResponseItemComponent::copy)
+                    .toList())
+            .setStatus(original.getStatus().toCode())
+            .setNotifiedPerson(notifiedPerson);
+
+    final Optional<String> anyProfile = Metas.profilesFrom(original).stream().findFirst();
+    anyProfile.ifPresent(result::setProfileUrl);
+    return result.build();
+  }
 
   private static void addImmunization(
       Immunization immunization,

@@ -1,4 +1,4 @@
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.copy;
+package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 /*-
  * #%L
@@ -26,10 +26,27 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.co
  * #L%
  */
 
+import java.util.List;
 import javax.annotation.Nonnull;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Element;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Reference;
 
-public interface CopyStrategy<E extends IBaseResource> {
+public class Organizations {
+  private Organizations() {}
+
+  /** Extract organizations referenced by the {@link Extension} on the given {@link Element}. */
   @Nonnull
-  E copy();
+  public static List<Organization> fromExtension(@Nonnull final Element resource) {
+    return resource.getExtension().stream()
+        .filter(Extension::hasValue)
+        .map(Extension::getValue)
+        .filter(Utils.hasFhirType("Reference"))
+        .map(Reference.class::cast)
+        .map(Reference::getResource)
+        .filter(Organization.class::isInstance)
+        .map(Organization.class::cast)
+        .toList();
+  }
 }

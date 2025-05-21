@@ -30,10 +30,12 @@ import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.base.Strings;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.SequencedCollection;
+import javax.annotation.Nonnull;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.Address;
@@ -93,10 +95,25 @@ public class AddressDataBuilder implements FhirObjectBuilder {
         redactedCopy.setCountry(original.getCountry());
         AddressDataBuilder.copyExtensions(original, redactedCopy);
         result.add(redactedCopy);
+      } else if (isReferencingOrganization(original)) {
+        // make sure to FIRST test that there is no data to redact and then add addresses
+        // referencing organizations
+        final Address target = new Address();
+        AddressDataBuilder.copyExtensions(original, target);
+        result.add(target);
       }
     }
 
     return result;
+  }
+
+  /**
+   * @return true if any extension on the address references an organization
+   */
+  public static boolean isReferencingOrganization(@Nonnull final Address original) {
+    return original.getExtension().stream()
+        .map(Extension::getValue)
+        .anyMatch(Utils.hasFhirType("Reference"));
   }
 
   /**

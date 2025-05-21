@@ -28,6 +28,9 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.function.Predicate;
+import javax.annotation.Nonnull;
+import org.hl7.fhir.r4.model.Type;
 
 public final class Utils {
 
@@ -43,5 +46,10 @@ public final class Utils {
 
   public static Date getCurrentDate() {
     return new Date();
+  }
+
+  @Nonnull
+  public static Predicate<Type> hasFhirType(@Nonnull final String search) {
+    return type -> type.fhirType().equals(search);
   }
 }

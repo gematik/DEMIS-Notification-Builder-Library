@@ -27,8 +27,8 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.co
  */
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.AnonymousCopyStrategy;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NonNominalCopyStrategy;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.hl7.fhir.r4.model.Bundle;
 
 public class CopyStrategyFactory {
@@ -39,9 +39,20 @@ public class CopyStrategyFactory {
    * Guess which strategy to use for the given Bundle. If none could be determined an {@link
    * Optional#empty()} is returned.
    */
-  public static Optional<CopyStrategy<Bundle>> getInstance(final Bundle resource) {
-    if (NonNominalCopyStrategy.isApplicableTo(resource)) {
-      return Optional.of(new NonNominalCopyStrategy(resource));
+  @Nonnull
+  public static Optional<CopyStrategy<Bundle>> getInstance(@Nonnull final Bundle resource) {
+    if (de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory
+        .NonNominalCopyStrategy.isApplicableTo(resource)) {
+      return Optional.of(
+          new de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious
+              .laboratory.NonNominalCopyStrategy(resource));
+    }
+
+    if (de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease
+        .NonNominalCopyStrategy.isApplicableTo(resource)) {
+      return Optional.of(
+          new de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious
+              .disease.NonNominalCopyStrategy(resource));
     }
 
     if (AnonymousCopyStrategy.isApplicableTo(resource)) {

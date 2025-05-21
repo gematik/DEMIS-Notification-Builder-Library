@@ -26,46 +26,42 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import javax.annotation.Nonnull;
-import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Reference;
 
-/** Methods to simplify working with {@link org.hl7.fhir.r4.model.Meta}. */
-public class Metas {
-
-  private Metas() {}
+public class Conditions {
+  private Conditions() {}
 
   /**
-   * @return A set of profiles defined for the Resource's Meta. Null values are removed. An empty
-   *     set if no Meta has been set.
+   * Find the first condition among the section entries of the given {@link Composition}.
+   *
+   * @return Empty optional if no, or multiple conditions found
    */
   @Nonnull
-  public static Set<String> profilesFrom(@Nonnull final Resource resource) {
-    if (!resource.hasMeta()) {
-      return Set.of();
+  public static Optional<Condition> from(@Nonnull final Composition composition) {
+    if (!composition.hasSection()) {
+      return Optional.empty();
     }
 
-    return resource.getMeta().getProfile().stream()
-        .map(IPrimitiveType::getValue)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toUnmodifiableSet());
-  }
-
-  /**
-   * @return a {@link Predicate} that matches if a resource has the given Profile.
-   */
-  @Nonnull
-  public static Predicate<Resource> hasProfile(@Nonnull final String profile) {
-    return resource -> {
-      if (!resource.hasMeta()) {
-        return false;
-      }
-
-      return resource.getMeta().hasProfile(profile);
-    };
+    final List<Composition.SectionComponent> section = composition.getSection();
+    final List<Condition> list =
+        section.stream()
+            .map(Composition.SectionComponent::getEntry)
+            .flatMap(Collection::stream)
+            .map(Reference::getResource)
+            .filter(Objects::nonNull) // Reference#getResource can return null
+            .filter(Condition.class::isInstance)
+            .map(Condition.class::cast)
+            .toList();
+    if (list.size() != 1) {
+      return Optional.empty();
+    }
+    return Optional.of(list.getFirst());
   }
 }

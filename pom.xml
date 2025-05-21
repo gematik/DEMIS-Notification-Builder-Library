@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>5.8.0</version>
+    <version>6.0.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json,
@@ -33,6 +33,7 @@
         <surefire.plugin.version>3.5.3</surefire.plugin.version>
         <jacoco.plugin.version>0.8.13</jacoco.plugin.version>
         <fhir.parser.lib.version>2.4.2</fhir.parser.lib.version>
+        <ca.uhn.hapi.fhir.version>8.0.0</ca.uhn.hapi.fhir.version>
         <junit.version>5.12.2</junit.version>
         <sonar.exclusions>
             **/de/gematik/demis/notification/builder/demis/fhir/notification/utils/DemisConstants.java
@@ -57,12 +58,12 @@
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>hapi-fhir-base</artifactId>
-                <version>7.6.1</version>
+                <version>${ca.uhn.hapi.fhir.version}</version>
             </dependency>
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>hapi-fhir-structures-r4</artifactId>
-                <version>7.6.1</version>
+                <version>${ca.uhn.hapi.fhir.version}</version>
             </dependency>
 
             <!-- HL7 -->
@@ -108,7 +109,7 @@
                     <dependency>
                         <groupId>de.gematik</groupId>
                         <artifactId>ospo-resources</artifactId>
-                        <version>1.2.0</version>
+                        <version>1.3.0</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -397,14 +398,14 @@
         <dependency>
             <groupId>org.fhir</groupId>
             <artifactId>ucum</artifactId>
-            <version>1.0.9</version>
+            <version>1.0.10</version>
         </dependency>
 
         <!--         caching -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-caching-caffeine</artifactId>
-            <version>7.6.1</version> <!-- Align with your HAPI FHIR version -->
+            <version>8.0.0</version> <!-- Align with your HAPI FHIR version -->
             <exclusions>
                 <exclusion>
                     <groupId>org.checkerframework</groupId>

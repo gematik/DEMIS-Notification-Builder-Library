@@ -34,6 +34,11 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
+import java.util.List;
+import java.util.Optional;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -66,8 +71,42 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   private Patient notifiedPerson;
   private PractitionerRole notifierRole;
   private Condition disease;
-  private QuestionnaireResponse commonQuestionnaireResponse;
+  @CheckForNull private QuestionnaireResponse commonQuestionnaireResponse;
   private QuestionnaireResponse specificQuestionnaireResponse;
+
+  @Nonnull
+  public static Composition deepCopy(
+      @Nonnull final Composition original,
+      @Nonnull final Condition condition,
+      @Nonnull final Patient notifiedPerson,
+      @Nonnull final PractitionerRole notifier,
+      @Nonnull final QuestionnaireResponse specificQuestionnaireResponse) {
+    final NotificationDiseaseDataBuilder builder =
+        new NotificationDiseaseDataBuilder()
+            .setCategory(original.getCategoryFirstRep().getCodingFirstRep().copy())
+            .setDate(original.getDateElement().copy())
+            .setId(original.getId())
+            .setIdentifier(original.getIdentifier().copy())
+            .setStatus(original.getStatus())
+            .setTitle(original.getTitle())
+            .setType(original.getType().getCodingFirstRep().copy());
+
+    final Optional<String> profile = Metas.profilesFrom(original).stream().findFirst();
+    profile.ifPresent(builder::setProfileUrl);
+
+    final Composition intermediate =
+        builder
+            .setDisease(condition)
+            .setNotifiedPerson(notifiedPerson)
+            .setNotifierRole(notifier)
+            .setSpecificQuestionnaireResponse(specificQuestionnaireResponse)
+            .build();
+    final List<Composition.CompositionRelatesToComponent> relatesTo =
+        original.getRelatesTo().stream()
+            .map(Composition.CompositionRelatesToComponent::copy)
+            .toList();
+    return intermediate.setRelatesTo(relatesTo);
+  }
 
   @Override
   public Composition build() {
@@ -163,7 +202,9 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
 
   private void addDiseaseSections(Composition composition) {
     addDiseaseSection(this.disease, composition);
-    addCommonInformationSection(this.commonQuestionnaireResponse, composition);
+    if (this.commonQuestionnaireResponse != null) {
+      addCommonInformationSection(this.commonQuestionnaireResponse, composition);
+    }
     if (this.specificQuestionnaireResponse != null) {
       addSpecificInformationSection(this.specificQuestionnaireResponse, composition);
     }
@@ -210,7 +251,8 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   }
 
   private void addCommonInformationSection(
-      QuestionnaireResponse commonQuestionnaireResponse, Composition composition) {
+      @Nonnull QuestionnaireResponse commonQuestionnaireResponse,
+      @Nonnull Composition composition) {
     composition.addSection(
         new Composition.SectionComponent()
             .setTitle("Meldetatbestandsübergreifende klinische und epidemiologische Angaben")
