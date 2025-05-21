@@ -31,11 +31,15 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Annotation;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Condition;
@@ -60,6 +64,36 @@ public class DiseaseDataBuilder implements InitializableFhirObjectBuilder {
   private DateTimeType recordedDate;
   private DateTimeType onset;
   private Patient notifiedPerson;
+
+  /**
+   * Copy the given condition and keep only the required fields.
+   *
+   * @param notifiedPerson Caller ensures the given resource was copied correctly.
+   */
+  @Nonnull
+  public static Condition deepCopy(
+      @Nonnull final Condition condition, @Nonnull final Patient notifiedPerson) {
+    final Coding verificationStatus = condition.getVerificationStatus().getCodingFirstRep().copy();
+    final Coding disease = condition.getCode().getCodingFirstRep().copy();
+
+    final Set<String> profiles = Metas.profilesFrom(condition);
+    final DiseaseDataBuilder diseaseDataBuilder =
+        new DiseaseDataBuilder()
+            // we assume the caller has verified the correctness of the condition, we can't take
+            // care of that in
+            // the builder-library
+            .setProfileUrl(profiles.stream().findFirst().orElseThrow())
+            .setNotifiedPerson(notifiedPerson)
+            .setVerificationStatus(verificationStatus)
+            .setRecordedDate(condition.getRecordedDateElement())
+            .setDisease(disease)
+            .setId(condition.getId())
+            .setOnset(condition.getOnsetDateTimeType());
+
+    condition.getNote().stream().map(Annotation::getText).forEach(diseaseDataBuilder::addNote);
+
+    return diseaseDataBuilder.build();
+  }
 
   private static Condition.ConditionEvidenceComponent toEvidence(Coding coding) {
     return new Condition.ConditionEvidenceComponent()

@@ -30,6 +30,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Provenances;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -85,12 +86,7 @@ record BundleBuilderContext(
             .map(Bundles::specimenFromObservation)
             .collect(ImmutableSet.toImmutableSet());
 
-    final Optional<Provenance> provenance =
-        entries.stream()
-            .filter(e -> e.getResource().getMeta().hasProfile(DemisConstants.PROFILE_PROVENANCE))
-            .findFirst()
-            .map(Bundle.BundleEntryComponent::getResource)
-            .map(e -> (Provenance) e);
+    final Optional<Provenance> provenance = Provenances.from(entries);
 
     return new BundleBuilderContext(
         composition,

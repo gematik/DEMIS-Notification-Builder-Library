@@ -2,6 +2,11 @@
 
 # Release-Notes notification-builder-library
 
+## Release 6.0.0
+* Introduce copy mechanism for 7.3 disease
+* Introduce new utility classes
+* Breaking: remove Bundles class, now split into other utility classes
+
 ## Release 5.8.0
 * Added CustomEvaluationContext to be used by services through NBL library.
 * Update dependencies

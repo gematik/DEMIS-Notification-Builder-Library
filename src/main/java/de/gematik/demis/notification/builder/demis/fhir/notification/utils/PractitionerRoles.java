@@ -1,4 +1,4 @@
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.copy;
+package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 /*-
  * #%L
@@ -26,10 +26,30 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.co
  * #L%
  */
 
+import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
 
-public interface CopyStrategy<E extends IBaseResource> {
+public class PractitionerRoles {
+  private PractitionerRoles() {}
+
+  /**
+   * @return Empty optional if no, or multiple authors found
+   */
   @Nonnull
-  E copy();
+  public static Optional<PractitionerRole> authorFrom(@Nonnull final Composition composition) {
+    if (!composition.hasAuthor()) {
+      return Optional.empty();
+    }
+
+    final List<Reference> author = composition.getAuthor();
+    if (author.size() != 1) {
+      return Optional.empty();
+    }
+
+    return Optional.of((PractitionerRole) author.getFirst().getResource());
+  }
 }

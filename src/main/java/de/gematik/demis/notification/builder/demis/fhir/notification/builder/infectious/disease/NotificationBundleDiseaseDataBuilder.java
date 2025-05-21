@@ -33,6 +33,7 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.CheckForNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +74,7 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
   private Composition notificationDisease;
 
   private Condition disease;
-  private QuestionnaireResponse commonInformation;
+  @CheckForNull private QuestionnaireResponse commonInformation;
   private QuestionnaireResponse specificInformation;
 
   private static String validSuffix(String disease) {
@@ -210,8 +211,10 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
   }
 
   private void addCommonInformationQuestionnaireResponse() {
-    addEncounters();
-    addEntry(this.commonInformation);
+    if (this.commonInformation != null) {
+      addEncounters();
+      addEntry(this.commonInformation);
+    }
   }
 
   private void addImmunizations() {

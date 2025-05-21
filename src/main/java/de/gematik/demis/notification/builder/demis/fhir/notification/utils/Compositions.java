@@ -29,32 +29,20 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
-import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
 
-/**
- * Methods to simplify extracting data and processing Bundles.
- *
- * <p>The methods generally try to be as safe as possible: if the bundle structure is not following
- * the well-defined structure you can expect empty Optionals instead of exceptions.
- *
- * <p><b>Well-defined Bundle structure</b>
- *
- * <p>For the most part this class expects arguments to follow a well-defined structure. For
- * example: the first element in the entries section of a Bundle should be a composition. This
- * composition should reference the subject/notified person.
- */
-public class Bundles {
+public class Compositions {
+  private Compositions() {}
 
   /**
    * Extract the composition of a bundle in a null-safe manner. Expect the first entry's resource to
    * be the composition. If the first entry can't be safely cast to a {@link Composition} an empty
    * Optional is returned.
    */
-  public static Optional<Composition> compositionFrom(@Nonnull final Bundle bundle) {
+  @Nonnull
+  public static Optional<Composition> from(@Nonnull final Bundle bundle) {
     final List<Bundle.BundleEntryComponent> entries = bundle.getEntry();
     if (entries.isEmpty()) {
       return Optional.empty();
@@ -66,31 +54,5 @@ public class Bundles {
     }
 
     return Optional.empty();
-  }
-
-  /**
-   * Extract the subject (aka notified person) of a bundle in a null-safe manner. Expects a
-   * well-defined
-   */
-  public static Optional<Patient> subjectFrom(@Nonnull final Bundle bundle) {
-    final List<Bundle.BundleEntryComponent> entries = bundle.getEntry();
-    if (entries.isEmpty()) {
-      return Optional.empty();
-    }
-
-    return compositionFrom(bundle)
-        .map(
-            c -> {
-              if (!c.hasSubject()) {
-                return null;
-              }
-
-              final IBaseResource candidate = c.getSubject().getResource();
-              if (candidate instanceof Patient patient) {
-                return patient;
-              }
-
-              return null;
-            });
   }
 }

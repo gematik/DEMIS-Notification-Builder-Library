@@ -1,4 +1,4 @@
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease;
 
 /*-
  * #%L
@@ -28,35 +28,31 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.copy.CopyStrategy;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Meta;
 
+/**
+ * The disease part for NonNominal bundles. See {@link
+ * de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NonNominalCopyStrategy}
+ * for the laboratory version.
+ */
 public class NonNominalCopyStrategy implements CopyStrategy<Bundle> {
 
-  private static final String APPLICABLE_PROFILE =
-      DemisConstants.PROFILE_NOTIFICATION_BUNDLE_LABORATORY_NON_NOMINAL;
+  @Nonnull private final Bundle resource;
 
-  @Nonnull private final Bundle source;
-
-  public NonNominalCopyStrategy(@Nonnull final Bundle source) {
-    this.source = source;
+  public NonNominalCopyStrategy(@Nonnull final Bundle resource) {
+    this.resource = resource;
   }
 
-  /** Test if the given Bundle can be copied using this strategy */
-  public static boolean isApplicableTo(final Bundle bundle) {
-    final Meta meta = bundle.getMeta();
-    if (meta == null) {
-      return false;
-    }
-
-    return meta.hasProfile(APPLICABLE_PROFILE);
+  public static boolean isApplicableTo(@Nonnull final Bundle resource) {
+    return Metas.profilesFrom(resource)
+        .contains(DemisConstants.PROFILE_NOTIFICATION_BUNDLE_DISEASE_NON_NOMINAL);
   }
 
-  /** Copy a bundle according to {@link NonNominalBundleBuilder#deepCopy(Bundle)} */
   @Override
   @Nonnull
   public Bundle copy() {
-    return NonNominalBundleBuilder.deepCopy(source);
+    return NonNominalBundleBuilder.deepCopy(resource);
   }
 }

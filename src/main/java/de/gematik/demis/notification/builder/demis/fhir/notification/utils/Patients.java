@@ -1,4 +1,4 @@
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.copy;
+package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 /*-
  * #%L
@@ -26,10 +26,37 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.co
  * #L%
  */
 
+import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Patient;
 
-public interface CopyStrategy<E extends IBaseResource> {
+public class Patients {
+  private Patients() {}
+
+  /** Extract the subject (aka notified person) of a bundle in a null-safe manner. */
   @Nonnull
-  E copy();
+  public static Optional<Patient> subjectFrom(@Nonnull final Bundle bundle) {
+    final List<Bundle.BundleEntryComponent> entries = bundle.getEntry();
+    if (entries.isEmpty()) {
+      return Optional.empty();
+    }
+
+    return Compositions.from(bundle)
+        .map(
+            c -> {
+              if (!c.hasSubject()) {
+                return null;
+              }
+
+              final IBaseResource candidate = c.getSubject().getResource();
+              if (candidate instanceof Patient patient) {
+                return patient;
+              }
+
+              return null;
+            });
+  }
 }

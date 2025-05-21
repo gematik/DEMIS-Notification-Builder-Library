@@ -70,6 +70,9 @@ public final class DemisConstants {
   // profiles for disease notification (Arztmeldung)
   public static final String PROFILE_NOTIFICATION_BUNDLE_DISEASE =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationBundleDisease";
+  public static final String PROFILE_NOTIFICATION_BUNDLE_DISEASE_NON_NOMINAL =
+      DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationBundleDiseaseNonNominal";
+
   public static final String PROFILE_NOTIFICATION_DISEASE =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationDiseaseCVDD";
   public static final String PROFILE_DISEASE_CVDD =

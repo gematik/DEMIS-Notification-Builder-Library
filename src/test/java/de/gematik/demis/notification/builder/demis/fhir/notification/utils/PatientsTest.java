@@ -36,45 +36,7 @@ import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class BundlesTest {
-
-  @Nested
-  class CompositionFrom {
-    @Test
-    void thatItCanExtractAComposition() {
-      final Composition composition = new Composition();
-      final Bundle bundle = new Bundle();
-      bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(composition)));
-
-      assertThat(Bundles.compositionFrom(bundle)).contains(composition);
-    }
-
-    @Test
-    void thatItCanDealWithTheFirstEntryNotBeingTheComposition() {
-      final Bundle bundle = new Bundle();
-      bundle.setEntry(List.of(new Bundle.BundleEntryComponent()));
-
-      assertThat(Bundles.compositionFrom(bundle)).isEmpty();
-    }
-
-    @Test
-    void thatItSafelyCasts() {
-      final Bundle otherThanComposition = new Bundle();
-      final Bundle bundle = new Bundle();
-      bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(otherThanComposition)));
-
-      assertThat(Bundles.compositionFrom(bundle)).isEmpty();
-    }
-
-    @Test
-    void thatItDealsWithNullResource() {
-      final Bundle bundle = new Bundle();
-      bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(null)));
-
-      assertThat(Bundles.compositionFrom(bundle)).isEmpty();
-    }
-  }
-
+class PatientsTest {
   @Nested
   class SubjectFrom {
 
@@ -86,7 +48,7 @@ class BundlesTest {
       final Bundle bundle = new Bundle();
       bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(composition)));
 
-      assertThat(Bundles.subjectFrom(bundle)).contains(subject);
+      assertThat(Patients.subjectFrom(bundle)).contains(subject);
     }
 
     @Test
@@ -95,7 +57,7 @@ class BundlesTest {
       final Bundle bundle = new Bundle();
       bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(subject)));
 
-      assertThat(Bundles.subjectFrom(bundle)).isEmpty();
+      assertThat(Patients.subjectFrom(bundle)).isEmpty();
     }
 
     @Test
@@ -106,7 +68,7 @@ class BundlesTest {
       final Bundle bundle = new Bundle();
       bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(composition)));
 
-      assertThat(Bundles.subjectFrom(bundle)).isEmpty();
+      assertThat(Patients.subjectFrom(bundle)).isEmpty();
     }
 
     @Test
@@ -115,7 +77,7 @@ class BundlesTest {
       final Bundle bundle = new Bundle();
       bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(composition)));
 
-      assertThat(Bundles.subjectFrom(bundle)).isEmpty();
+      assertThat(Patients.subjectFrom(bundle)).isEmpty();
     }
   }
 }
