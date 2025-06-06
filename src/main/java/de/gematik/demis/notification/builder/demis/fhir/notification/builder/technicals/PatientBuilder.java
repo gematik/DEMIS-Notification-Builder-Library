@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -104,6 +105,14 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
     }
     if (gender != null) {
       patient.setGender(gender);
+      if (Enumerations.AdministrativeGender.OTHER.equals(gender)) {
+        var extension =
+            new Extension("https://demis.rki.de/fhir/StructureDefinition/gender-amtlich-de");
+        extension.setValue(
+            new Coding("https://demis.rki.de/fhir/CodeSystem/gender-amtlich-de", "D", null));
+
+        patient.getGenderElement().addExtension(extension);
+      }
     }
     if (id != null) {
       final IdType idType = new IdType(RESOURCE_TYPE, id);

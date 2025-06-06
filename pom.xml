@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>6.0.0</version>
+    <version>6.1.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json,
@@ -70,7 +70,7 @@
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>org.hl7.fhir.r4</artifactId>
-                <version>6.5.21</version>
+                <version>6.5.24</version>
             </dependency>
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
