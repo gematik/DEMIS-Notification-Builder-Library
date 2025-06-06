@@ -469,4 +469,25 @@ class PathogenDetectionDataBuilderTest {
       assertThat(result.getNoteFirstRep().getText()).isEqualTo("note");
     }
   }
+
+  @Test
+  void shouldAddVersionIfSetByUser() {
+    PathogenDetectionDataBuilder pathogenDetectionDataBuilder = new PathogenDetectionDataBuilder();
+    pathogenDetectionDataBuilder.setObservationCodeCode("observationCode");
+    pathogenDetectionDataBuilder.setObservationCodeSystem("observationCodeSystem");
+    pathogenDetectionDataBuilder.setObservationCodeDisplay("observationCodeDisplay");
+    pathogenDetectionDataBuilder.setObservationCodeVersion("observationCodeVersion");
+
+    pathogenDetectionDataBuilder.setMethodCode("methodCode");
+    pathogenDetectionDataBuilder.setMethodDisplay("methodDisplay");
+    pathogenDetectionDataBuilder.setMethodSystem("methodSystem");
+    pathogenDetectionDataBuilder.setMethodCodingVersion("methodCodingVersion");
+
+    Observation observation = pathogenDetectionDataBuilder.build();
+
+    assertThat(observation.getCode().getCodingFirstRep().getVersion())
+        .isEqualTo("observationCodeVersion");
+    assertThat(observation.getMethod().getCodingFirstRep().getVersion())
+        .isEqualTo("methodCodingVersion");
+  }
 }

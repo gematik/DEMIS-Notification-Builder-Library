@@ -65,6 +65,7 @@ public class SpecimenDataBuilder {
   private String typeSystem;
   private String typeCode;
   private String typeDisplay;
+  private String typeCodingVersion;
 
   private Date collectedDate;
 
@@ -123,7 +124,11 @@ public class SpecimenDataBuilder {
 
     specimen.setId(specimenId);
     specimen.setStatus(specimenStatus);
-    specimen.setType(new CodeableConcept(new Coding(typeSystem, typeCode, typeDisplay)));
+    Coding typeCoding = new Coding(typeSystem, typeCode, typeDisplay);
+    if (typeCodingVersion != null) {
+      typeCoding.setVersion(typeCodingVersion);
+    }
+    specimen.setType(new CodeableConcept(typeCoding));
     if (notifiedPerson != null) {
       specimen.setSubject(internalReference(notifiedPerson));
     }

@@ -181,10 +181,12 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
     }
     newComposition.setMeta(new Meta().addProfile(metaUrl));
 
-    Coding codeAndCategroyCoding =
-        new Coding(codeAndCategorySystem, codeAndCategoryCode, codeAndCategoryDisplay);
-    CodeableConcept categoryCodeableConcept = new CodeableConcept(codeAndCategroyCoding);
-    newComposition.addCategory(categoryCodeableConcept);
+    if (codeAndCategorySystem != null && codeAndCategoryCode != null) {
+      Coding codeAndCategroyCoding =
+          new Coding(codeAndCategorySystem, codeAndCategoryCode, codeAndCategoryDisplay);
+      CodeableConcept categoryCodeableConcept = new CodeableConcept(codeAndCategroyCoding);
+      newComposition.addCategory(categoryCodeableConcept);
+    }
 
     newComposition.setDate(date);
 

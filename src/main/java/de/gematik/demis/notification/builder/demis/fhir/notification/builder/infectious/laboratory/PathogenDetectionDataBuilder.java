@@ -63,9 +63,11 @@ public class PathogenDetectionDataBuilder {
   private String observationCodeSystem;
   private String observationCodeCode;
   private String observationCodeDisplay;
+  private String observationCodeVersion;
   private String methodSystem;
   private String methodCode;
   private String methodDisplay;
+  private String methodCodingVersion;
   private String interpretationSystem;
   private String interpretationCode;
   private String interpretationDisplay;
@@ -217,10 +219,17 @@ public class PathogenDetectionDataBuilder {
     observation.addInterpretation(codeableConceptInterpretation);
 
     Coding coding = new Coding(observationCodeSystem, observationCodeCode, observationCodeDisplay);
+    if (observationCodeVersion != null) {
+      coding.setVersion(observationCodeVersion);
+    }
     observation.setCode(new CodeableConcept().addCoding(coding));
 
     CodeableConcept codeableConceptMethod = new CodeableConcept();
-    codeableConceptMethod.addCoding(new Coding(methodSystem, methodCode, methodDisplay));
+    Coding methodCoding = new Coding(methodSystem, methodCode, methodDisplay);
+    if (methodCodingVersion != null) {
+      methodCoding.setVersion(methodCodingVersion);
+    }
+    codeableConceptMethod.addCoding(methodCoding);
     observation.setMethod(codeableConceptMethod);
 
     observation.addNote(note);
