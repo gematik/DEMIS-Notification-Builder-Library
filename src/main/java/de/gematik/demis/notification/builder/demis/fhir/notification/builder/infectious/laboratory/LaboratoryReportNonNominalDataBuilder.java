@@ -26,15 +26,32 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LABORATORY_REPORT_NON_NOMINAL_BASE_URL;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LABORATORY_REPORT_BASE_URL;
 
 import lombok.Setter;
 
+/**
+ * Builder for LaboratoryReport resources intended for non-nominal (non-identifiable) notifications.
+ *
+ * <p>Currently, this builder does not introduce any functional differences compared to
+ * LaboratoryReportDataBuilder. Both builders generate LaboratoryReport resources with the same
+ * profile URL schema: "LaboratoryReport" + pathogen code (e.g. "LaboratoryReportCVDP" for
+ * SARS-CoV-2).
+ *
+ * <p>The explicit separation into two builders is intentional, providing flexibility for future
+ * requirements. Should significant differences for non-nominal reports arise, this structure allows
+ * for isolated changes without breaking existing interfaces or implementations.
+ */
 @Setter
 public class LaboratoryReportNonNominalDataBuilder extends LaboratoryReportDataBuilder {
 
   @Override
   protected String getDefaultProfileUrl() {
-    return LABORATORY_REPORT_NON_NOMINAL_BASE_URL;
+    /*
+     * Note: The profile URL for LaboratoryReportNonNominal remains identical to the nominal variant.
+     * This ensures consistent FHIR validation and processing, regardless of notification type.
+     * If future requirements demand a different profile URL, adjustments can be made here.
+     */
+    return LABORATORY_REPORT_BASE_URL;
   }
 }
