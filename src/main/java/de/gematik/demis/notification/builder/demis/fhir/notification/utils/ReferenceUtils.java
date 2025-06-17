@@ -43,6 +43,7 @@ public final class ReferenceUtils {
    * @deprecated Use {@link
    *     de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder#createFullUrl(Resource)}
    */
+  @Deprecated(since = "2.4.0", forRemoval = true)
   public static String getFullUrl(Resource resource) {
     return BundleDataBuilder.createFullUrl(resource);
   }
