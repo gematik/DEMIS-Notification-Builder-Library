@@ -2,6 +2,16 @@
 
 # Release-Notes notification-builder-library
 
+## Release 6.2.0
+* Upgrade HAPI FHIR to 8.2.0
+* Fix publishing to Maven Central
+
+## Release 6.1.1
+* Fixing metaURL for non Nominal Laboratory reports
+
+## Release 6.1.0
+* Introduced further classes for §7.3 disease notifications
+
 ## Release 6.0.0
 * Introduce copy mechanism for 7.3 disease
 * Introduce new utility classes
@@ -12,16 +22,13 @@
 * Update dependencies
 
 ## Release 5.7.0
-
 * Added Builder for LaboratoryReportNonNominal for §7.3 notifications.
 * Updated dependencies
 
 ## Release 5.6.1
-
 * Bugfix: reference utils now set resource for `urn:uuid:` references correctly
 
 ## Release 5.6.0
-
 * Allow processing resources using only `urn:uuid:` references
 
 ## Release 5.5.1

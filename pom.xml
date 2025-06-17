@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>6.1.1</version>
+    <version>6.2.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json,
@@ -32,9 +32,9 @@
         <asm.version>9.8</asm.version>
         <surefire.plugin.version>3.5.3</surefire.plugin.version>
         <jacoco.plugin.version>0.8.13</jacoco.plugin.version>
-        <fhir.parser.lib.version>2.4.2</fhir.parser.lib.version>
-        <ca.uhn.hapi.fhir.version>8.0.0</ca.uhn.hapi.fhir.version>
-        <junit.version>5.12.2</junit.version>
+        <fhir.parser.lib.version>2.5.0</fhir.parser.lib.version>
+        <ca.uhn.hapi.fhir.version>8.2.0</ca.uhn.hapi.fhir.version>
+        <junit.version>5.13.1</junit.version>
         <sonar.exclusions>
             **/de/gematik/demis/notification/builder/demis/fhir/notification/utils/DemisConstants.java
         </sonar.exclusions>
@@ -66,16 +66,32 @@
                 <version>${ca.uhn.hapi.fhir.version}</version>
             </dependency>
 
-            <!-- HL7 -->
+            <!-- HL7, using same version of HAPI FHIR Framework parent -->
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>org.hl7.fhir.r4</artifactId>
-                <version>6.5.24</version>
+                <version>6.5.18</version>
             </dependency>
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>org.hl7.fhir.utilities</artifactId>
-                <version>6.5.21</version>
+                <version>6.5.18</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.19.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.38.0</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.18.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -327,15 +343,13 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.7.0</version>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                            <stagingProgressTimeoutMinutes>20</stagingProgressTimeoutMinutes>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -405,7 +419,7 @@
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-caching-caffeine</artifactId>
-            <version>8.0.0</version> <!-- Align with your HAPI FHIR version -->
+            <version>${ca.uhn.hapi.fhir.version}</version> <!-- Align with your HAPI FHIR version -->
             <exclusions>
                 <exclusion>
                     <groupId>org.checkerframework</groupId>
