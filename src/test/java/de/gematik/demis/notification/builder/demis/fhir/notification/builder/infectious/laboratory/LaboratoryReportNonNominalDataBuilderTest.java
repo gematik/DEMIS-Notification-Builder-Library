@@ -85,7 +85,7 @@ class LaboratoryReportNonNominalDataBuilderTest {
     laboratoryReportNonNomialDataBuilder1.setProfileUrlHelper("CVDP");
     DiagnosticReport diagnosticReport = laboratoryReportNonNomialDataBuilder1.build();
     assertThat(diagnosticReport.getMeta().getProfile().get(0).getValue())
-        .isEqualTo("https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportNonNominalCVDP");
+        .isEqualTo("https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportCVDP");
   }
 
   @Test
@@ -98,7 +98,7 @@ class LaboratoryReportNonNominalDataBuilderTest {
     laboratoryReportNonNomialDataBuilder1.setNotifiedPerson(patient);
     DiagnosticReport diagnosticReport = laboratoryReportNonNomialDataBuilder1.build();
     assertThat(diagnosticReport.getMeta().getProfile().get(0).getValue())
-        .isEqualTo("https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportNonNominalCVDP");
+        .isEqualTo("https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportCVDP");
   }
 
   @Test
