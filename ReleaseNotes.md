@@ -2,6 +2,11 @@
 
 # Release-Notes notification-builder-library
 
+## Release 6.3.0
+* Fix missing tag copy function for non nominal disease bundle
+* New composition data builder for non nominal compositions
+* Remove not used constant
+
 ## Release 6.2.0
 * Upgrade HAPI FHIR to 8.2.0
 * Fix publishing to Maven Central

@@ -72,6 +72,8 @@ public final class DemisConstants {
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationBundleDisease";
   public static final String PROFILE_NOTIFICATION_BUNDLE_DISEASE_NON_NOMINAL =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationBundleDiseaseNonNominal";
+  public static final String PROFILE_NOTIFICATION_DISEASE_NON_NOMINAL =
+      DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationDiseaseNonNominal";
 
   public static final String PROFILE_NOTIFICATION_DISEASE =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationDiseaseCVDD";
@@ -256,6 +258,9 @@ public final class DemisConstants {
   public static final String DISEASE_NOTIFICATION_TYPE_CODE = "6.1_2";
   public static final String DISEASE_NOTIFICATION_TYPE_DISPLAY =
       "Meldung gemäß IfSG §6 Absatz 1, 2";
+  public static final String DISEASE_NOTIFICATION_7_3_TYPE_CODE = "7.3";
+  public static final String DISEASE_NOTIFICATION_7_3_TYPE_DISPLAY =
+      "Meldung gemäß IfSG §7 Absatz 3";
   public static final String DISEASE_SECTION_SPECIFIC_CODE = "specificClinAndEpiInformation";
   public static final String DISEASE_SECTION_SPECIFIC_DISPLAY =
       "Meldetatbestandsspezifische klinische und epidemiologische Angaben";

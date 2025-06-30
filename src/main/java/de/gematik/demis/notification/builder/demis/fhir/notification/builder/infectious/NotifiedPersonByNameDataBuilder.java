@@ -26,8 +26,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
+
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PatientBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Setter;
@@ -41,17 +43,17 @@ import org.hl7.fhir.r4.model.Patient;
 @Setter
 public class NotifiedPersonByNameDataBuilder {
 
-  private static final String PROFILE_URL = DemisConstants.PROFILE_NOTIFIED_PERSON;
   private HumanName humanName;
   private Enumerations.AdministrativeGender gender;
   private String id;
   private List<Address> address = new ArrayList<>();
   private DateType birthdate;
   private List<ContactPoint> telecom = new ArrayList<>();
+  private String profileUrl;
 
   public Patient build() {
     return new PatientBuilder()
-        .setProfileUrl(PROFILE_URL)
+        .setProfileUrl(profileUrl)
         .setHumanName(humanName)
         .setGender(gender)
         .setId(id)
@@ -68,6 +70,14 @@ public class NotifiedPersonByNameDataBuilder {
 
   public NotifiedPersonByNameDataBuilder addTelecom(ContactPoint newTelecom) {
     telecom.add(newTelecom);
+    return this;
+  }
+
+  public NotifiedPersonByNameDataBuilder setDefault() {
+    if (this.id == null) {
+      setId(generateUuidString());
+    }
+    profileUrl = PROFILE_NOTIFIED_PERSON;
     return this;
   }
 }
