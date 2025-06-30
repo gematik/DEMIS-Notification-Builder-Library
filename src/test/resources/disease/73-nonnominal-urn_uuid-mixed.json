@@ -2,7 +2,13 @@
   "resourceType": "Bundle",
   "meta": {
     "lastUpdated": "2022-03-10T14:58:51.377+01:00",
-    "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationBundleDiseaseNonNominal" ]
+    "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationBundleDiseaseNonNominal" ],
+    "tag": [
+      {
+        "system": "https://demis.rki.de/fhir/CodeSystem/ResponsibleDepartment",
+        "code": "1."
+      }
+    ]
   },
   "identifier": {
     "system": "https://demis.rki.de/fhir/NamingSystem/NotificationBundleId",

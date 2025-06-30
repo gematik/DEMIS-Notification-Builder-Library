@@ -158,23 +158,27 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
    */
   public NotificationDiseaseDataBuilder createComposition() {
     log.debug("Disease notification bundle builder generates composition.");
-    NotificationDiseaseDataBuilder composition = new NotificationDiseaseDataBuilder();
-    composition.setDefaults();
-    composition.setProfileUrlByDisease(getCategory());
-    DateTimeType date = new DateTimeType();
-    date.setValue(Utils.getCurrentDate(), InstantType.DEFAULT_PRECISION);
-    composition.setDate(date);
-    composition.setNotifiedPerson(this.notifiedPerson);
-    composition.setNotifierRole(this.notifierRole);
-    composition.setDisease(this.disease);
-    composition.setCommonQuestionnaireResponse(this.commonInformation);
-    if (this.specificInformation != null) {
-      composition.setSpecificQuestionnaireResponse(this.specificInformation);
-    }
-    return composition;
+    NotificationDiseaseDataBuilder compositionBuilder = new NotificationDiseaseDataBuilder();
+    createCompositionHelper(compositionBuilder);
+    return compositionBuilder;
   }
 
-  private String getCategory() {
+  void createCompositionHelper(NotificationDiseaseDataBuilder compositionBuilder) {
+    compositionBuilder.setDefaults();
+    compositionBuilder.setProfileUrlByDisease(getCategory());
+    DateTimeType date = new DateTimeType();
+    date.setValue(Utils.getCurrentDate(), InstantType.DEFAULT_PRECISION);
+    compositionBuilder.setDate(date);
+    compositionBuilder.setNotifiedPerson(this.notifiedPerson);
+    compositionBuilder.setNotifierRole(this.notifierRole);
+    compositionBuilder.setDisease(this.disease);
+    compositionBuilder.setCommonQuestionnaireResponse(this.commonInformation);
+    if (this.specificInformation != null) {
+      compositionBuilder.setSpecificQuestionnaireResponse(this.specificInformation);
+    }
+  }
+
+  String getCategory() {
     if (this.disease.hasMeta()) {
       Meta meta = this.disease.getMeta();
       if (meta.hasProfile()) {

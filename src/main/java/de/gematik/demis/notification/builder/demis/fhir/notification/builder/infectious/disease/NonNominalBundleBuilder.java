@@ -92,13 +92,18 @@ public class NonNominalBundleBuilder extends NotificationBundleDiseaseDataBuilde
 
     // Note: these setters do not return a NotificationBundleDiseaseDataBuilder and make it harder
     // to chain all calls together
-    return builder
-        .setProfileUrl(builder.getDefaultProfileUrl())
-        .setIdentifierAsNotificationBundleId(original.getIdentifier().getValue())
-        .setType(Bundle.BundleType.DOCUMENT)
-        .setTimestamp(original.getTimestamp())
-        .setLastUpdated(original.getMeta().getLastUpdated())
-        .build();
+    Bundle bundle =
+        builder
+            .setProfileUrl(builder.getDefaultProfileUrl())
+            .setIdentifierAsNotificationBundleId(original.getIdentifier().getValue())
+            .setType(Bundle.BundleType.DOCUMENT)
+            .setTimestamp(original.getTimestamp())
+            .setLastUpdated(original.getMeta().getLastUpdated())
+            .build();
+
+    original.getMeta().getTag().forEach(builder::addTag);
+
+    return bundle;
   }
 
   @Override

@@ -154,11 +154,7 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
               DemisConstants.NOTIFICATION_STANDARD_TYPE_DISPLAY));
     }
     if (this.category == null) {
-      setCategory(
-          new Coding(
-              CODE_SYSTEM_NOTIFICATION_TYPE,
-              DemisConstants.DISEASE_NOTIFICATION_TYPE_CODE,
-              DemisConstants.DISEASE_NOTIFICATION_TYPE_DISPLAY));
+      setDefaultCategory();
     }
     if (this.identifier == null) {
       setIdentifierAsNotificationId(generateUuidString());
@@ -170,6 +166,14 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
       setDate(DateTimeType.now());
     }
     return this;
+  }
+
+  public void setDefaultCategory() {
+    setCategory(
+        new Coding(
+            CODE_SYSTEM_NOTIFICATION_TYPE,
+            DemisConstants.DISEASE_NOTIFICATION_TYPE_CODE,
+            DemisConstants.DISEASE_NOTIFICATION_TYPE_DISPLAY));
   }
 
   public NotificationDiseaseDataBuilder setStatus(Composition.CompositionStatus status) {
