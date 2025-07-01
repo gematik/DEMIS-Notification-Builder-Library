@@ -55,9 +55,28 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
   @CheckForNull private Patient notifiedPerson;
   @CheckForNull private PractitionerRole notifierRole;
   private Composition.CompositionStatus compositionStatus;
+
+  /**
+   * @deprecated the strict profiles for laboratory notifications will not allow the use of
+   *     composition cateogry. so it can be removed from the builders
+   */
+  @Deprecated(forRemoval = true)
   private String codeAndCategorySystem;
+
+  /**
+   * @deprecated the strict profiles for laboratory notifications will not allow the use of
+   *     composition cateogry. so it can be removed from the builders
+   */
+  @Deprecated(forRemoval = true)
   private String codeAndCategoryCode;
+
+  /**
+   * @deprecated the strict profiles for laboratory notifications will not allow the use of
+   *     composition cateogry. so it can be removed from the builders
+   */
+  @Deprecated(forRemoval = true)
   private String codeAndCategoryDisplay;
+
   private Date date;
   private String identifierSystem;
   private String identifierValue;
