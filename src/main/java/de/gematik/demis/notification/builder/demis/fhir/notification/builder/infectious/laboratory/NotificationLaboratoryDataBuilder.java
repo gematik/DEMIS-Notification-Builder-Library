@@ -26,8 +26,6 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LABORAOTRY_CATEGORY_CODE;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LABORATORY_CATEGORY_DISPLAY;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LOINC_ORG_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_ID_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_LABORATORY;
@@ -64,9 +62,6 @@ public class NotificationLaboratoryDataBuilder
 
     setIdentifierSystem(NOTIFICATION_ID_SYSTEM);
     setSectionComponentSystem(LOINC_ORG_SYSTEM);
-    setCodeAndCategorySystem(LOINC_ORG_SYSTEM);
-    setCodeAndCategoryCode(LABORAOTRY_CATEGORY_CODE);
-    setCodeAndCategoryDisplay(LABORATORY_CATEGORY_DISPLAY);
     setTitle("Erregernachweismeldung");
 
     super.setDefaultData();

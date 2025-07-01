@@ -87,13 +87,10 @@ class NotificationLaboratoryDataBuilderTest {
         .containsOnly("https://demis.rki.de/fhir/StructureDefinition/NotificationLaboratory");
     assertThat(composition.getIdentifier().getSystem())
         .isEqualTo("https://demis.rki.de/fhir/NamingSystem/NotificationId");
-    assertThat(composition.getCategory()).hasSize(1);
-    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getSystem())
-        .isEqualTo("http://loinc.org");
-    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getCode())
-        .isEqualTo("11502-2");
-    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getDisplay())
-        .isEqualTo("Laboratory report");
+    assertThat(composition.getCategory()).isEmpty();
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getSystem()).isNull();
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getCode()).isNull();
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getDisplay()).isNull();
 
     assertThat(composition.getSection()).hasSize(1);
     assertThat(composition.getSectionFirstRep().getCode().getCodingFirstRep().getSystem())
@@ -260,12 +257,9 @@ class NotificationLaboratoryDataBuilderTest {
 
     assertThat(composition.getIdentifier().getSystem())
         .isEqualTo("https://demis.rki.de/fhir/NamingSystem/NotificationId");
-    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getSystem())
-        .isEqualTo("http://loinc.org");
-    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getCode())
-        .isEqualTo("11502-2");
-    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getDisplay())
-        .isEqualTo("Laboratory report");
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getSystem()).isNull();
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getCode()).isNull();
+    assertThat(composition.getCategoryFirstRep().getCodingFirstRep().getDisplay()).isNull();
   }
 
   @Test
