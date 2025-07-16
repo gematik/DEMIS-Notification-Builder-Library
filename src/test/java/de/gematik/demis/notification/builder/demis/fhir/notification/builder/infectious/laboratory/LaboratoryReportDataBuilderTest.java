@@ -145,6 +145,48 @@ class LaboratoryReportDataBuilderTest {
     assertThat(diagnosticReport.getCode().getCodingFirstRep().getCode()).isEqualTo("codeCode");
     assertThat(diagnosticReport.getCode().getCodingFirstRep().getDisplay())
         .isEqualTo("codeDisplay");
+    assertThat(diagnosticReport.getCode().getCodingFirstRep().getVersion()).isNull();
+    assertThat(diagnosticReport.getConclusion()).isEqualTo("conclusionText");
+    assertThat(diagnosticReport.getConclusionCodeFirstRep().getCodingFirstRep().getCode())
+        .isEqualTo("conclusionCode");
+    assertThat(diagnosticReport.getConclusionCodeFirstRep().getCodingFirstRep().getDisplay())
+        .isEqualTo("conclusionDisplay");
+    assertThat(diagnosticReport.getResult())
+        .extracting("resource")
+        .containsOnly(pathogenDetection1);
+  }
+
+  @Test
+  void shouldBuildWithGivenDataWithCodeVersion() {
+    LaboratoryReportDataBuilder laboratoryReportDataBuilder1 = new LaboratoryReportDataBuilder();
+    Patient patient = new Patient();
+    patient.setId("123");
+
+    laboratoryReportDataBuilder1.setNotifiedPerson(patient);
+    Date date = new Date();
+    laboratoryReportDataBuilder1.setIssued(date);
+    laboratoryReportDataBuilder1.setStatus(CORRECTED);
+    laboratoryReportDataBuilder1.setCodeCode("codeCode");
+    laboratoryReportDataBuilder1.setCodeDisplay("codeDisplay");
+    laboratoryReportDataBuilder1.setCodeVersion("codeVersion");
+    laboratoryReportDataBuilder1.setConclusion("conclusionText");
+    laboratoryReportDataBuilder1.setConclusionCodeCode("conclusionCode");
+    laboratoryReportDataBuilder1.setConclusionCodeDisplay("conclusionDisplay");
+    Observation pathogenDetection1 = new Observation();
+    pathogenDetection1.setId("321");
+    laboratoryReportDataBuilder1.setPathogenDetections(
+        Collections.singletonList(pathogenDetection1));
+
+    DiagnosticReport diagnosticReport = laboratoryReportDataBuilder1.build();
+
+    assertThat(diagnosticReport.getSubject().getResource()).isEqualTo(patient);
+    assertThat(diagnosticReport.getIssued()).isEqualTo(date);
+    assertThat(diagnosticReport.getStatus()).isEqualTo(CORRECTED);
+    assertThat(diagnosticReport.getCode().getCodingFirstRep().getCode()).isEqualTo("codeCode");
+    assertThat(diagnosticReport.getCode().getCodingFirstRep().getDisplay())
+        .isEqualTo("codeDisplay");
+    assertThat(diagnosticReport.getCode().getCodingFirstRep().getVersion())
+        .isEqualTo("codeVersion");
     assertThat(diagnosticReport.getConclusion()).isEqualTo("conclusionText");
     assertThat(diagnosticReport.getConclusionCodeFirstRep().getCodingFirstRep().getCode())
         .isEqualTo("conclusionCode");
@@ -369,16 +411,15 @@ class LaboratoryReportDataBuilderTest {
               .setType("ServiceRequest")
               .setIdentifier(new Identifier().setSystem("system").setValue("value")));
       diagnosticReport.setStatus(DiagnosticReport.DiagnosticReportStatus.FINAL);
-      diagnosticReport.setCode(
-          new CodeableConcept()
-              .addCoding(new Coding().setSystem("system").setCode("code").setDisplay("display")));
+      Coding t = new Coding().setSystem("system").setCode("code").setDisplay("display");
+      t.setVersion("version");
+      diagnosticReport.setCode(new CodeableConcept(t));
       diagnosticReport.setIssued(new Date());
       diagnosticReport.setConclusion("Conclusion text");
       diagnosticReport.setConclusionCode(
           Collections.singletonList(
-              new CodeableConcept()
-                  .addCoding(
-                      new Coding().setSystem("system").setCode("code").setDisplay("display"))));
+              new CodeableConcept(
+                  new Coding().setSystem("system").setCode("code").setDisplay("display"))));
       return diagnosticReport;
     }
 
@@ -432,6 +473,7 @@ class LaboratoryReportDataBuilderTest {
       assertThat(diagnosticReport.getCode().getCodingFirstRep().getSystem()).isEqualTo("system");
       assertThat(diagnosticReport.getCode().getCodingFirstRep().getCode()).isEqualTo("code");
       assertThat(diagnosticReport.getCode().getCodingFirstRep().getDisplay()).isEqualTo("display");
+      assertThat(diagnosticReport.getCode().getCodingFirstRep().getVersion()).isEqualTo("version");
     }
 
     @Test

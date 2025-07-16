@@ -74,6 +74,7 @@ public class LaboratoryReportDataBuilder {
   private String codeSystem;
   private String codeCode;
   private String codeDisplay;
+  private String codeVersion;
   private String laboratoryId;
   private String conclusionCodeSystem;
   private String conclusionCodeCode;
@@ -96,9 +97,11 @@ public class LaboratoryReportDataBuilder {
     result.setLaboratoryId(original.getId());
 
     final Coding codingFirstRep = original.getCode().getCodingFirstRep();
-    result.setCodeCode(codingFirstRep.getCode());
-    result.setCodeDisplay(codingFirstRep.getDisplay());
-    result.setCodeSystem(codingFirstRep.getSystem());
+    result
+        .setCodeCode(codingFirstRep.getCode())
+        .setCodeDisplay(codingFirstRep.getDisplay())
+        .setCodeSystem(codingFirstRep.getSystem())
+        .setCodeVersion(codingFirstRep.getVersion());
 
     result.setStatus(original.getStatus());
     result.setIssued(original.getIssued());
@@ -290,7 +293,11 @@ public class LaboratoryReportDataBuilder {
     }
     diagnosticReport.setIssued(issued);
     diagnosticReport.setStatus(status);
-    diagnosticReport.setCode(new CodeableConcept(new Coding(codeSystem, codeCode, codeDisplay)));
+    Coding notificationCategoryCode = new Coding(codeSystem, codeCode, codeDisplay);
+    if (codeVersion != null) {
+      notificationCategoryCode.setVersion(codeVersion);
+    }
+    diagnosticReport.setCode(new CodeableConcept(notificationCategoryCode));
     diagnosticReport.setId(laboratoryId);
     diagnosticReport.setBasedOn(basedOnReferenceList);
     diagnosticReport.setExtension(extensionList);

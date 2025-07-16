@@ -93,7 +93,8 @@ public class SpecimenDataBuilder {
       resultBuilder
           .setTypeCode(codingFirstRep.getCode())
           .setTypeDisplay(codingFirstRep.getDisplay())
-          .setTypeSystem(codingFirstRep.getSystem());
+          .setTypeSystem(codingFirstRep.getSystem())
+          .setTypeCodingVersion(codingFirstRep.getVersion());
     }
 
     resultBuilder.setNotifiedPerson(subject);

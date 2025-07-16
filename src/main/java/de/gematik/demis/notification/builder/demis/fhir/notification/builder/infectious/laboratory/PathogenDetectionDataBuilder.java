@@ -102,7 +102,8 @@ public class PathogenDetectionDataBuilder {
     resultBuilder
         .setObservationCodeCode(code.getCode())
         .setObservationCodeDisplay(code.getDisplay())
-        .setObservationCodeSystem(code.getSystem());
+        .setObservationCodeSystem(code.getSystem())
+        .setObservationCodeVersion(code.getVersion());
 
     // value
     final Type copiedValue =
@@ -135,7 +136,8 @@ public class PathogenDetectionDataBuilder {
       resultBuilder
           .setMethodCode(codingFirstRep.getCode())
           .setMethodDisplay(codingFirstRep.getDisplay())
-          .setMethodSystem(codingFirstRep.getSystem());
+          .setMethodSystem(codingFirstRep.getSystem())
+          .setMethodCodingVersion(codingFirstRep.getVersion());
     }
 
     return resultBuilder.build();
