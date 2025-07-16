@@ -351,20 +351,19 @@ class PathogenDetectionDataBuilderTest {
       observation.addCategory(
           new CodeableConcept()
               .addCoding(new Coding("categorySystem", "categoryCode", "categoryDisplay")));
-      observation.setCode(
-          new CodeableConcept()
-              .addCoding(
-                  new Coding(
-                      "observationCodeSystem", "observationCodeCode", "observationCodeDisplay")));
+      Coding code =
+          new Coding("observationCodeSystem", "observationCodeCode", "observationCodeDisplay");
+      code.setVersion("1.0.0");
+      observation.setCode(new CodeableConcept(code));
       observation.setValue(new Quantity().setValue(500).setUnit("unit"));
       observation.addInterpretation(
           new CodeableConcept()
               .addCoding(
                   new Coding(
                       "interpretationSystem", "interpretationCode", "interpretationDisplay")));
-      observation.setMethod(
-          new CodeableConcept()
-              .addCoding(new Coding("methodSystem", "methodCode", "methodDisplay")));
+      Coding method = new Coding("methodSystem", "methodCode", "methodDisplay");
+      method.setVersion("1.0.0");
+      observation.setMethod(new CodeableConcept(method));
       observation.addNote().setText("note");
       return observation;
     }
@@ -412,6 +411,7 @@ class PathogenDetectionDataBuilderTest {
       assertThat(result.getCode().getCodingFirstRep().getCode()).isEqualTo("observationCodeCode");
       assertThat(result.getCode().getCodingFirstRep().getDisplay())
           .isEqualTo("observationCodeDisplay");
+      assertThat(result.getCode().getCodingFirstRep().getVersion()).isEqualTo("1.0.0");
     }
 
     @Test
@@ -459,6 +459,7 @@ class PathogenDetectionDataBuilderTest {
       assertThat(result.getMethod().getCodingFirstRep().getSystem()).isEqualTo("methodSystem");
       assertThat(result.getMethod().getCodingFirstRep().getCode()).isEqualTo("methodCode");
       assertThat(result.getMethod().getCodingFirstRep().getDisplay()).isEqualTo("methodDisplay");
+      assertThat(result.getMethod().getCodingFirstRep().getVersion()).isEqualTo("1.0.0");
     }
 
     @Test

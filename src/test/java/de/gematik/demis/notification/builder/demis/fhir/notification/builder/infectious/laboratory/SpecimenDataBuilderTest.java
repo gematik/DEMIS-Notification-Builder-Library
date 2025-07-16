@@ -144,8 +144,9 @@ class SpecimenDataBuilderTest {
       Specimen specimen = new Specimen();
       specimen.setMeta(new Meta().addProfile("https://example.com/profile"));
       specimen.setStatus(Specimen.SpecimenStatus.AVAILABLE);
-      specimen.setType(
-          new CodeableConcept().addCoding(new Coding("typeSystem", "typeCode", "typeDisplay")));
+      Coding code = new Coding("typeSystem", "typeCode", "typeDisplay");
+      code.setVersion("1.0.0");
+      specimen.setType(new CodeableConcept(code));
       specimen.setReceivedTime(new Date());
       Specimen.SpecimenCollectionComponent collection = new Specimen.SpecimenCollectionComponent();
       collection.setCollected(new DateTimeType(new Date()));
@@ -186,6 +187,7 @@ class SpecimenDataBuilderTest {
       assertThat(result.getType().getCodingFirstRep().getSystem()).isEqualTo("typeSystem");
       assertThat(result.getType().getCodingFirstRep().getCode()).isEqualTo("typeCode");
       assertThat(result.getType().getCodingFirstRep().getDisplay()).isEqualTo("typeDisplay");
+      assertThat(result.getType().getCodingFirstRep().getVersion()).isEqualTo("1.0.0");
     }
 
     @Test

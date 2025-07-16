@@ -2,6 +2,10 @@
 
 # Release-Notes notification-builder-library
 
+##
+- add missing version copy in laboratory notification deep copy logic
+- add version to notification category input possibility
+
 ## Release 6.3.1
 - remove default values for laboratory composition category
 
