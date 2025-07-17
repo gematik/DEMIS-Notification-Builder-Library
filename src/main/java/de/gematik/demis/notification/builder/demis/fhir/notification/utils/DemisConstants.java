@@ -295,6 +295,9 @@ public final class DemisConstants {
   public static final String DOCUMENT_REFERENCE_BASE =
       DEMIS_RKI_IGS_DE_FHIR + PREFIX_DOCUMENT_REFERENCE;
 
+  public static final String RECEPTION_TIME_STAMP_TYPE =
+      DEMIS_RKI_DE_FHIR + "StructureDefinition/ReceptionTimeStampType";
+
   private DemisConstants() {
     throw new NotImplementedException("you shall not use this constructor");
   }

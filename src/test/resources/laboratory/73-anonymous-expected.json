@@ -18,6 +18,10 @@
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationLaboratoryAnonymous" ]
       },
+      "extension": [ {
+        "url": "https://demis.rki.de/fhir/StructureDefinition/ReceptionTimeStampType",
+        "valueDateTime": "2025-07-04T11:24:20+02:00"
+      } ],
       "identifier": {
         "system": "https://demis.rki.de/fhir/NamingSystem/NotificationId",
         "value": "555-42-23-12"
@@ -40,7 +44,7 @@
       "subject": {
         "reference": "Patient/555-42-23-7"
       },
-      "date": "2024-03-14T14:45:00+01:00",
+      "date": "2024-03-14T14:45:00.000+01:00",
       "author": [ {
         "reference": "PractitionerRole/555-42-23-2"
       } ],
@@ -211,12 +215,12 @@
       "subject": {
         "reference": "Patient/555-42-23-7"
       },
-      "receivedTime": "2022-02-20T00:00:00+01:00",
+      "receivedTime": "2022-02-20T00:00:00.000+01:00",
       "collection": {
         "collector": {
           "reference": "PractitionerRole/555-42-23-4"
         },
-        "collectedDateTime": "2022-02-19T00:00:00+01:00"
+        "collectedDateTime": "2022-02-19T00:00:00.000+01:00"
       }
     }
   }, {

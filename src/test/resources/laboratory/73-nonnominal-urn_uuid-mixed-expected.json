@@ -214,12 +214,12 @@
       "subject": {
         "reference": "urn:uuid:58b26b0f-ee2d-42f2-9dd9-56c8223fcbd0"
       },
-      "receivedTime": "2022-02-20T00:00:00+01:00",
+      "receivedTime": "2022-02-20T00:00:00.000+01:00",
       "collection": {
         "collector": {
           "reference": "urn:uuid:2ed49de9-20df-4a48-96ac-3d11cf854847"
         },
-        "collectedDateTime": "2022-02-19T00:00:00+01:00"
+        "collectedDateTime": "2022-02-19T00:00:00.000+01:00"
       }
     }
   }, {

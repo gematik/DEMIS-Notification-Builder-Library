@@ -216,12 +216,12 @@
       "subject": {
         "reference": "Patient/555-42-23-7"
       },
-      "receivedTime": "2022-02-20T00:00:00+01:00",
+      "receivedTime": "2022-02-20T00:00:00.000+01:00",
       "collection": {
         "collector": {
           "reference": "PractitionerRole/555-42-23-4"
         },
-        "collectedDateTime": "2022-02-19T00:00:00+01:00"
+        "collectedDateTime": "2022-02-19T00:00:00.000+01:00"
       }
     }
   }, {

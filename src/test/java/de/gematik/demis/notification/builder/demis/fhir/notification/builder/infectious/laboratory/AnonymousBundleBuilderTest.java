@@ -41,14 +41,13 @@ class AnonymousBundleBuilderTest {
   @Test
   void thatExistingAnonymousBundleRemainsUnchanged() throws IOException {
     // GIVEN a bundle with NonNominal profiles and a notified person
-
-    // THEN
     final String source =
         Files.readString(Path.of("src/test/resources/laboratory/73-anonymous.json"));
     final IParser iParser = FhirContext.forR4().newJsonParser();
     iParser.setPrettyPrint(true);
 
     final Bundle original = (Bundle) iParser.parseResource(source);
+    // THEN
     final Bundle copy = AnonymousBundleBuilder.deepCopy(original);
 
     final String expected =

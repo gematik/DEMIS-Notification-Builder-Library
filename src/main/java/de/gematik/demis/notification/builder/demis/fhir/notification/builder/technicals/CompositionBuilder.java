@@ -34,12 +34,16 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.APPENDS;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.annotation.CheckForNull;
 import lombok.Getter;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
@@ -55,6 +59,7 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
   @CheckForNull private Patient notifiedPerson;
   @CheckForNull private PractitionerRole notifierRole;
   private Composition.CompositionStatus compositionStatus;
+  private List<Extension> extensions;
 
   /**
    * @deprecated the strict profiles for laboratory notifications will not allow the use of
@@ -77,7 +82,23 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
   @Deprecated(forRemoval = true)
   private String codeAndCategoryDisplay;
 
+  /**
+   * @deprecated Use {@code dateTimeElement} instead. This field uses {@link java.util.Date}, which
+   *     does not reliably preserve millisecond precision when serializing or deserializing FHIR
+   *     resources. For full precision and to ensure the original timestamp (including milliseconds)
+   *     is retained in FHIR JSON/XML, use the new {@link org.hl7.fhir.r4.model.DateTimeType} field
+   *     and set it via {@code setDateElement()}.
+   */
+  @Deprecated(forRemoval = true)
   private Date date;
+
+  /**
+   * Stores the exact FHIR date/time value, including milliseconds, as a {@link DateTimeType}.
+   * Always use this field and {@code setDateElement()} for setting or copying date/time values to
+   * ensure full precision is maintained in FHIR resources.
+   */
+  private DateTimeType dateTimeElement;
+
   private String identifierSystem;
   private String identifierValue;
   private String metaUrl;
@@ -160,8 +181,21 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
     return (T) this;
   }
 
+  /**
+   * @deprecated Use {@link #setDateTimeType(DateTimeType)} instead. Setting the date using a {@link
+   *     java.util.Date} does not guarantee preservation of millisecond precision when serializing
+   *     or deserializing FHIR resources. To ensure the exact timestamp (including milliseconds) is
+   *     retained in the FHIR output, use {@code setDateElement(DateTimeType)} with a {@link
+   *     DateTimeType} value.
+   */
+  @Deprecated(forRemoval = true)
   public T setDate(Date date) {
     this.date = date;
+    return (T) this;
+  }
+
+  public T setDateTimeType(DateTimeType dateTimeType) {
+    this.dateTimeElement = dateTimeType;
     return (T) this;
   }
 
@@ -172,6 +206,14 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
 
   public T setIdentifierValue(String identifierValue) {
     this.identifierValue = identifierValue;
+    return (T) this;
+  }
+
+  public T addExtension(Extension extension) {
+    if (extensions == null) {
+      extensions = new ArrayList<>();
+    }
+    this.extensions.add(extension);
     return (T) this;
   }
 
@@ -207,11 +249,17 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
       newComposition.addCategory(categoryCodeableConcept);
     }
 
-    newComposition.setDate(date);
+    if (dateTimeElement != null) {
+      newComposition.setDateElement(dateTimeElement);
+    } else if (date != null) {
+      newComposition.setDate(date);
+    }
 
     Coding typeCoding = new Coding(typeSystem, typeCode, typeDisplay);
     CodeableConcept typeCodeableConcept = new CodeableConcept(typeCoding);
     newComposition.setType(typeCodeableConcept);
+
+    newComposition.setExtension(extensions);
 
     return newComposition;
   }

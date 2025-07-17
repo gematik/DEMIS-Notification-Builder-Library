@@ -2,7 +2,10 @@
 
 # Release-Notes notification-builder-library
 
-##
+## Release 6.3.3
+- fix millisecond data copying of specimen and compositions
+
+## Release 6.3.2
 - add missing version copy in laboratory notification deep copy logic
 - add version to notification category input possibility
 
