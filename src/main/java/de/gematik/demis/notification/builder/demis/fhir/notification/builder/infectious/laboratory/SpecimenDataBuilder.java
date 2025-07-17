@@ -67,9 +67,29 @@ public class SpecimenDataBuilder {
   private String typeDisplay;
   private String typeCodingVersion;
 
+  /**
+   * @deprecated Use {@code dateTimeElement} instead. This field uses {@link java.util.Date}, which
+   *     does not reliably preserve millisecond precision when serializing or deserializing FHIR
+   *     resources. For full precision and to ensure the original timestamp (including milliseconds)
+   *     is retained in FHIR JSON/XML, use the new {@link org.hl7.fhir.r4.model.DateTimeType} field
+   *     and set it via {@code setDateElement()}.
+   */
+  @Deprecated(forRemoval = true)
   private Date collectedDate;
 
+  private DateTimeType collectedDateTime;
+
+  /**
+   * @deprecated Use {@code dateTimeElement} instead. This field uses {@link java.util.Date}, which
+   *     does not reliably preserve millisecond precision when serializing or deserializing FHIR
+   *     resources. For full precision and to ensure the original timestamp (including milliseconds)
+   *     is retained in FHIR JSON/XML, use the new {@link org.hl7.fhir.r4.model.DateTimeType} field
+   *     and set it via {@code setDateElement()}.
+   */
+  @Deprecated(forRemoval = true)
   private Date receivedTime;
+
+  private DateTimeType receivedDateTime;
   private String metaProfileUrl;
   @CheckForNull private Patient notifiedPerson;
   @CheckForNull private PractitionerRole submittingRole;
@@ -98,9 +118,9 @@ public class SpecimenDataBuilder {
     }
 
     resultBuilder.setNotifiedPerson(subject);
-    resultBuilder.setReceivedTime(original.getReceivedTime());
+    resultBuilder.setReceivedDateTime(original.getReceivedTimeElement());
     resultBuilder.setSubmittingRole(collection);
-    resultBuilder.setCollectedDate(original.getCollection().getCollectedDateTimeType().getValue());
+    resultBuilder.setCollectedDateTime(original.getCollection().getCollectedDateTimeType());
 
     // processing
     if (original.hasProcessing()) {
@@ -133,15 +153,23 @@ public class SpecimenDataBuilder {
     if (notifiedPerson != null) {
       specimen.setSubject(internalReference(notifiedPerson));
     }
-    specimen.setReceivedTime(receivedTime);
+
+    if (receivedDateTime != null) {
+      specimen.setReceivedTimeElement(receivedDateTime);
+    } else if (receivedTime != null) {
+      specimen.setReceivedTime(receivedTime);
+    }
 
     Specimen.SpecimenCollectionComponent specimenCollectionComponent =
         new Specimen.SpecimenCollectionComponent();
     if (submittingRole != null) {
       specimenCollectionComponent.setCollector(internalReference(submittingRole));
     }
-    Type collected = new DateTimeType(collectedDate);
-    specimenCollectionComponent.setCollected(collected);
+    if (collectedDateTime != null) {
+      specimenCollectionComponent.setCollected(collectedDateTime);
+    } else if (collectedDate != null) {
+      specimenCollectionComponent.setCollected(new DateTimeType(collectedDate));
+    }
     specimen.setCollection(specimenCollectionComponent);
     specimen.setMeta(new Meta().addProfile(metaProfileUrl));
     specimen.setNote(notes);
