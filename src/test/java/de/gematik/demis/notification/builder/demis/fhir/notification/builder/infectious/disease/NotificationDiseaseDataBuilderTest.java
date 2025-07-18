@@ -27,7 +27,9 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_DISEASE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.RECEPTION_TIME_STAMP_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import java.text.ParseException;
@@ -35,7 +37,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.QuestionnaireResponse;
+import org.hl7.fhir.r4.model.Type;
 import org.junit.jupiter.api.Test;
 
 public final class NotificationDiseaseDataBuilderTest {
@@ -95,5 +104,37 @@ public final class NotificationDiseaseDataBuilderTest {
     assertThat(disease.getCategoryFirstRep().getCodingFirstRep().getCode()).isEqualTo(categoryCode);
     assertThat(disease.getStatus()).isSameAs(status);
     assertThat(disease.getDate()).isEqualTo(date);
+  }
+
+  @Test
+  void shouldCopyExtension() {
+    // set up data
+    Composition composition;
+    PractitionerRole author;
+    Patient subject;
+
+    composition = new Composition();
+    composition.setMeta(new Meta().addProfile("foobarProfile"));
+    composition.setStatus(Composition.CompositionStatus.FINAL);
+
+    author = new PractitionerRole();
+    author.setId("author");
+
+    subject = new Patient();
+    subject.setId("subject");
+
+    // relevant for test
+    Type value = new DateTimeType("2022-02-19T00:00:00.000+01:00");
+    composition.addExtension(new Extension(RECEPTION_TIME_STAMP_TYPE, value));
+
+    Condition condition = new Condition();
+    QuestionnaireResponse specificQuestionnaireResponse = new QuestionnaireResponse();
+    Composition deepCopyComposition =
+        NotificationDiseaseDataBuilder.deepCopy(
+            composition, condition, subject, author, specificQuestionnaireResponse);
+
+    assertThat(deepCopyComposition.getExtension())
+        .extracting(Extension::getUrl, Extension::getValue)
+        .contains(tuple(RECEPTION_TIME_STAMP_TYPE, value));
   }
 }
