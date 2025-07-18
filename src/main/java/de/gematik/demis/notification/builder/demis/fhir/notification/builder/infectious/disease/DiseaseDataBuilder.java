@@ -74,6 +74,7 @@ public class DiseaseDataBuilder implements InitializableFhirObjectBuilder {
   public static Condition deepCopy(
       @Nonnull final Condition condition, @Nonnull final Patient notifiedPerson) {
     final Coding verificationStatus = condition.getVerificationStatus().getCodingFirstRep().copy();
+    final Coding clinicalStatus = condition.getClinicalStatus().getCodingFirstRep().copy();
     final Coding disease = condition.getCode().getCodingFirstRep().copy();
 
     final Set<String> profiles = Metas.profilesFrom(condition);
@@ -85,6 +86,7 @@ public class DiseaseDataBuilder implements InitializableFhirObjectBuilder {
             .setProfileUrl(profiles.stream().findFirst().orElseThrow())
             .setNotifiedPerson(notifiedPerson)
             .setVerificationStatus(verificationStatus)
+            .setClinicalStatus(clinicalStatus)
             .setRecordedDate(condition.getRecordedDateElement())
             .setDisease(disease)
             .setId(condition.getId())
