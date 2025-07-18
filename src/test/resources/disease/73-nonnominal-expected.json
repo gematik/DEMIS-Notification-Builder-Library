@@ -122,6 +122,12 @@
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/DiseaseHIVD" ]
       },
+      "clinicalStatus": {
+        "coding": [ {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+          "code": "active"
+        } ]
+      },
       "verificationStatus": {
         "coding": [ {
           "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",

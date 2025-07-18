@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## Release 6.3.4
+- fixing missing clinicalStatus in deepCopy-method of DiseaseDataBuilder 
+
 ## Release 6.3.3
 - fix millisecond data copying of specimen and compositions
 
