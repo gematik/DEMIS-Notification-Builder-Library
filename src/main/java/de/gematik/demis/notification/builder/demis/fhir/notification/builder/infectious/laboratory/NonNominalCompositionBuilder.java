@@ -27,12 +27,14 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_LABORATORY_NON_NOMINAL;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.RECEPTION_TIME_STAMP_TYPE;
 
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
@@ -61,7 +63,7 @@ public class NonNominalCompositionBuilder extends NotificationLaboratoryDataBuil
     builder.setCompositionStatus(original.getStatus());
 
     builder.setTitle(original.getTitle());
-    builder.setDate(original.getDate());
+    builder.setDateTimeType(original.getDateElement());
 
     List<Composition.CompositionRelatesToComponent> relatesTo = original.getRelatesTo();
     if (!relatesTo.isEmpty()) {
@@ -81,6 +83,12 @@ public class NonNominalCompositionBuilder extends NotificationLaboratoryDataBuil
     final Composition.SectionComponent section = original.getSectionFirstRep();
     final Coding sectionCode = section.getCode().getCodingFirstRep();
     builder.setSectionCode(sectionCode);
+
+    Extension extensionByUrl = original.getExtensionByUrl(RECEPTION_TIME_STAMP_TYPE);
+    if (extensionByUrl != null) {
+      builder.addExtension(
+          new Extension().setUrl(extensionByUrl.getUrl()).setValue(extensionByUrl.getValue()));
+    }
 
     return builder.build();
   }

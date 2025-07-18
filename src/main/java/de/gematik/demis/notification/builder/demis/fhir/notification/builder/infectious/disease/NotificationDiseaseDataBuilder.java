@@ -29,12 +29,14 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_NOTIFICATION_TYPE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_SECTION_CODE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_NOTIFICATION_ID;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.RECEPTION_TIME_STAMP_TYPE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.CheckForNull;
@@ -45,6 +47,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
@@ -67,6 +70,7 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   private DateTimeType date;
   private Identifier identifier;
   private Coding category;
+  private List<Extension> extensions;
 
   private Patient notifiedPerson;
   private PractitionerRole notifierRole;
@@ -93,6 +97,12 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
 
     final Optional<String> profile = Metas.profilesFrom(original).stream().findFirst();
     profile.ifPresent(builder::setProfileUrl);
+
+    Extension extensionByUrl = original.getExtensionByUrl(RECEPTION_TIME_STAMP_TYPE);
+    if (extensionByUrl != null) {
+      builder.addExtension(
+          new Extension().setUrl(extensionByUrl.getUrl()).setValue(extensionByUrl.getValue()));
+    }
 
     final Composition intermediate =
         builder
@@ -122,6 +132,9 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
     addSubject(composition);
     addNotifierRole(composition);
     addDiseaseSections(composition);
+
+    composition.setExtension(extensions);
+
     return composition;
   }
 
@@ -308,5 +321,13 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
     if (isNotBlank(profileUrl)) {
       composition.setMeta(new Meta().addProfile(profileUrl));
     }
+  }
+
+  public NotificationDiseaseDataBuilder addExtension(Extension extension) {
+    if (this.extensions == null) {
+      extensions = new ArrayList<>();
+    }
+    this.extensions.add(extension);
+    return this;
   }
 }
