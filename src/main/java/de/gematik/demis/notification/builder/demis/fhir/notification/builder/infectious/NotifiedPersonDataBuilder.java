@@ -52,8 +52,8 @@ import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 
 /**
- * @deprecated Use {@link NotifiedPersonNotByNameDataBuilder}, {@link
- *     NotifiedPersonAnonymousDataBuilder}, {@link NotifiedPersonByNameDataBuilder} instead.
+ * @deprecated Use {@link NotifiedPersonNonNominalDataBuilder}, {@link
+ *     NotifiedPersonAnonymousDataBuilder}, {@link NotifiedPersonNominalDataBuilder} instead.
  */
 @Deprecated(forRemoval = true)
 @Setter

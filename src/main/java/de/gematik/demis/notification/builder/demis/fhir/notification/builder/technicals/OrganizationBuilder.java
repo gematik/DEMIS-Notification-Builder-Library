@@ -58,7 +58,7 @@ public class OrganizationBuilder implements InitializableFhirObjectBuilder {
   private Coding type;
   private List<Organization.OrganizationContactComponent> contacts = new ArrayList<>();
   private List<ContactPoint> telecomList = new ArrayList<>();
-  private Address address;
+  private List<Address> address;
   private String facilityName;
   // Sequenced set guarantees iteration order, which can help stabilizing tests
   private final SequencedSet<String> metaProfileUrls = new LinkedHashSet<>();
@@ -141,9 +141,22 @@ public class OrganizationBuilder implements InitializableFhirObjectBuilder {
     organization.setName(facilityName);
     organization.setTelecom(telecomList);
     organization.setContact(contacts);
-    organization.addAddress(address);
+    organization.setAddress(address);
     organization.setId(organizationId);
     return organization;
+  }
+
+  public OrganizationBuilder setAddress(List<Address> address) {
+    this.address = address;
+    return this;
+  }
+
+  public OrganizationBuilder setAddress(Address address) {
+    if (this.address == null) {
+      this.address = new ArrayList<>();
+    }
+    this.address.add(address);
+    return this;
   }
 
   /** Reset present URLs and set the given URL as only element */

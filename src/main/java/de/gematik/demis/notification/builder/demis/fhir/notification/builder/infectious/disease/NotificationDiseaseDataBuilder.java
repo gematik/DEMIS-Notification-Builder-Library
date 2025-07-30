@@ -28,7 +28,13 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_NOTIFICATION_TYPE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_SECTION_CODE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.DISEASE_COMPOSITION_TITLE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.DISEASE_NOTIFICATION_TYPE_CODE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.DISEASE_NOTIFICATION_TYPE_DISPLAY;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_NOTIFICATION_ID;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_CODE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_DISPLAY;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.RECEPTION_TIME_STAMP_TYPE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -157,14 +163,14 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
       setId(generateUuidString());
     }
     if (this.title == null) {
-      setTitle(DemisConstants.DISEASE_COMPOSITION_TITLE);
+      setTitle(getDefaultTitle());
     }
     if (this.type == null) {
       setType(
           new Coding(
-              DemisConstants.NOTIFICATION_STANDARD_TYPE_SYSTEM,
-              DemisConstants.NOTIFICATION_STANDARD_TYPE_CODE,
-              DemisConstants.NOTIFICATION_STANDARD_TYPE_DISPLAY));
+              NOTIFICATION_STANDARD_TYPE_SYSTEM,
+              NOTIFICATION_STANDARD_TYPE_CODE,
+              NOTIFICATION_STANDARD_TYPE_DISPLAY));
     }
     if (this.category == null) {
       setDefaultCategory();
@@ -181,12 +187,16 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
     return this;
   }
 
+  protected String getDefaultTitle() {
+    return DISEASE_COMPOSITION_TITLE;
+  }
+
   public void setDefaultCategory() {
     setCategory(
         new Coding(
             CODE_SYSTEM_NOTIFICATION_TYPE,
-            DemisConstants.DISEASE_NOTIFICATION_TYPE_CODE,
-            DemisConstants.DISEASE_NOTIFICATION_TYPE_DISPLAY));
+            DISEASE_NOTIFICATION_TYPE_CODE,
+            DISEASE_NOTIFICATION_TYPE_DISPLAY));
   }
 
   public NotificationDiseaseDataBuilder setStatus(Composition.CompositionStatus status) {

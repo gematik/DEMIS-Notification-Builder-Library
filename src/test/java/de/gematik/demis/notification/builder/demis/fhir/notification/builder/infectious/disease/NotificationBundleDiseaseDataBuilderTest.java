@@ -100,8 +100,9 @@ class NotificationBundleDiseaseDataBuilderTest {
     o1.setId("1");
     Organization o2 = new Organization();
     o2.setId("2");
-    assertThat(this.builder.addOrganization(o1)).isSameAs(this.builder);
-    assertThat(this.builder.setOrganizations(Collections.singletonList(o2))).isSameAs(this.builder);
+    assertThat(this.builder.addEncounterOrganization(o1)).isSameAs(this.builder);
+    assertThat(this.builder.setEncounterOrganizations(Collections.singletonList(o2)))
+        .isSameAs(this.builder);
     List<Organization> organizations =
         builder.build().getEntry().stream()
             .map(Bundle.BundleEntryComponent::getResource)
@@ -129,5 +130,51 @@ class NotificationBundleDiseaseDataBuilderTest {
     this.builder.setNotificationDisease(composition);
     Bundle bundle = this.builder.build();
     assertThat(bundle).isNotNull();
+  }
+
+  @Test
+  void addNotifiedPersonFacilities_shouldAddOrganizationToList() {
+    Organization organization = new Organization();
+    organization.setId("org1");
+    builder.addNotifiedPersonFacilities(organization);
+    List<Organization> facilities =
+        builder.build().getEntry().stream()
+            .map(Bundle.BundleEntryComponent::getResource)
+            .filter(Organization.class::isInstance)
+            .map(Organization.class::cast)
+            .toList();
+    assertThat(facilities).containsExactly(organization);
+  }
+
+  @Test
+  void setNotifiedPersonFacilities_shouldReplaceExistingOrganizations() {
+    Organization org1 = new Organization();
+    org1.setId("org1");
+    Organization org2 = new Organization();
+    org2.setId("org2");
+    builder.addNotifiedPersonFacilities(org1);
+    builder.setNotifiedPersonFacilities(Collections.singletonList(org2));
+    List<Organization> facilities =
+        builder.build().getEntry().stream()
+            .map(Bundle.BundleEntryComponent::getResource)
+            .filter(Organization.class::isInstance)
+            .map(Organization.class::cast)
+            .toList();
+    assertThat(facilities).containsExactly(org2);
+  }
+
+  @Test
+  void setNotifiedPersonFacilities_shouldHandleEmptyList() {
+    Organization org1 = new Organization();
+    org1.setId("org1");
+    builder.addNotifiedPersonFacilities(org1);
+    builder.setNotifiedPersonFacilities(Collections.emptyList());
+    List<Organization> facilities =
+        builder.build().getEntry().stream()
+            .map(Bundle.BundleEntryComponent::getResource)
+            .filter(Organization.class::isInstance)
+            .map(Organization.class::cast)
+            .toList();
+    assertThat(facilities).isEmpty();
   }
 }

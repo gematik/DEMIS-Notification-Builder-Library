@@ -27,8 +27,34 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_LABORATORY_ANONYMOUS;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.RECEPTION_TIME_STAMP_TYPE;
+
+import javax.annotation.Nonnull;
+import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.PractitionerRole;
 
 public class NotificationLaboratoryAnonymousDataBuilder extends NotificationLaboratoryDataBuilder {
+
+  public static Composition deepCopy(
+      @Nonnull final Composition original,
+      @Nonnull final PractitionerRole author,
+      @Nonnull final Patient subject,
+      @Nonnull final DiagnosticReport diagnosticReport) {
+    final NotificationLaboratoryAnonymousDataBuilder builder =
+        new NotificationLaboratoryAnonymousDataBuilder();
+    builder.deepCopyFields(original, author, subject, diagnosticReport);
+
+    Extension extensionByUrl = original.getExtensionByUrl(RECEPTION_TIME_STAMP_TYPE);
+    if (extensionByUrl != null) {
+      builder.addExtension(
+          new Extension().setUrl(extensionByUrl.getUrl()).setValue(extensionByUrl.getValue()));
+    }
+
+    return builder.build();
+  }
 
   @Override
   protected String getDefaultProfileUrl() {

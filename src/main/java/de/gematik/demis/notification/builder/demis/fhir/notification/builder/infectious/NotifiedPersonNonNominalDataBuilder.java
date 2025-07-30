@@ -32,11 +32,14 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.OrganizationBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PatientBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Organizations;
 import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.SequencedCollection;
@@ -48,11 +51,12 @@ import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Type;
 
 @Setter
-public class NotifiedPersonNotByNameDataBuilder {
+public class NotifiedPersonNonNominalDataBuilder {
 
   private String id;
   private DateType birthdate;
@@ -63,7 +67,7 @@ public class NotifiedPersonNotByNameDataBuilder {
   private Type pseudonym;
 
   public static Patient deepCopy(@Nonnull final Patient patientToCopy) {
-    final NotifiedPersonNotByNameDataBuilder builder = new NotifiedPersonNotByNameDataBuilder();
+    final NotifiedPersonNonNominalDataBuilder builder = new NotifiedPersonNonNominalDataBuilder();
     final SequencedCollection<Address> addresses =
         AddressDataBuilder.copyOfRedactedAddress(patientToCopy.getAddress());
     builder.setAddress(List.copyOf(addresses));
@@ -80,8 +84,34 @@ public class NotifiedPersonNotByNameDataBuilder {
     return builder.build();
   }
 
+  private static Organization deepCopyNotifiedPersonFacility(
+      @Nonnull final Organization organizationToCopy) {
+
+    SequencedCollection<Address> addresses =
+        AddressDataBuilder.copyOfRedactedAddress(organizationToCopy.getAddress());
+
+    return new OrganizationBuilder()
+        .setOrganizationId(organizationToCopy.getId())
+        .setDefaults()
+        .setMetaProfileUrl("https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonFacility")
+        .setAddress(addresses.stream().toList())
+        .build();
+  }
+
+  public static List<Organization> copyReferencedOrganizations(Patient notifiedPerson) {
+    final List<Address> addressWithOrganization =
+        notifiedPerson.getAddress().stream()
+            .filter(AddressDataBuilder::isReferencingOrganization)
+            .toList();
+    return addressWithOrganization.stream()
+        .map(Organizations::fromExtension)
+        .flatMap(Collection::stream)
+        .map(NotifiedPersonNonNominalDataBuilder::deepCopyNotifiedPersonFacility)
+        .toList();
+  }
+
   private static void copyBirthdate(
-      final Patient patientToCopy, final NotifiedPersonNotByNameDataBuilder builder) {
+      final Patient patientToCopy, final NotifiedPersonNonNominalDataBuilder builder) {
     final DateType birthDateElement = patientToCopy.getBirthDateElement();
     final TemporalPrecisionEnum precision = birthDateElement.getPrecision();
     if (TemporalPrecisionEnum.YEAR.equals(precision)
@@ -110,14 +140,14 @@ public class NotifiedPersonNotByNameDataBuilder {
         .build();
   }
 
-  public NotifiedPersonNotByNameDataBuilder setBirthdate(Year year) {
+  public NotifiedPersonNonNominalDataBuilder setBirthdate(Year year) {
     this.birthdate = new DateType();
     this.birthdate.setValueAsString(year.toString());
     this.birthdate.setPrecision(TemporalPrecisionEnum.YEAR);
     return this;
   }
 
-  public NotifiedPersonNotByNameDataBuilder setBirthdate(YearMonth yearMonth) {
+  public NotifiedPersonNonNominalDataBuilder setBirthdate(YearMonth yearMonth) {
     this.birthdate = new DateType();
     this.birthdate.setValueAsString(yearMonthToString(yearMonth));
     this.birthdate.setPrecision(TemporalPrecisionEnum.MONTH);
@@ -126,14 +156,14 @@ public class NotifiedPersonNotByNameDataBuilder {
 
   /**
    * <b>NOTE:</b> You probably want to use {@link
-   * NotifiedPersonNotByNameDataBuilder#setBirthdate(YearMonth)} which won't generate exceptions.
+   * NotifiedPersonNonNominalDataBuilder#setBirthdate(YearMonth)} which won't generate exceptions.
    *
    * <p>Attempt to parse a birthdate from the given string.
    *
    * @param birthdate in the format yyyy or yyyy-MM
    * @throws IllegalArgumentException If the date is in a format other than yyyy-MM or yyyy.
    */
-  public NotifiedPersonNotByNameDataBuilder setBirthdate(String birthdate) {
+  public NotifiedPersonNonNominalDataBuilder setBirthdate(String birthdate) {
     this.birthdate = new DateType();
     TemporalPrecisionEnum precision;
     if (birthdate == null) {

@@ -3,12 +3,10 @@
   "meta": {
     "lastUpdated": "2022-03-10T14:58:51.377+01:00",
     "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationBundleDiseaseNonNominal" ],
-    "tag": [
-      {
-        "system": "https://demis.rki.de/fhir/CodeSystem/ResponsibleDepartment",
-        "code": "1."
-      }
-    ]
+    "tag": [ {
+      "system": "https://demis.rki.de/fhir/CodeSystem/ResponsibleDepartment",
+      "code": "1."
+    } ]
   },
   "identifier": {
     "system": "https://demis.rki.de/fhir/NamingSystem/NotificationBundleId",
@@ -329,47 +327,9 @@
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonFacility" ]
       },
-      "identifier": [ {
-        "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR",
-        "value": "123456789"
-      } ],
-      "type": [ {
-        "coding": [ {
-          "system": "https://demis.rki.de/fhir/CodeSystem/organizationType",
-          "code": "hospital",
-          "display": "Krankenhaus"
-        } ]
-      } ],
-      "name": "TEST Organisation",
-      "telecom": [ {
-        "system": "phone",
-        "value": "01234567"
-      }, {
-        "system": "email",
-        "value": "anna@ansprechpartner.de"
-      } ],
       "address": [ {
-        "line": [ "Krankenhausstraße 1" ],
-        "_line": [ {
-          "extension": [ {
-            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName",
-            "valueString": "Krankenhausstraße"
-          }, {
-            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber",
-            "valueString": "1"
-          } ]
-        } ],
-        "city": "Buchhorst",
-        "postalCode": "21481",
+        "postalCode": "214",
         "country": "20422"
-      } ],
-      "contact": [ {
-        "name": {
-          "text": "Frau Dr. Anna Beate Carolin Ansprechpartner",
-          "family": "Ansprechpartner",
-          "given": [ "Anna", "Beate", "Carolin" ],
-          "prefix": [ "Dr." ]
-        }
       } ]
     }
   } ]

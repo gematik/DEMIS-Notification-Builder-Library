@@ -1,4 +1,4 @@
-package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease;
+package de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory;
 
 /*-
  * #%L
@@ -27,73 +27,80 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder.copyReferencedOrganizations;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_BUNDLE_LABORATORY_NON_NOMINAL;
 
+import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.SpecificInformationDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
-import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Provenance;
-import org.hl7.fhir.r4.model.QuestionnaireResponse;
+import org.hl7.fhir.r4.model.Specimen;
 
-@Slf4j
-public class NotificationBundleDiseaseNonNominalDataBuilder
-    extends NotificationBundleDiseaseDataBuilder {
+public class NotificationBundleLaboratoryNonNominalDataBuilder
+    extends NotificationBundleLaboratoryDataBuilder {
 
-  @Override
-  public NotificationDiseaseDataBuilder createComposition() {
-    log.debug("Disease notification bundle builder generates composition.");
-    NotificationDiseaseDataBuilder compositionBuilder =
-        new NotificationDiseaseNonNominalDataBuilder();
-    createCompositionHelper(compositionBuilder);
-    return compositionBuilder;
-  }
-
-  @Nonnull
+  /**
+   * Create a copy of the bundle and a copy of all ressources.
+   *
+   * <p>This method expects a valid bundle with:
+   *
+   * <ul>
+   *   <li>Composition
+   *   <li>DiagnosticReport
+   *   <li>Submitter
+   *   <li>Notifier
+   *   <li>Subject
+   *   <li>Specimen
+   *   <li>Observation
+   * </ul>
+   *
+   * Relationships between these must be correctly established. i.e. the observation must reference
+   * the specimen for this to work. Missing elements will cause the copy to fail. No validation is
+   * performed.
+   */
   public static Bundle deepCopy(@Nonnull final Bundle originalBundle) {
-    final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle);
-    // in case the subject references an organization as address we do copy the address entry, but
-    // we then need to manually copy the organization as well
+    final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle.getEntry());
+
     final Patient notifiedPerson = NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject());
     final List<Organization> referencedOrganizations = copyReferencedOrganizations(notifiedPerson);
 
-    final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy(ctx.notifier());
-    final Condition condition = DiseaseDataBuilder.deepCopy(ctx.condition(), notifiedPerson);
-    final QuestionnaireResponse specificQuestionnaire =
-        SpecificInformationDataBuilder.deepCopy(ctx.specificQuestionnaire(), notifiedPerson);
+    final PractitionerRole submitter = PractitionerRoleBuilder.deepCopy(ctx.submitter());
+    final PractitionerRole notifier = PractitionerRoleBuilder.deepCopy(ctx.notifier());
+
+    final Bundles.ObservationCopyResult observationCopyResult =
+        Bundles.copyObservations(ctx.observations(), notifiedPerson, submitter);
+    final ImmutableSet<Observation> observations = observationCopyResult.observations();
+    final ImmutableSet<Specimen> specimen = observationCopyResult.specimen();
+    final DiagnosticReport diagnosticReport =
+        LaboratoryReportDataBuilder.deepCopy(ctx.diagnosticReport(), notifiedPerson, observations);
+
     final Composition composition =
-        NotificationDiseaseDataBuilder.deepCopy(
-            ctx.composition(), condition, notifiedPerson, notifierRole, specificQuestionnaire);
+        NotificationLaboratoryNonNominalDataBuilder.deepCopy(
+            ctx.composition(), notifier, notifiedPerson, diagnosticReport);
 
-    final NotificationBundleDiseaseDataBuilder builder =
-        new NotificationBundleDiseaseNonNominalDataBuilder()
-            .setDisease(condition)
-            .setSpecificInformation(specificQuestionnaire)
-            .setNotificationDisease(composition)
+    final NotificationBundleLaboratoryDataBuilder builder =
+        new NotificationBundleLaboratoryNonNominalDataBuilder()
+            .setNotificationLaboratory(composition)
             .setNotifiedPerson(notifiedPerson)
-            .setNotifierRole(notifierRole);
+            .setNotifierRole(notifier)
+            .setSubmitterRole(submitter)
+            .setLaboratoryReport(diagnosticReport)
+            .setSpecimen(specimen)
+            .setPathogenDetection(observations);
 
-    /*
-     Currently the NotificationBundleDiseaseDataBuilder is only adding values set using builder.setOrganizations
-     if a common questionnaire is set. This currently does not happen for NonNominal flavours, so we add it
-     manually.
-    */
     referencedOrganizations.forEach(builder::addAdditionalEntry);
     final Optional<Provenance> provenance = ctx.provenance().map(Provenance::copy);
     provenance.ifPresent(builder::addAdditionalEntry);
 
-    // Note: these setters do not return a NotificationBundleDiseaseDataBuilder and make it harder
-    // to chain all calls together
     Bundle bundle =
         builder
             .setId(originalBundle.getId())
@@ -110,13 +117,7 @@ public class NotificationBundleDiseaseNonNominalDataBuilder
   }
 
   @Override
-  public NotificationBundleDiseaseDataBuilder setCommonInformation(
-      @CheckForNull final QuestionnaireResponse commonInformation) {
-    throw new UnsupportedOperationException("Not supported for this builder");
-  }
-
-  @Override
   protected String getDefaultProfileUrl() {
-    return DemisConstants.PROFILE_NOTIFICATION_BUNDLE_DISEASE_NON_NOMINAL;
+    return PROFILE_NOTIFICATION_BUNDLE_LABORATORY_NON_NOMINAL;
   }
 }

@@ -60,6 +60,7 @@ This project includes:
   JUnit Platform Commons under Eclipse Public License v2.0
   JUnit Platform Engine API under Eclipse Public License v2.0
   mockito-core under MIT
+  mockito-junit-jupiter under MIT
   notification-builder-library under Licensed under the EUPL 1.2
   Objenesis under Apache License, Version 2.0
   OpenTelemetry Instrumentation for Java under The Apache License, Version 2.0

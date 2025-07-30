@@ -42,16 +42,19 @@ import java.util.List;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Specimen;
 import org.junit.jupiter.api.Test;
 
-class NonNominalBundleBuilderTest {
+class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
   @Test
   void shouldCreateBundleWithNonNominalUrl() {
-    NonNominalBundleBuilder builder = new NonNominalBundleBuilder();
+    NotificationBundleLaboratoryNonNominalDataBuilder builder =
+        new NotificationBundleLaboratoryNonNominalDataBuilder();
     builder.setDefaults();
 
     builder.setNotificationLaboratory(TestObjects.composition());
@@ -86,7 +89,8 @@ class NonNominalBundleBuilderTest {
   void shouldCopyMetaProfileUrl() {
     Bundle originalBundle = createBundle();
 
-    final Bundle result = NonNominalBundleBuilder.deepCopy(originalBundle);
+    final Bundle result =
+        NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
 
     assertThat(result.getMeta().getProfile().getFirst().getValue())
         .isEqualTo(DemisConstants.PROFILE_NOTIFICATION_BUNDLE_LABORATORY_NON_NOMINAL);
@@ -96,7 +100,8 @@ class NonNominalBundleBuilderTest {
   void shouldCopyMetaTags() {
     Bundle originalBundle = createBundle();
 
-    final Bundle result = NonNominalBundleBuilder.deepCopy(originalBundle);
+    final Bundle result =
+        NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
     assertThat(result.getMeta().getTag().get(0).getSystem()).isEqualTo("system");
     assertThat(result.getMeta().getTag().get(0).getCode()).isEqualTo("code");
     assertThat(result.getMeta().getTag().get(0).getDisplay()).isEqualTo("display");
@@ -106,7 +111,8 @@ class NonNominalBundleBuilderTest {
   void shouldCopyIdentifier() {
     Bundle originalBundle = createBundle();
 
-    final Bundle result = NonNominalBundleBuilder.deepCopy(originalBundle);
+    final Bundle result =
+        NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
     assertThat(result.getIdentifier().getSystem())
         .isEqualTo("https://demis.rki.de/fhir/NamingSystem/NotificationBundleId");
     assertThat(result.getIdentifier().getValue()).isEqualTo("555-42-23-6");
@@ -115,7 +121,8 @@ class NonNominalBundleBuilderTest {
   @Test
   void shouldCopyType() {
     Bundle originalBundle = createBundle();
-    final Bundle result = NonNominalBundleBuilder.deepCopy(originalBundle);
+    final Bundle result =
+        NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
     assertThat(result.getType()).isEqualTo(Bundle.BundleType.DOCUMENT);
   }
 
@@ -124,7 +131,8 @@ class NonNominalBundleBuilderTest {
     Bundle originalBundle = createBundle();
     Date lastUpdated = originalBundle.getMeta().getLastUpdated();
 
-    final Bundle result = NonNominalBundleBuilder.deepCopy(originalBundle);
+    final Bundle result =
+        NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
     assertThat(result.getMeta().getLastUpdated()).isEqualTo(lastUpdated);
   }
 
@@ -133,7 +141,8 @@ class NonNominalBundleBuilderTest {
     Bundle originalBundle = createBundle();
     Date timestamp = originalBundle.getTimestamp();
 
-    final Bundle result = NonNominalBundleBuilder.deepCopy(originalBundle);
+    final Bundle result =
+        NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
     assertThat(result.getTimestamp()).isEqualTo(timestamp);
   }
 
@@ -141,7 +150,7 @@ class NonNominalBundleBuilderTest {
   void shouldCopyEntries() {
     final Bundle original = getBundle();
 
-    final Bundle result = NonNominalBundleBuilder.deepCopy(original);
+    final Bundle result = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
 
     assertThat(result.getEntry()).hasSize(original.getEntry().size());
     // Equality is implemented on referencial equality. Ensure that no entry is present in either
@@ -163,7 +172,7 @@ class NonNominalBundleBuilderTest {
     assertThatNoException()
         .isThrownBy(
             () -> {
-              NonNominalBundleBuilder.deepCopy(original);
+              NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
             });
   }
 
@@ -178,7 +187,7 @@ class NonNominalBundleBuilderTest {
     iParser.setPrettyPrint(true);
 
     final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
 
     final String expected =
         Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal-expected.json"));
@@ -195,7 +204,7 @@ class NonNominalBundleBuilderTest {
     iParser.setPrettyPrint(true);
 
     final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
 
     final String expected =
         Files.readString(
@@ -215,7 +224,7 @@ class NonNominalBundleBuilderTest {
     iParser.setPrettyPrint(true);
 
     final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
 
     final String expected =
         Files.readString(
@@ -238,7 +247,7 @@ class NonNominalBundleBuilderTest {
     iParser.setPrettyPrint(true);
 
     final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
 
     // NOTE: it's okay if this test breaks should you change either the input or the output. Just
     // make sure you
@@ -262,7 +271,7 @@ class NonNominalBundleBuilderTest {
     iParser.setPrettyPrint(true);
 
     final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
 
     final String expected =
         Files.readString(
@@ -272,13 +281,76 @@ class NonNominalBundleBuilderTest {
     assertThat(result).isEqualToIgnoringNewLines(expected);
   }
 
+  @Test
+  void shouldSetPractitionerReferenceWithoutUrnUuidWhenParametersNotificationisReceived()
+      throws IOException {
+    final String source =
+        Files.readString(
+            Path.of("src/test/resources/laboratory/73-laboratory-parameters-notification.json"));
+
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    final Parameters original = (Parameters) iParser.parseResource(source);
+    Bundle originalBundle = (Bundle) original.getParameter().getFirst().getResource();
+
+    Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
+
+    assertThat(copy.getEntryFirstRep().getFullUrl())
+        .isEqualTo("https://demis.rki.de/fhir/Composition/6ed88a19-70e9-3292-8272-b45740eb82b6");
+    Resource resource = copy.getEntry().get(2).getResource();
+    assertThat(resource).isInstanceOf(PractitionerRole.class);
+    PractitionerRole practitionerRole = (PractitionerRole) resource;
+    assertThat(practitionerRole.getOrganization().getReference())
+        .hasToString("Organization/f66f699c-4ca5-3c54-9405-d2ef4305791e");
+
+    Resource resource2 = copy.getEntry().get(4).getResource();
+    assertThat(resource2).isInstanceOf(PractitionerRole.class);
+    PractitionerRole practitionerRole2 = (PractitionerRole) resource2;
+    assertThat(practitionerRole2.getOrganization().getReference())
+        .hasToString("Organization/e9dddc3f-2110-38ad-9f1a-479f2a656074");
+
+    final String expected =
+        Files.readString(
+            Path.of(
+                "src/test/resources/laboratory/73-laboratory-parameters-notification-copy.json"));
+
+    IParser iParser1 = FhirContext.forR4Cached().newJsonParser();
+    iParser1.setPrettyPrint(true);
+    String actual = iParser1.encodeResourceToString(copy);
+    assertThat(actual).isEqualToIgnoringWhitespace(expected);
+  }
+
+  @Test
+  void shouldCopyNotifiedPersonFacility() throws IOException {
+    final String source =
+        Files.readString(Path.of("src/test/resources/laboratory/73-other-facility-case.json"));
+
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    final Parameters original = (Parameters) iParser.parseResource(source);
+    Bundle originalBundle = (Bundle) original.getParameter().getFirst().getResource();
+
+    Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
+
+    final String expected =
+        Files.readString(
+            Path.of("src/test/resources/laboratory/73-other-facility-case-expected.json"));
+
+    IParser iParser1 = FhirContext.forR4Cached().newJsonParser();
+    iParser1.setPrettyPrint(true);
+    String actual = iParser1.encodeResourceToString(copy);
+    assertThat(actual).isEqualToIgnoringWhitespace(expected);
+  }
+
   private static Bundle getBundle() {
     final Specimen specimen = TestObjects.specimen();
     final Observation observation = TestObjects.pathogenDetection(specimen);
     final DiagnosticReport diagnosticReport = TestObjects.laboratoryReport(observation);
     final Patient patient = TestObjects.notifiedPerson();
     final PractitionerRole submitter = TestObjects.submitter();
-    return new NonNominalBundleBuilder()
+    return new NotificationBundleLaboratoryNonNominalDataBuilder()
         .setDefaults()
         .setNotifierRole(TestObjects.notifier())
         .setSubmitterRole(submitter)

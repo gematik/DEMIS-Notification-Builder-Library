@@ -28,7 +28,6 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.demis.notification.builder.demis.fhir.testUtils.TestObjects;
 import org.hl7.fhir.r4.model.Bundle;

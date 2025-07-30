@@ -53,6 +53,6 @@ public class NonNominalCopyStrategy implements CopyStrategy<Bundle> {
   @Override
   @Nonnull
   public Bundle copy() {
-    return NonNominalBundleBuilder.deepCopy(resource);
+    return NotificationBundleDiseaseNonNominalDataBuilder.deepCopy(resource);
   }
 }

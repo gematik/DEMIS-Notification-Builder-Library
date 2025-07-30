@@ -41,7 +41,7 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 
 @Setter
-public class NotifiedPersonByNameDataBuilder {
+public class NotifiedPersonNominalDataBuilder {
 
   private HumanName humanName;
   private Enumerations.AdministrativeGender gender;
@@ -63,17 +63,17 @@ public class NotifiedPersonByNameDataBuilder {
         .build();
   }
 
-  public NotifiedPersonByNameDataBuilder addAddress(Address newAddress) {
+  public NotifiedPersonNominalDataBuilder addAddress(Address newAddress) {
     this.address.add(newAddress);
     return this;
   }
 
-  public NotifiedPersonByNameDataBuilder addTelecom(ContactPoint newTelecom) {
+  public NotifiedPersonNominalDataBuilder addTelecom(ContactPoint newTelecom) {
     telecom.add(newTelecom);
     return this;
   }
 
-  public NotifiedPersonByNameDataBuilder setDefault() {
+  public NotifiedPersonNominalDataBuilder setDefault() {
     if (this.id == null) {
       setId(generateUuidString());
     }
