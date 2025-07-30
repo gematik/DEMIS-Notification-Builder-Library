@@ -40,6 +40,7 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Provenance;
@@ -97,6 +98,19 @@ record BundleBuilderContext(
         observations,
         specimens,
         provenance);
+  }
+
+  private static List<Organization> getNotifiedPersonFacilities(
+      List<Bundle.BundleEntryComponent> entries) {
+    return entries.stream()
+        .filter(
+            e ->
+                e.getResource()
+                    .getMeta()
+                    .hasProfile(DemisConstants.PROFILE_NOTIFIED_PERSON_FACILITY))
+        .map(Bundle.BundleEntryComponent::getResource)
+        .map(Organization.class::cast)
+        .toList();
   }
 
   /**

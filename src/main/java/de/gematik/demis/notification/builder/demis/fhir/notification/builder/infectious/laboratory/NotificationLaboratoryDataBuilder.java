@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LABORATORY_NOTIFICATION_7_1_COMPOSITION_TITLE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LOINC_ORG_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_ID_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_LABORATORY;
@@ -36,7 +37,9 @@ import static java.util.Objects.requireNonNullElse;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.CompositionBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
+import java.util.List;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -58,14 +61,55 @@ public class NotificationLaboratoryDataBuilder
 
   @CheckForNull private DiagnosticReport laboratoryReport;
 
+  protected String getDefaultTitle() {
+    return LABORATORY_NOTIFICATION_7_1_COMPOSITION_TITLE;
+  }
+
   public NotificationLaboratoryDataBuilder setDefault() {
 
     setIdentifierSystem(NOTIFICATION_ID_SYSTEM);
     setSectionComponentSystem(LOINC_ORG_SYSTEM);
-    setTitle("Erregernachweismeldung");
+    setTitle(getDefaultTitle());
 
     super.setDefaultData();
     return this;
+  }
+
+  // In NotificationLaboratoryDataBuilder.java
+
+  protected void deepCopyFields(
+      @Nonnull final Composition original,
+      @Nonnull final PractitionerRole author,
+      @Nonnull final Patient subject,
+      @Nonnull final DiagnosticReport diagnosticReport) {
+    setDefault();
+    setNotificationId(original.getIdElement().getIdPart());
+    setTypeCode(original.getType().getCodingFirstRep());
+    setCategoryCode(original.getCategoryFirstRep().getCodingFirstRep());
+    setIdentifierSystem(original.getIdentifier().getSystem());
+    setIdentifierValue(original.getIdentifier().getValue());
+    setCompositionStatus(original.getStatus());
+    setTitle(original.getTitle());
+    setDateTimeType(original.getDateElement());
+
+    List<Composition.CompositionRelatesToComponent> relatesTo = original.getRelatesTo();
+    if (!relatesTo.isEmpty()) {
+      final Composition.CompositionRelatesToComponent relatesToElement = relatesTo.get(0);
+      final Reference targetReference = relatesToElement.getTargetReference();
+      final Identifier identifier = targetReference.getIdentifier();
+
+      setRelatesToCode(relatesToElement.getCode());
+      setRelatesToReferenceType(targetReference.getType());
+      setRelatesToNotificationId(identifier.getValue());
+    }
+
+    setNotifierRole(author);
+    setNotifiedPerson(subject);
+
+    setLaboratoryReport(diagnosticReport);
+
+    final Composition.SectionComponent section = original.getSectionFirstRep();
+    setSectionCode(section.getCode().getCodingFirstRep());
   }
 
   @Override

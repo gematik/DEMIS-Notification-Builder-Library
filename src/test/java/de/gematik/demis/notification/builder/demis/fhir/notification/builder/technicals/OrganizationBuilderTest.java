@@ -251,4 +251,15 @@ class OrganizationBuilderTest {
         orga.getMeta().getProfile().stream().map(PrimitiveType::getValueAsString).toList();
     assertThat(actual).containsExactly(expectedUrl);
   }
+
+  @Test
+  void shouldAddASingleAddress() {
+    Address address = new Address();
+
+    OrganizationBuilder organizationBuilder = new OrganizationBuilder().setAddress(address);
+
+    Organization organization = organizationBuilder.build();
+
+    assertThat(organization.getAddress()).containsExactly(address);
+  }
 }

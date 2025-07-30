@@ -36,7 +36,7 @@ import java.nio.file.Path;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Test;
 
-class AnonymousBundleBuilderTest {
+class NotificationBundleLaboratoryAnonymousDataBuilderTest {
 
   @Test
   void thatExistingAnonymousBundleRemainsUnchanged() throws IOException {
@@ -48,7 +48,7 @@ class AnonymousBundleBuilderTest {
 
     final Bundle original = (Bundle) iParser.parseResource(source);
     // THEN
-    final Bundle copy = AnonymousBundleBuilder.deepCopy(original);
+    final Bundle copy = NotificationBundleLaboratoryAnonymousDataBuilder.deepCopy(original);
 
     final String expected =
         Files.readString(Path.of("src/test/resources/laboratory/73-anonymous-expected.json"));

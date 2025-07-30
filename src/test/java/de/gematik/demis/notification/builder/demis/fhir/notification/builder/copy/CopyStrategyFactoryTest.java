@@ -28,10 +28,11 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.co
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.AnonymousBundleBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.NotificationBundleDiseaseNonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.AnonymousCopyStrategy;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NonNominalBundleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NonNominalCopyStrategy;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NotificationBundleLaboratoryAnonymousDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NotificationBundleLaboratoryNonNominalDataBuilder;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,8 @@ class CopyStrategyFactoryTest {
 
   @Test
   void thatNonNominalLaboratoryBundlesAreRecognized() {
-    final Bundle nonNominalBundle = new NonNominalBundleBuilder().setDefaults().build();
+    final Bundle nonNominalBundle =
+        new NotificationBundleLaboratoryNonNominalDataBuilder().setDefaults().build();
     final Optional<CopyStrategy<Bundle>> result = CopyStrategyFactory.getInstance(nonNominalBundle);
     assertThat(result).containsInstanceOf(NonNominalCopyStrategy.class);
   }
@@ -48,10 +50,7 @@ class CopyStrategyFactoryTest {
   @Test
   void thatNonNominalDiseaseBundlesAreRecognized() {
     final Bundle nonNominalBundle =
-        new de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease
-                .NonNominalBundleBuilder()
-            .setDefaults()
-            .build();
+        new NotificationBundleDiseaseNonNominalDataBuilder().setDefaults().build();
     final Optional<CopyStrategy<Bundle>> result = CopyStrategyFactory.getInstance(nonNominalBundle);
     assertThat(result)
         .containsInstanceOf(
@@ -61,7 +60,8 @@ class CopyStrategyFactoryTest {
 
   @Test
   void thatAnonymousBundlesAreRecognized() {
-    final Bundle anonymousBundle = new AnonymousBundleBuilder().setDefaults().build();
+    final Bundle anonymousBundle =
+        new NotificationBundleLaboratoryAnonymousDataBuilder().setDefaults().build();
     final Optional<CopyStrategy<Bundle>> result = CopyStrategyFactory.getInstance(anonymousBundle);
     assertThat(result).containsInstanceOf(AnonymousCopyStrategy.class);
   }

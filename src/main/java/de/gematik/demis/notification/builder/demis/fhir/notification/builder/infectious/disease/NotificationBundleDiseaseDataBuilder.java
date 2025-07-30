@@ -65,7 +65,8 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
 
   private final List<Resource> hospitalizations = new ArrayList<>();
   private final List<Resource> immunizations = new ArrayList<>();
-  private final List<Resource> organizations = new ArrayList<>();
+  private final List<Resource> encounterOrganizations = new ArrayList<>();
+  private final List<Resource> notifiedPersonFacilities = new ArrayList<>();
 
   private Patient notifiedPerson;
   @Getter private PractitionerRole notifierRole;
@@ -125,25 +126,44 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
     return this;
   }
 
-  public final NotificationBundleDiseaseDataBuilder addOrganization(Organization organization) {
-    this.organizations.add(organization);
+  public final NotificationBundleDiseaseDataBuilder addEncounterOrganization(
+      Organization organization) {
+    this.encounterOrganizations.add(organization);
     return this;
   }
 
-  public final NotificationBundleDiseaseDataBuilder setOrganizations(
+  public final NotificationBundleDiseaseDataBuilder setEncounterOrganizations(
+      List<Organization> encounterOrganizations) {
+    this.encounterOrganizations.clear();
+    this.encounterOrganizations.addAll(encounterOrganizations);
+    return this;
+  }
+
+  public final NotificationBundleDiseaseDataBuilder addNotifiedPersonFacilities(
+      Organization organization) {
+    this.notifiedPersonFacilities.add(organization);
+    return this;
+  }
+
+  public final NotificationBundleDiseaseDataBuilder setNotifiedPersonFacilities(
       List<Organization> organizations) {
-    this.organizations.clear();
-    this.organizations.addAll(organizations);
+    this.notifiedPersonFacilities.clear();
+    this.notifiedPersonFacilities.addAll(organizations);
     return this;
   }
 
   @Override
   protected void addEntries() {
     addComposition();
-    addEntry(this.notifiedPerson);
+    addNotifiedPerson();
     addEntry(this.disease);
     addEntryOfPractitionerRole(this.notifierRole);
     addQuestionnaireResponses();
+  }
+
+  private void addNotifiedPerson() {
+    addEntry(this.notifiedPerson);
+    addEntries(this.notifiedPersonFacilities);
   }
 
   @Override
@@ -226,7 +246,7 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
   }
 
   private void addEncounters() {
-    addEntries(this.organizations);
+    addEntries(this.encounterOrganizations);
     addEntries(this.hospitalizations);
   }
 }

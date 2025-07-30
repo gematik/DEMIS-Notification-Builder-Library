@@ -35,14 +35,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Parameters;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
-class NonNominalBundleBuilderTest {
+class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
   @Test
   void canDeepCopyAValidBundle() throws IOException {
     final Bundle original = createBundle(Path.of("src/test/resources/disease/73-nonnominal.json"));
-    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+    final Bundle copy = NotificationBundleDiseaseNonNominalDataBuilder.deepCopy(original);
 
     final String expected =
         Files.readString(Path.of("src/test/resources/disease/73-nonnominal-expected.json"));
@@ -58,7 +61,7 @@ class NonNominalBundleBuilderTest {
   void canDeepCopyAValidBundleWithUrnUuids() throws IOException {
     final Bundle original =
         createBundle(Path.of("src/test/resources/disease/73-nonnominal-urn_uuid-mixed.json"));
-    final Bundle copy = NonNominalBundleBuilder.deepCopy(original);
+    final Bundle copy = NotificationBundleDiseaseNonNominalDataBuilder.deepCopy(original);
 
     final String expected =
         Files.readString(
@@ -69,6 +72,58 @@ class NonNominalBundleBuilderTest {
 
     final String result = iParser.encodeResourceToString(copy);
     assertThat(result).isEqualToIgnoringWhitespace(expected);
+  }
+
+  @Test
+  void shouldSetPractitionerReferenceWithoutUrnUuidWhenParametersNotificationisReceived()
+      throws IOException {
+    final String source =
+        Files.readString(
+            Path.of("src/test/resources/disease/73-disease-parameters-notification.json"));
+
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    final Parameters original = (Parameters) iParser.parseResource(source);
+    Bundle originalBundle = (Bundle) original.getParameter().getFirst().getResource();
+
+    Bundle copy = NotificationBundleDiseaseNonNominalDataBuilder.deepCopy(originalBundle);
+
+    assertThat(copy.getEntryFirstRep().getFullUrl())
+        .isEqualTo("https://demis.rki.de/fhir/Composition/9bb7aeba-581a-47ce-8791-5cdb319d6267");
+    Resource resource = copy.getEntry().get(3).getResource();
+    assertThat(resource).isInstanceOf(PractitionerRole.class);
+    PractitionerRole practitionerRole = (PractitionerRole) resource;
+    assertThat(practitionerRole.getOrganization().getReference())
+        .hasToString("Organization/2ac04fbc-e807-4eb1-a07e-8a941ae1b7d7");
+
+    final String expected =
+        Files.readString(
+            Path.of("src/test/resources/disease/73-disease-parameters-notification-copy.json"));
+
+    assertThat(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(copy))
+        .isEqualToIgnoringWhitespace(expected);
+  }
+
+  @Test
+  void shouldCopyNotifiedPersonFacility() throws IOException {
+    final String source =
+        Files.readString(Path.of("src/test/resources/disease/73-nonnominal-other-facility.json"));
+
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    Bundle originalBundle = iParser.parseResource(Bundle.class, source);
+    iParser.setPrettyPrint(true);
+
+    Bundle copy = NotificationBundleDiseaseNonNominalDataBuilder.deepCopy(originalBundle);
+
+    final String expected =
+        Files.readString(
+            Path.of("src/test/resources/disease/73-nonnominal-other-facility-expected.json"));
+
+    assertThat(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(copy))
+        .isEqualToIgnoringWhitespace(expected);
   }
 
   @Nonnull

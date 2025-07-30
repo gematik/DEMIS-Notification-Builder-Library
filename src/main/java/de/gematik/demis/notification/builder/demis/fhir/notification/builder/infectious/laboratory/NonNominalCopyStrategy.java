@@ -53,10 +53,13 @@ public class NonNominalCopyStrategy implements CopyStrategy<Bundle> {
     return meta.hasProfile(APPLICABLE_PROFILE);
   }
 
-  /** Copy a bundle according to {@link NonNominalBundleBuilder#deepCopy(Bundle)} */
+  /**
+   * Copy a bundle according to {@link
+   * NotificationBundleLaboratoryNonNominalDataBuilder#deepCopy(Bundle)}
+   */
   @Override
   @Nonnull
   public Bundle copy() {
-    return NonNominalBundleBuilder.deepCopy(source);
+    return NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(source);
   }
 }

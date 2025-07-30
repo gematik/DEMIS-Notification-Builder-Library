@@ -29,6 +29,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIER_ROLE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_SUBMITTING_ROLE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getShortReferenceOrUrnUuid;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.PractitionerType;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
@@ -50,7 +51,24 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
    *     organization)
    */
   public static PractitionerRole deepCopy(@Nonnull final PractitionerRole original) {
-    return original.copy();
+    PractitionerRole copy = new PractitionerRole();
+    copy.setId(original.getId());
+    copy.setMeta(original.getMeta());
+    Practitioner referencedPractitioner = (Practitioner) original.getPractitioner().getResource();
+    Organization referencedOrganization = (Organization) original.getOrganization().getResource();
+    if (referencedPractitioner != null) {
+      Practitioner copiedPractitioner = referencedPractitioner.copy();
+      Reference newReference = new Reference(copiedPractitioner);
+      newReference.setReference(getShortReferenceOrUrnUuid(copiedPractitioner));
+      copy.setPractitioner(newReference);
+    }
+    if (referencedOrganization != null) {
+      Organization copiedOrganization = referencedOrganization.copy();
+      Reference value = new Reference(copiedOrganization);
+      value.setReference(getShortReferenceOrUrnUuid(copiedOrganization));
+      copy.setOrganization(value);
+    }
+    return copy;
   }
 
   @Override

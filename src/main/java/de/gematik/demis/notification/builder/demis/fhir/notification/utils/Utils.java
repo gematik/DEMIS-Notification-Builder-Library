@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Type;
 
 public final class Utils {
@@ -51,5 +52,24 @@ public final class Utils {
   @Nonnull
   public static Predicate<Type> hasFhirType(@Nonnull final String search) {
     return type -> type.fhirType().equals(search);
+  }
+
+  @Nonnull
+  @SuppressWarnings("ConstantConditions")
+  public static String getShortReferenceOrUrnUuid(@Nonnull IBaseResource resource) {
+    if (resource == null) { // NOSONAR
+      throw new IllegalArgumentException("Resource must not be null");
+    }
+    if (resource.getIdElement() == null
+        || resource.getIdElement().getValue() == null
+        || resource.getIdElement().getIdPart() == null) {
+      throw new IllegalStateException("Resource does not have a valid id");
+    }
+    String value = resource.getIdElement().getValue();
+    if (value.startsWith("urn:uuid")) {
+      return value;
+    } else {
+      return resource.fhirType() + "/" + resource.getIdElement().getIdPart();
+    }
   }
 }

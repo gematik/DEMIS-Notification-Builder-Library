@@ -44,13 +44,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-class NotifiedPersonByNameDataBuilderTest {
+class NotifiedPersonNominalDataBuilderTest {
 
-  private NotifiedPersonByNameDataBuilder notifiedPersonDataBuilder;
+  private NotifiedPersonNominalDataBuilder notifiedPersonDataBuilder;
 
   @BeforeEach
   void setUp() {
-    notifiedPersonDataBuilder = new NotifiedPersonByNameDataBuilder();
+    notifiedPersonDataBuilder = new NotifiedPersonNominalDataBuilder();
   }
 
   @Test
@@ -111,7 +111,7 @@ class NotifiedPersonByNameDataBuilderTest {
   @Test
   void shouldKeepIdWhenSet() {
     String id = "init-id";
-    IBase resource = new NotifiedPersonByNameDataBuilder().setId(id).build();
+    IBase resource = new NotifiedPersonNominalDataBuilder().setId(id).build();
     if (resource instanceof Patient patient) {
       assertThat(patient.getId()).isEqualTo("Patient/init-id");
     } else {

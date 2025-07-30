@@ -52,9 +52,12 @@ public class AnonymousCopyStrategy implements CopyStrategy<Bundle> {
     return meta.hasProfile(APPLICABLE_PROFILE);
   }
 
-  /** Copy the given bundle according to {@link AnonymousBundleBuilder#deepCopy(Bundle)} */
+  /**
+   * Copy the given bundle according to {@link
+   * NotificationBundleLaboratoryAnonymousDataBuilder#deepCopy(Bundle)}
+   */
   @Override
   public Bundle copy() {
-    return AnonymousBundleBuilder.deepCopy(source);
+    return NotificationBundleLaboratoryAnonymousDataBuilder.deepCopy(source);
   }
 }

@@ -27,6 +27,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_NOTIFICATION_TYPE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_7_3_COMPOSITION_TITLE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_DISEASE_NON_NOMINAL;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
@@ -48,6 +49,11 @@ public class NotificationDiseaseNonNominalDataBuilder extends NotificationDiseas
         new Coding(
             CODE_SYSTEM_NOTIFICATION_TYPE,
             DemisConstants.DISEASE_NOTIFICATION_7_3_TYPE_CODE,
-            DemisConstants.DISEASE_NOTIFICATION_7_3_TYPE_DISPLAY));
+            DemisConstants.NOTIFICATION_7_3_COMPOSITION_TITLE));
+  }
+
+  @Override
+  protected String getDefaultTitle() {
+    return NOTIFICATION_7_3_COMPOSITION_TITLE;
   }
 }

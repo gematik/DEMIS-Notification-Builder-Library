@@ -32,7 +32,8 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
 
-public class AnonymousBundleBuilder extends NotificationBundleLaboratoryDataBuilder {
+public class NotificationBundleLaboratoryAnonymousDataBuilder
+    extends NotificationBundleLaboratoryDataBuilder {
 
   /**
    * Create a copy of the given bundle and it's entries.
@@ -40,7 +41,8 @@ public class AnonymousBundleBuilder extends NotificationBundleLaboratoryDataBuil
    * <p>The subject will be replaced by the anonymous flavour when copied.
    */
   public static Bundle deepCopy(final Bundle originalBundle) {
-    final AnonymousBundleBuilder builder = new AnonymousBundleBuilder();
+    final NotificationBundleLaboratoryAnonymousDataBuilder builder =
+        new NotificationBundleLaboratoryAnonymousDataBuilder();
     builder.setId(originalBundle.getId());
     builder.setProfileUrl(originalBundle.getMeta().getProfile().getFirst().getValueAsString());
     originalBundle
@@ -61,7 +63,7 @@ public class AnonymousBundleBuilder extends NotificationBundleLaboratoryDataBuil
         .copyWith(
             NotifiedPersonAnonymousDataBuilder::deepCopy,
             (composition, copy) ->
-                AnonymousCompositionBuilder.deepCopy(
+                NotificationLaboratoryAnonymousDataBuilder.deepCopy(
                     composition, copy.notifier(), copy.subject(), copy.diagnosticReport()))
         .applyTo(builder);
 
