@@ -257,11 +257,11 @@ public final class DemisConstants {
   public static final String DISEASE_COMPOSITION_TITLE = "Meldung gemäß §6 Absatz 1, 2 IfSG";
   public static final String DISEASE_NOTIFICATION_TYPE_CODE = "6.1_2";
   public static final String DISEASE_NOTIFICATION_TYPE_DISPLAY =
-      "Meldung gemäß IfSG §6 Absatz 1, 2";
+      "Meldung gemäß §6 Absatz 1, 2 IfSG";
   public static final String DISEASE_NOTIFICATION_7_3_TYPE_CODE = "7.3";
-  public static final String NOTIFICATION_7_3_COMPOSITION_TITLE = "Meldung gemäß IfSG §7 Absatz 3";
+  public static final String NOTIFICATION_7_3_COMPOSITION_TITLE = "Meldung gemäß §7 Absatz 3 IfSG";
   public static final String LABORATORY_NOTIFICATION_7_1_COMPOSITION_TITLE =
-      "Meldung gemäß IfSG §7 Absatz 1";
+      "Meldung gemäß §7 Absatz 1 IfSG";
   public static final String DISEASE_SECTION_SPECIFIC_CODE = "specificClinAndEpiInformation";
   public static final String DISEASE_SECTION_SPECIFIC_DISPLAY =
       "Meldetatbestandsspezifische klinische und epidemiologische Angaben";
