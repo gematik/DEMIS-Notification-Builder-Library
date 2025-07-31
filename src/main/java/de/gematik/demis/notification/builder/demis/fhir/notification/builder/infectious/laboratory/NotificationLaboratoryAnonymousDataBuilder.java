@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_7_3_COMPOSITION_TITLE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_LABORATORY_ANONYMOUS;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.RECEPTION_TIME_STAMP_TYPE;
 
@@ -59,5 +60,10 @@ public class NotificationLaboratoryAnonymousDataBuilder extends NotificationLabo
   @Override
   protected String getDefaultProfileUrl() {
     return PROFILE_NOTIFICATION_LABORATORY_ANONYMOUS;
+  }
+
+  @Override
+  protected String getDefaultTitle() {
+    return NOTIFICATION_7_3_COMPOSITION_TITLE;
   }
 }

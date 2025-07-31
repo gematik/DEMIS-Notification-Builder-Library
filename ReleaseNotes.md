@@ -2,6 +2,12 @@
 
 # Release-Notes notification-builder-library
 
+## 6.3.8
+- fix default title for laboratory anonymous composition resources.
+
+## 6.3.7
+- fix for different spellings of titles for notifications according to IfSG
+
 ## 6.3.6
 - fix issues with copy process of PractitionerRole resources
 - fix issues with additional organization resources while copying a notification
