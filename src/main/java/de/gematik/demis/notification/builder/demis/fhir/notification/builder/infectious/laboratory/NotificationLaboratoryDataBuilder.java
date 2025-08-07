@@ -35,6 +35,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static java.util.Objects.requireNonNullElse;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.CompositionBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.RelatesToBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import java.util.List;
@@ -132,15 +133,8 @@ public class NotificationLaboratoryDataBuilder
 
     String relatesTo = getRelatesTo();
     if (relatesTo != null) {
-      Reference reference = new Reference();
-      Identifier identifier =
-          new Identifier().setSystem(NOTIFICATION_ID_SYSTEM).setValue(relatesTo);
-      reference.setIdentifier(identifier);
-      reference.setType(getRelatesToReferenceType());
       Composition.CompositionRelatesToComponent compositionRelatesToComponent =
-          new Composition.CompositionRelatesToComponent();
-      compositionRelatesToComponent.setCode(getRelatesToCode());
-      compositionRelatesToComponent.setTarget(reference);
+          RelatesToBuilder.forInitialNotificationId(relatesTo);
       newComposition.addRelatesTo(compositionRelatesToComponent);
     }
 
