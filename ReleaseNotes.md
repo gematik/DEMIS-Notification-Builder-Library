@@ -2,6 +2,11 @@
 
 # Release-Notes notification-builder-library
 
+## 6.3.9
+- update NotifiedPersonAnonymous Builder with default method
+- added setters to NotifiedPersonNomial Builder to be used in child classes
+- additional convenient extension addind in Address Builder
+
 ## 6.3.8
 - fix default title for laboratory anonymous composition resources.
 
