@@ -26,25 +26,16 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_DISEASE;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.RECEPTION_TIME_STAMP_TYPE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.RelatesToBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Composition;
-import org.hl7.fhir.r4.model.Condition;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.PractitionerRole;
-import org.hl7.fhir.r4.model.QuestionnaireResponse;
-import org.hl7.fhir.r4.model.Type;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
 
 public final class NotificationDiseaseDataBuilderTest {
@@ -95,6 +86,8 @@ public final class NotificationDiseaseDataBuilderTest {
             .setCategory(new Coding().setCode(categoryCode))
             .setStatus(status)
             .setDate(new DateTimeType(date))
+            .setRelatesTo(
+                RelatesToBuilder.forInitialNotificationId("48929a09-81eb-4a44-b4bc-00c1d28b820a"))
             .setDefaults()
             .build();
     assertThat(disease.getId()).isEqualTo(id);
@@ -104,6 +97,15 @@ public final class NotificationDiseaseDataBuilderTest {
     assertThat(disease.getCategoryFirstRep().getCodingFirstRep().getCode()).isEqualTo(categoryCode);
     assertThat(disease.getStatus()).isSameAs(status);
     assertThat(disease.getDate()).isEqualTo(date);
+    assertThat(disease.getRelatesToFirstRep().getTarget())
+        .isInstanceOfSatisfying(
+            Reference.class,
+            ref -> {
+              assertThat(ref.getIdentifier().getValue())
+                  .isEqualTo("48929a09-81eb-4a44-b4bc-00c1d28b820a");
+              assertThat(ref.getIdentifier().getSystem()).isEqualTo(NOTIFICATION_ID_SYSTEM);
+              assertThat(ref.getType()).isEqualTo("Composition");
+            });
   }
 
   @Test

@@ -83,6 +83,7 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   private Condition disease;
   @CheckForNull private QuestionnaireResponse commonQuestionnaireResponse;
   private QuestionnaireResponse specificQuestionnaireResponse;
+  @CheckForNull private Composition.CompositionRelatesToComponent relatesTo;
 
   @Nonnull
   public static Composition deepCopy(
@@ -140,6 +141,10 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
     addDiseaseSections(composition);
 
     composition.setExtension(extensions);
+
+    if (relatesTo != null) {
+      composition.setRelatesTo(List.of(relatesTo));
+    }
 
     return composition;
   }
@@ -338,6 +343,13 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
       extensions = new ArrayList<>();
     }
     this.extensions.add(extension);
+    return this;
+  }
+
+  @Nonnull
+  public NotificationDiseaseDataBuilder setRelatesTo(
+      @Nonnull final Composition.CompositionRelatesToComponent releatesTo) {
+    this.relatesTo = releatesTo;
     return this;
   }
 }
