@@ -77,9 +77,6 @@
     "resource": {
       "resourceType": "Patient",
       "id": "555-42-23-7",
-      "meta": {
-        "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonAnonymous" ]
-      },
       "address": [ {
         "extension": [ {
           "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",

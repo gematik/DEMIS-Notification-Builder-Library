@@ -108,6 +108,20 @@ class AddressDataBuilderTest {
         .containsExactly("https://demis.rki.de/fhir/StructureDefinition/AddressUse");
   }
 
+  @Test
+  void shouldSetAddressUseExtensionWithoutDisplay() {
+    Address address = new AddressDataBuilder().withAddressUseExtension("use").build();
+    assertThat(address.getExtension()).hasSize(1);
+    Type value = address.getExtension().get(0).getValue();
+    assertThat(value).isInstanceOf(Coding.class);
+    Coding code = (Coding) value;
+    assertThat(code.getCode()).isEqualTo("use");
+    assertThat(code.getSystem()).isEqualTo("https://demis.rki.de/fhir/CodeSystem/addressUse");
+    assertThat(address.getExtension())
+        .extracting("url")
+        .containsExactly("https://demis.rki.de/fhir/StructureDefinition/AddressUse");
+  }
+
   @DisplayName("add random extension")
   @Test
   void shouldAddExtension() {

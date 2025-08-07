@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_ANONYMOUS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hl7.fhir.r4.model.DateType;
@@ -87,5 +88,38 @@ class NotifiedPersonAnonymousDataBuilderTest {
 
     assertThat(patient.getId()).isEqualTo("Patient/54321");
     assertThat(patient.getGender()).isNull();
+  }
+
+  private NotifiedPersonAnonymousDataBuilder builder;
+
+  @Test
+  void setDefault_setsIdIfNull() {
+    builder = new NotifiedPersonAnonymousDataBuilder();
+    builder.setId(null);
+    builder.setDefault();
+    Patient actualPatient = builder.build();
+    assertThat(actualPatient.getId()).as("ID sollte nach setDefault nicht null sein").isNotNull();
+  }
+
+  @Test
+  void setDefault_doesNotOverwriteExistingId() {
+    builder = new NotifiedPersonAnonymousDataBuilder();
+    String existingId = "test-id";
+    builder.setId(existingId);
+    builder.setDefault();
+    Patient actualPatient = builder.build();
+    assertThat(actualPatient.getId())
+        .as("ID sollte nicht überschrieben werden")
+        .isEqualTo("Patient/" + existingId);
+  }
+
+  @Test
+  void setDefault_setsProfileUrl() {
+    builder = new NotifiedPersonAnonymousDataBuilder();
+    builder.setDefault();
+    Patient actualPatient = builder.build();
+    assertThat(actualPatient.getMeta().getProfile().getFirst().getValueAsString())
+        .as("ProfileUrl sollte korrekt gesetzt werden")
+        .isEqualTo(PROFILE_NOTIFIED_PERSON_ANONYMOUS);
   }
 }

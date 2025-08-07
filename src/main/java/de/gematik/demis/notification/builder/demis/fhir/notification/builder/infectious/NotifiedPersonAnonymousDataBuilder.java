@@ -29,22 +29,16 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_ANONYMOUS;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PatientBuilder;
-import java.util.List;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.SequencedCollection;
 import javax.annotation.Nonnull;
 import lombok.Setter;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
 
 @Setter
-public class NotifiedPersonAnonymousDataBuilder {
-
-  private String id;
-  private Enumerations.AdministrativeGender gender;
-  private SequencedCollection<Address> addresses = List.of();
+public class NotifiedPersonAnonymousDataBuilder extends NotifiedPersonNominalDataBuilder {
 
   /**
    * Create a copy of the given Patient. In case there is more information, only the relevant data
@@ -56,7 +50,7 @@ public class NotifiedPersonAnonymousDataBuilder {
 
     final SequencedCollection<Address> copiedAddresses =
         AddressDataBuilder.copyOfRedactedAddress(original.getAddress());
-    builder.setAddresses(copiedAddresses);
+    builder.setAddress(copiedAddresses.stream().toList());
     builder.setGender(original.getGender());
     final IIdType idElement = original.getIdElement();
     builder.setId(idElement.getIdPart());
@@ -64,12 +58,13 @@ public class NotifiedPersonAnonymousDataBuilder {
     return builder.build();
   }
 
-  public Patient build() {
-    return new PatientBuilder()
-        .setProfileUrl(PROFILE_NOTIFIED_PERSON_ANONYMOUS)
-        .setAddress(List.copyOf(addresses))
-        .setGender(gender)
-        .setId(id)
-        .build();
+  @Override
+  public NotifiedPersonAnonymousDataBuilder setDefault() {
+    if (this.getId() == null) {
+      setId(Utils.generateUuidString());
+    }
+
+    setProfileUrl(PROFILE_NOTIFIED_PERSON_ANONYMOUS);
+    return this;
   }
 }

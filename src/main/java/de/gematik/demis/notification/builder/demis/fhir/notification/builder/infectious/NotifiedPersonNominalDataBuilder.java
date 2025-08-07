@@ -32,6 +32,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PatientBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.ContactPoint;
@@ -41,6 +42,7 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 
 @Setter
+@Getter
 public class NotifiedPersonNominalDataBuilder {
 
   private HumanName humanName;

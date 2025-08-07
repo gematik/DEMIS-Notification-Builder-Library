@@ -150,6 +150,10 @@ public class AddressDataBuilder implements FhirObjectBuilder {
     return this;
   }
 
+  public AddressDataBuilder withAddressUseExtension(String addressUseCode) {
+    return withAddressUseExtension(addressUseCode, null);
+  }
+
   public AddressDataBuilder withAddressUseExtension(
       String addressUseCode, String addressUseDisplay) {
     Extension addressUseExtension = new Extension();
