@@ -39,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Observation;
@@ -48,6 +49,9 @@ import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Specimen;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
@@ -163,7 +167,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
   @Test
   void thatCopyingWithMissingBirthdateWorks() {
     final Specimen specimen = TestObjects.specimen();
-    final Observation observation = TestObjects.pathogenDetection(specimen);
+    TestObjects.pathogenDetection(specimen);
     final Patient notifiedPerson = TestObjects.notifiedPerson();
     notifiedPerson.setBirthDate(null);
 
@@ -176,106 +180,48 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
             });
   }
 
-  @Test
-  void readingFromJsonShouldOnlySwapNotifiedPerson() throws IOException {
+  private static Stream<Arguments> copyTestCases() {
+    return Stream.of(
+        Arguments.of(
+            Path.of("src/test/resources/laboratory/73-nonnominal.json"),
+            Path.of("src/test/resources/laboratory/73-nonnominal-expected.json")),
+        Arguments.of(
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid.json"),
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-expected.json")),
+        Arguments.of(
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-mixed.json"),
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-mixed-expected.json")),
+        // verify that parsing a bundle without ids, will add the fullurl as id to the resources
+        Arguments.of(
+            Path.of("src/test/resources/laboratory/73-nonnominal-no-ids.json"),
+            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-expected.json")),
+        Arguments.of(
+            Path.of("src/test/resources/laboratory/73-nonnominal-notbyname.json"),
+            Path.of("src/test/resources/laboratory/73-nonnominal-notbyname-expected.json")),
+        // verify that undesired profiles are removed from organizations
+        Arguments.of(
+            Path.of(
+                "src/test/resources/laboratory/73-notified_person_facility-is-submitting_facility.json"),
+            Path.of(
+                "src/test/resources/laboratory/73-notified_person_facility-is-submitting_facility-expected.json")));
+  }
+
+  @MethodSource("copyTestCases")
+  @ParameterizedTest
+  void thatCopyingCreatesTheExpectedResult(final Path inputPath, final Path expectedPath)
+      throws IOException {
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
     // GIVEN a bundle with NonNominal profiles and a notified person
 
     // THEN
-    final String source =
-        Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal.json"));
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
+    final String source = Files.readString(inputPath);
 
     final Bundle original = (Bundle) iParser.parseResource(source);
     final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
 
-    final String expected =
-        Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal-expected.json"));
-
-    final String result = iParser.encodeResourceToString(copy);
-    assertThat(result).isEqualToIgnoringNewLines(expected);
-  }
-
-  @Test
-  void thatProcessingWithUrnUuidWorks() throws IOException {
-    final String source =
-        Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid.json"));
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
-
-    final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
-
-    final String expected =
-        Files.readString(
-            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-expected.json"));
-
-    final String result = iParser.encodeResourceToString(copy);
-    assertThat(result).isEqualToIgnoringNewLines(expected);
-  }
-
-  @Test
-  void thatProcessingWithUrnUuidAndRegularIdsMixedWorks() throws IOException {
-    // GIVEN a bundle that makes use of urn:uuid: and regular ids (e.g. Composition/...)
-    final String source =
-        Files.readString(
-            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-mixed.json"));
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
-
-    final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
-
-    final String expected =
-        Files.readString(
-            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-mixed-expected.json"));
-
-    final String result = iParser.encodeResourceToString(copy);
-    assertThat(result).isEqualToIgnoringNewLines(expected);
-  }
-
-  @Test
-  void thatProcessingResourcesWithoutIdWorks() throws IOException {
-    // A test to verify that parsing a bundle without ids, will add the fullurl as id to the
-    // resource so we can
-    // process it
-    //
-    // GIVEN a bundle that has no id fields on the resources
-    final String source =
-        Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal-no-ids.json"));
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
-
-    final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
-
-    // NOTE: it's okay if this test breaks should you change either the input or the output. Just
-    // make sure you
-    // adjust accordingly.
-    final String expected =
-        Files.readString(
-            Path.of("src/test/resources/laboratory/73-nonnominal-urn_uuid-expected.json"));
-
-    final String result = iParser.encodeResourceToString(copy);
-    assertThat(result).isEqualToIgnoringNewLines(expected);
-  }
-
-  @Test
-  void readingFromJsonShouldNotModifyAnything() throws IOException {
-    // GIVEN a bundle with NonNominal profiles and a notified person
-
-    // THEN
-    final String source =
-        Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal-notbyname.json"));
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
-
-    final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
-
-    final String expected =
-        Files.readString(
-            Path.of("src/test/resources/laboratory/73-nonnominal-notbyname-expected.json"));
+    final String expected = Files.readString(expectedPath);
 
     final String result = iParser.encodeResourceToString(copy);
     assertThat(result).isEqualToIgnoringNewLines(expected);
@@ -322,7 +268,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
   }
 
   @Test
-  void shouldCopyNotifiedPersonFacility() throws IOException {
+  void shouldNotCopyNotifiedPersonFacility() throws IOException {
     final String source =
         Files.readString(Path.of("src/test/resources/laboratory/73-other-facility-case.json"));
 

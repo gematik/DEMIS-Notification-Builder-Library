@@ -2,6 +2,10 @@
 
 # Release-Notes notification-builder-library
 
+## 6.3.11
+- 7.3 ressources: don't copy current AddressUse Tag and NotifiedPersonFacility
+- 7.3 resources: copy symptoms for disease bundles
+
 ## 6.3.10
 - add relates-to method for NotificationDiseaseDataBuilder
 

@@ -26,21 +26,18 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
-import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder.copyReferencedOrganizations;
-
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.SpecificInformationDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
-import java.util.List;
-import java.util.Optional;
+import java.util.SequencedCollection;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
+import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Condition;
-import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Provenance;
@@ -64,10 +61,12 @@ public class NotificationBundleDiseaseNonNominalDataBuilder
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle);
     // in case the subject references an organization as address we do copy the address entry, but
     // we then need to manually copy the organization as well
-    final Patient notifiedPerson = NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject());
-    final List<Organization> referencedOrganizations = copyReferencedOrganizations(notifiedPerson);
+    final SequencedCollection<Address> addresses =
+        NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(ctx.subject());
+    final Patient notifiedPerson =
+        NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject(), addresses);
 
-    final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy(ctx.notifier());
+    final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
     final Condition condition = DiseaseDataBuilder.deepCopy(ctx.condition(), notifiedPerson);
     final QuestionnaireResponse specificQuestionnaire =
         SpecificInformationDataBuilder.deepCopy(ctx.specificQuestionnaire(), notifiedPerson);
@@ -83,30 +82,19 @@ public class NotificationBundleDiseaseNonNominalDataBuilder
             .setNotifiedPerson(notifiedPerson)
             .setNotifierRole(notifierRole);
 
-    /*
-     Currently the NotificationBundleDiseaseDataBuilder is only adding values set using builder.setOrganizations
-     if a common questionnaire is set. This currently does not happen for NonNominal flavours, so we add it
-     manually.
-    */
-    referencedOrganizations.forEach(builder::addAdditionalEntry);
-    final Optional<Provenance> provenance = ctx.provenance().map(Provenance::copy);
-    provenance.ifPresent(builder::addAdditionalEntry);
+    ctx.provenance().map(Provenance::copy).ifPresent(builder::addAdditionalEntry);
 
-    // Note: these setters do not return a NotificationBundleDiseaseDataBuilder and make it harder
-    // to chain all calls together
-    Bundle bundle =
-        builder
-            .setId(originalBundle.getId())
-            .setProfileUrl(builder.getDefaultProfileUrl())
-            .setIdentifierAsNotificationBundleId(originalBundle.getIdentifier().getValue())
-            .setType(Bundle.BundleType.DOCUMENT)
-            .setTimestamp(originalBundle.getTimestamp())
-            .setLastUpdated(originalBundle.getMeta().getLastUpdated())
-            .build();
-
+    // Ensure this is called before you call builder.build()!
     originalBundle.getMeta().getTag().forEach(builder::addTag);
 
-    return bundle;
+    return builder
+        .setId(originalBundle.getId())
+        .setProfileUrl(builder.getDefaultProfileUrl())
+        .setIdentifierAsNotificationBundleId(originalBundle.getIdentifier().getValue())
+        .setType(Bundle.BundleType.DOCUMENT)
+        .setTimestamp(originalBundle.getTimestamp())
+        .setLastUpdated(originalBundle.getMeta().getLastUpdated())
+        .build();
   }
 
   @Override

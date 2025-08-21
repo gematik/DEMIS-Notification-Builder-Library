@@ -76,13 +76,18 @@ public class DiseaseDataBuilder implements InitializableFhirObjectBuilder {
     final Coding verificationStatus = condition.getVerificationStatus().getCodingFirstRep().copy();
     final Coding clinicalStatus = condition.getClinicalStatus().getCodingFirstRep().copy();
     final Coding disease = condition.getCode().getCodingFirstRep().copy();
+    final List<Coding> evidence =
+        condition.getEvidence().stream()
+            .flatMap(e -> e.getCode().stream())
+            .flatMap(concept -> concept.getCoding().stream())
+            .map(Coding::copy)
+            .toList();
 
     final Set<String> profiles = Metas.profilesFrom(condition);
     final DiseaseDataBuilder diseaseDataBuilder =
         new DiseaseDataBuilder()
             // we assume the caller has verified the correctness of the condition, we can't take
-            // care of that in
-            // the builder-library
+            // care of that in the builder-library
             .setProfileUrl(profiles.stream().findFirst().orElseThrow())
             .setNotifiedPerson(notifiedPerson)
             .setVerificationStatus(verificationStatus)
@@ -90,7 +95,8 @@ public class DiseaseDataBuilder implements InitializableFhirObjectBuilder {
             .setRecordedDate(condition.getRecordedDateElement())
             .setDisease(disease)
             .setId(condition.getId())
-            .setOnset(condition.getOnsetDateTimeType());
+            .setOnset(condition.getOnsetDateTimeType())
+            .setEvidences(evidence);
 
     condition.getNote().stream().map(Annotation::getText).forEach(diseaseDataBuilder::addNote);
 
