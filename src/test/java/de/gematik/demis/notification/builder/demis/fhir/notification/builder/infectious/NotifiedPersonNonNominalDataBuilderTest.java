@@ -32,16 +32,27 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.OrganizationBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.types.AddressUse;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.time.Year;
 import java.time.YearMonth;
+import java.util.List;
+import java.util.SequencedCollection;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Base64BinaryType;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
+import org.hl7.fhir.r4.model.Element;
 import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Type;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -163,7 +174,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     Patient patientToCopy = new Patient();
     patientToCopy.setId("12345");
 
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
     assertThat(patient.getId()).isEqualTo("Patient/12345");
   }
 
@@ -172,7 +183,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     Patient patientToCopy = new Patient();
     patientToCopy.setGender(Enumerations.AdministrativeGender.MALE);
 
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.MALE);
   }
 
@@ -181,7 +192,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     Patient patientToCopy = new Patient();
     patientToCopy.setBirthDateElement(new DateType("1975-10"));
 
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
     assertThat(patient.getBirthDateElement().getValueAsString()).isEqualTo("1975-10");
     assertThat(patient.getBirthDateElement().getPrecision()).isEqualTo(TemporalPrecisionEnum.MONTH);
   }
@@ -193,9 +204,22 @@ class NotifiedPersonNonNominalDataBuilderTest {
     address.setPostalCode("12345");
     patientToCopy.addAddress(address);
 
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
+    final Patient patient =
+        NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of(address));
     assertThat(patient.getAddress()).hasSize(1);
     assertThat(patient.getAddress().get(0).getPostalCode()).isEqualTo("123");
+  }
+
+  @Test
+  void thatOnlyAddressesPassedAsParameterAreCopied() {
+    // GIVEN a patient with an assigned address
+    final Patient patientToCopy = new Patient().addAddress(new Address().setPostalCode("12345"));
+
+    // WHEN we copy without passing the address
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+
+    // THEN no address is present
+    assertThat(patient.getAddress()).isEmpty();
   }
 
   @Test
@@ -204,8 +228,119 @@ class NotifiedPersonNonNominalDataBuilderTest {
     Base64BinaryType actualPseudonym = new Base64BinaryType("pseudonym");
     patientToCopy.addExtension(EXTENSION_URL_PSEUDONYM, actualPseudonym);
 
-    final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
+    final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
     assertThat(result.getExtensionByUrl(EXTENSION_URL_PSEUDONYM).getValue())
         .isEqualTo(actualPseudonym);
+  }
+
+  @Nested
+  class GetAddressesToCopy {
+    @Test
+    void thatAddressesAreClonedToAvoidMutatingSharedReferences() {
+      final Address primary =
+          new AddressDataBuilder()
+              .withAddressUseExtension(AddressUse.PRIMARY)
+              .setPostalCode("12345")
+              .build();
+      primary.setId("test-id-keep");
+
+      final Patient toCopy = new Patient().addAddress(primary);
+
+      final SequencedCollection<Address> addressesToCopy =
+          NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(toCopy);
+      assertThat(addressesToCopy)
+          .doesNotContain(primary) // can't find it with equals due to copy
+          .extracting(Element::getId)
+          .containsExactly("test-id-keep")
+          .hasSize(1); // but we still have one address
+    }
+
+    @Test
+    void thatCurrentAddressesAreNotReturned() {
+      final Address toIgnore =
+          new AddressDataBuilder()
+              .withAddressUseExtension(AddressUse.CURRENT)
+              .setPostalCode("12345")
+              .build();
+      toIgnore.setId("test-id-ignore");
+
+      final Address toKeep =
+          new AddressDataBuilder()
+              .withAddressUseExtension(AddressUse.PRIMARY)
+              .setPostalCode("12345")
+              .build();
+      toKeep.setId("test-id-keep");
+
+      final Patient toCopy = new Patient().addAddress(toIgnore).addAddress(toKeep);
+
+      final SequencedCollection<Address> addressesToCopy =
+          NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(toCopy);
+      assertThat(addressesToCopy)
+          .extracting((Element::getId))
+          .containsExactlyInAnyOrder("test-id-keep");
+    }
+
+    @Test
+    void thatCurrentIsRemovedFromAddressWithMixedExtension() {
+      final Address mixedExtension =
+          new AddressDataBuilder()
+              .withAddressUseExtension(AddressUse.CURRENT)
+              .withAddressUseExtension(AddressUse.PRIMARY)
+              .setPostalCode("12345")
+              .build();
+
+      final Patient toCopy = new Patient().addAddress(mixedExtension);
+
+      final SequencedCollection<Address> addressesToCopy =
+          NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(toCopy);
+      final Address first = addressesToCopy.getFirst();
+      assertThat(first.getExtension())
+          .extracting(
+              extension -> {
+                final Type value = extension.getValue();
+                if (value instanceof Coding code) {
+                  return code.getCode();
+                }
+                return "";
+              })
+          .contains("primary");
+    }
+  }
+
+  @Test
+  void thatNotifiedPersonFacilityIsRemoved() {
+    final Organization remove =
+        new OrganizationBuilder().addNotifiedPersonFacilityProfile().build();
+    remove.setId("test-id-remove");
+    final Organization keep = new Organization();
+    keep.setId("test-id-keep");
+
+    final Address mixedExtension =
+        new AddressDataBuilder()
+            .withAddressUseExtension(AddressUse.PRIMARY)
+            .withOrganizationReferenceExtension(remove)
+            .withOrganizationReferenceExtension(keep)
+            .setPostalCode("12345")
+            .build();
+
+    final Patient toCopy = new Patient().addAddress(mixedExtension);
+
+    final SequencedCollection<Address> addressesToCopy =
+        NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(toCopy);
+    final Address first = addressesToCopy.getFirst();
+    assertThat(first.getExtension())
+        .extracting(
+            extension -> {
+              final Type value = extension.getValue();
+              if (value instanceof Coding code) {
+                return code.getCode();
+              }
+              if (value instanceof Reference ref) {
+                return ref.getResource().getIdElement().getValue();
+              }
+
+              return "";
+            })
+        .containsExactly("primary", "test-id-keep");
   }
 }

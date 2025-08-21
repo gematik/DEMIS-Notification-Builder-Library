@@ -31,12 +31,22 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getShortReferenceOrUrnUuid;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.PractitionerType;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import lombok.Setter;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
 
 public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
 
@@ -50,6 +60,7 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
    * @return a copy of the given {@link PractitionerRole} and the contained resources (e.g. the
    *     organization)
    */
+  @Nonnull
   public static PractitionerRole deepCopy(@Nonnull final PractitionerRole original) {
     PractitionerRole copy = new PractitionerRole();
     copy.setId(original.getId());
@@ -69,6 +80,50 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
       copy.setOrganization(value);
     }
     return copy;
+  }
+
+  /**
+   * @return a copy of the given {@link PractitionerRole} and the contained resources (e.g. the
+   *     organization) with 7.3 specific modifications
+   */
+  @Nonnull
+  public static PractitionerRole deepCopy73(@Nonnull final PractitionerRole original) {
+    final PractitionerRole copy = new PractitionerRole();
+    copy.setId(original.getId());
+    copy.setMeta(original.getMeta());
+    if (original.getPractitioner().getResource()
+        instanceof final Practitioner referencedPractitioner) {
+      final Practitioner copiedPractitioner = referencedPractitioner.copy();
+      final Reference newReference =
+          new Reference(copiedPractitioner)
+              .setReference(getShortReferenceOrUrnUuid(copiedPractitioner));
+      copy.setPractitioner(newReference);
+    }
+    if (original.getOrganization().getResource()
+        instanceof final Organization originalOrganization) {
+      final Organization organization = removeNotifiedPersonFacilityProfile(originalOrganization);
+      final Reference reference =
+          new Reference(organization).setReference(getShortReferenceOrUrnUuid(organization));
+      copy.setOrganization(reference);
+    }
+    return copy;
+  }
+
+  /**
+   * @return a copy of the given Organization with the profile NotifiedPersonFacility removed (if
+   *     available)
+   */
+  @Nonnull
+  private static Organization removeNotifiedPersonFacilityProfile(
+      @Nonnull final Organization organization) {
+    final Organization result = organization.copy();
+    final List<CanonicalType> allowedProfiles =
+        Metas.profilesFrom(result).stream()
+            .filter(Predicate.not(DemisConstants.PROFILE_NOTIFIED_PERSON_FACILITY::equals))
+            .map(CanonicalType::new)
+            .toList();
+    result.getMeta().setProfile(allowedProfiles);
+    return result;
   }
 
   @Override

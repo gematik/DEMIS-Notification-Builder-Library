@@ -32,9 +32,10 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.OrganizationBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PatientBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Organizations;
+import de.gematik.demis.notification.builder.demis.fhir.notification.types.AddressUse;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.time.YearMonth;
@@ -43,6 +44,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.SequencedCollection;
+import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -51,8 +53,9 @@ import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Type;
 
 @Setter
@@ -66,11 +69,28 @@ public class NotifiedPersonNonNominalDataBuilder {
   @Setter(AccessLevel.PRIVATE)
   private Type pseudonym;
 
-  public static Patient deepCopy(@Nonnull final Patient patientToCopy) {
+  /**
+   * Copy all required properties and resources attached to the given {@link Patient}.
+   *
+   * <p><strong>Note on handling addresses</strong>
+   *
+   * <p>Addresses are simply redacted using {@link
+   * AddressDataBuilder#copyOfRedactedAddress(Collection)}. The caller MUST pass only addresses that
+   * should be copied. No considerations are made for specific AddressUse extensions.
+   *
+   * @param addressesToCopy Addresses to copy to the new Patient resource. Existing addresses on the
+   *     Patient are ignored.
+   */
+  @Nonnull
+  public static Patient deepCopy(
+      @Nonnull final Patient patientToCopy,
+      @Nonnull final SequencedCollection<Address> addressesToCopy) {
     final NotifiedPersonNonNominalDataBuilder builder = new NotifiedPersonNonNominalDataBuilder();
+
     final SequencedCollection<Address> addresses =
-        AddressDataBuilder.copyOfRedactedAddress(patientToCopy.getAddress());
+        AddressDataBuilder.copyOfRedactedAddress(addressesToCopy);
     builder.setAddress(List.copyOf(addresses));
+
     if (patientToCopy.hasBirthDateElement()) {
       copyBirthdate(patientToCopy, builder);
     }
@@ -82,32 +102,6 @@ public class NotifiedPersonNonNominalDataBuilder {
     builder.setPseudonym(pseudonym);
 
     return builder.build();
-  }
-
-  private static Organization deepCopyNotifiedPersonFacility(
-      @Nonnull final Organization organizationToCopy) {
-
-    SequencedCollection<Address> addresses =
-        AddressDataBuilder.copyOfRedactedAddress(organizationToCopy.getAddress());
-
-    return new OrganizationBuilder()
-        .setOrganizationId(organizationToCopy.getId())
-        .setDefaults()
-        .setMetaProfileUrl("https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonFacility")
-        .setAddress(addresses.stream().toList())
-        .build();
-  }
-
-  public static List<Organization> copyReferencedOrganizations(Patient notifiedPerson) {
-    final List<Address> addressWithOrganization =
-        notifiedPerson.getAddress().stream()
-            .filter(AddressDataBuilder::isReferencingOrganization)
-            .toList();
-    return addressWithOrganization.stream()
-        .map(Organizations::fromExtension)
-        .flatMap(Collection::stream)
-        .map(NotifiedPersonNonNominalDataBuilder::deepCopyNotifiedPersonFacility)
-        .toList();
   }
 
   private static void copyBirthdate(
@@ -125,8 +119,63 @@ public class NotifiedPersonNonNominalDataBuilder {
     }
   }
 
-  private void addAddress(Address address) {
-    this.address.add(address);
+  /** Return the addresses to copy. This method will remove forbidden AddressUse extensions. */
+  @Nonnull
+  public static SequencedCollection<Address> getAddressesToCopy(
+      @Nonnull final Patient patientToCopy) {
+    /*
+     Look at two types of addresses. Addresses that have
+     1. only the AddressUse::current extension
+     2. multiple extensions, at least one is AddressUse::current
+     3. no AddressUse::current extension
+     Ensure the iteration order stays intact, we do the same when redacting
+    */
+
+    final ArrayList<Address> result = new ArrayList<>();
+
+    // We are about to modify Address objects here, to avoid changing data for the caller we do copy
+    // the information first.
+    final List<Address> safeAddresses =
+        patientToCopy.getAddress().stream().map(Address::copy).toList();
+
+    for (final Address address : safeAddresses) {
+      final List<Extension> desiredExtensions =
+          address.getExtension().stream()
+              // Remove extensions that reference an Organization with NotifiedPersonFacility
+              // profile
+              .filter(
+                  extension -> {
+                    final boolean hasProfile =
+                        DemisConstants.STRUCTURE_DEFINITION_FACILITY_ADDRESS_NOTIFIED_PERSON.equals(
+                            extension.getUrl());
+                    if (hasProfile
+                        && extension.getValue() instanceof Reference ref
+                        && ref.getResource() instanceof Resource resource) {
+                      return !Metas.hasProfile(DemisConstants.PROFILE_NOTIFIED_PERSON_FACILITY)
+                          .test(resource);
+                    }
+                    return true;
+                  })
+              // Remove AddressUse.CURRENT
+              .filter(Predicate.not(AddressUse.CURRENT.matchesExtension()))
+              .toList();
+      /*
+       Only keep the address if we have an AddressUse extension, otherwise we might keep a current
+       address around that doesn't have any useful extension (e.g. because someone added a random
+       extension that we don't filter)
+      */
+      final boolean hasAddressUseExtension =
+          desiredExtensions.stream()
+              .anyMatch(
+                  extension ->
+                      DemisConstants.STRUCTURE_DEFINITION_ADDRESS_USE.equals(extension.getUrl()));
+      if (hasAddressUseExtension) {
+        address.setExtension(desiredExtensions);
+        result.add(address);
+      }
+    }
+
+    return result;
   }
 
   public Patient build() {

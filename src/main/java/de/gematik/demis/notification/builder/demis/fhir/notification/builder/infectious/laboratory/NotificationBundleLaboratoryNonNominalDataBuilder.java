@@ -26,20 +26,19 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
-import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder.copyReferencedOrganizations;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder.getAddressesToCopy;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_BUNDLE_LABORATORY_NON_NOMINAL;
 
 import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
-import java.util.List;
-import java.util.Optional;
+import java.util.SequencedCollection;
 import javax.annotation.Nonnull;
+import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Observation;
-import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Provenance;
@@ -70,11 +69,12 @@ public class NotificationBundleLaboratoryNonNominalDataBuilder
   public static Bundle deepCopy(@Nonnull final Bundle originalBundle) {
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle.getEntry());
 
-    final Patient notifiedPerson = NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject());
-    final List<Organization> referencedOrganizations = copyReferencedOrganizations(notifiedPerson);
+    final SequencedCollection<Address> addresses = getAddressesToCopy(ctx.subject());
+    final Patient notifiedPerson =
+        NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject(), addresses);
 
-    final PractitionerRole submitter = PractitionerRoleBuilder.deepCopy(ctx.submitter());
-    final PractitionerRole notifier = PractitionerRoleBuilder.deepCopy(ctx.notifier());
+    final PractitionerRole submitter = PractitionerRoleBuilder.deepCopy73(ctx.submitter());
+    final PractitionerRole notifier = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
 
     final Bundles.ObservationCopyResult observationCopyResult =
         Bundles.copyObservations(ctx.observations(), notifiedPerson, submitter);
@@ -97,23 +97,19 @@ public class NotificationBundleLaboratoryNonNominalDataBuilder
             .setSpecimen(specimen)
             .setPathogenDetection(observations);
 
-    referencedOrganizations.forEach(builder::addAdditionalEntry);
-    final Optional<Provenance> provenance = ctx.provenance().map(Provenance::copy);
-    provenance.ifPresent(builder::addAdditionalEntry);
+    ctx.provenance().map(Provenance::copy).ifPresent(builder::addAdditionalEntry);
 
-    Bundle bundle =
-        builder
-            .setId(originalBundle.getId())
-            .setProfileUrl(builder.getDefaultProfileUrl())
-            .setIdentifierAsNotificationBundleId(originalBundle.getIdentifier().getValue())
-            .setType(Bundle.BundleType.DOCUMENT)
-            .setTimestamp(originalBundle.getTimestamp())
-            .setLastUpdated(originalBundle.getMeta().getLastUpdated())
-            .build();
-
+    // Ensure this is called before builder.build()!
     originalBundle.getMeta().getTag().forEach(builder::addTag);
 
-    return bundle;
+    return builder
+        .setId(originalBundle.getId())
+        .setProfileUrl(builder.getDefaultProfileUrl())
+        .setIdentifierAsNotificationBundleId(originalBundle.getIdentifier().getValue())
+        .setType(Bundle.BundleType.DOCUMENT)
+        .setTimestamp(originalBundle.getTimestamp())
+        .setLastUpdated(originalBundle.getMeta().getLastUpdated())
+        .build();
   }
 
   @Override

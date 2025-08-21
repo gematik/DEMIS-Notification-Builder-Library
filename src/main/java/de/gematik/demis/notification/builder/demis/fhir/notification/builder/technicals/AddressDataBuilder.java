@@ -30,6 +30,8 @@ import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.base.Strings;
+import de.gematik.demis.notification.builder.demis.fhir.notification.types.AddressUse;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -141,12 +143,18 @@ public class AddressDataBuilder implements FhirObjectBuilder {
     return fhirAddress;
   }
 
-  public AddressDataBuilder withOrganizationReferenceExtension(Organization organization) {
-    Extension organisationReference = new Extension();
-    organisationReference.setUrl(
-        "https://demis.rki.de/fhir/StructureDefinition/FacilityAddressNotifiedPerson");
-    organisationReference.setValue(new Reference(organization));
+  @Nonnull
+  public AddressDataBuilder withOrganizationReferenceExtension(@Nonnull Organization organization) {
+    final Extension organisationReference =
+        new Extension()
+            .setUrl(DemisConstants.STRUCTURE_DEFINITION_FACILITY_ADDRESS_NOTIFIED_PERSON)
+            .setValue(new Reference(organization));
     extensionList.add(organisationReference);
+    return this;
+  }
+
+  public AddressDataBuilder withAddressUseExtension(@Nonnull final AddressUse addressUse) {
+    extensionList.add(addressUse.asExtension());
     return this;
   }
 

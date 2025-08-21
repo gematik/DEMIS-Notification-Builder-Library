@@ -27,14 +27,102 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Parameters;
+import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class NotificationBundleDiseaseNonNominalDataBuilderTest {
+
+  @MethodSource("bundleTestData")
+  @ParameterizedTest
+  void thatBundlesCanBeCopied(final Path inputPath, final Path expectedPath) throws IOException {
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    final Bundle original = createBundle(inputPath);
+    final Bundle copy = NotificationBundleDiseaseNonNominalDataBuilder.deepCopy(original);
+
+    final String expected = Files.readString(expectedPath);
+    final String result = iParser.encodeResourceToString(copy);
+    assertThat(result).isEqualToIgnoringWhitespace(expected);
+  }
+
+  private static Stream<Arguments> bundleTestData() {
+    return Stream.of(
+        // Valid bundle
+        Arguments.of(
+            Path.of("src/test/resources/disease/7_3/generic.json"),
+            Path.of("src/test/resources/disease/7_3/generic-expected.json")),
+        // with urn-uuids
+        Arguments.of(
+            Path.of("src/test/resources/disease/7_3/urn_uuid-mixed.json"),
+            Path.of("src/test/resources/disease/7_3/urn_uuid-mixed-expected.json")),
+        // don't copy current address and NotifiedPersonFacility
+        Arguments.of(
+            Path.of("src/test/resources/disease/7_3/other-facility.json"),
+            Path.of("src/test/resources/disease/7_3/other-facility-expected.json")),
+        // keep symptoms
+        Arguments.of(
+            Path.of("src/test/resources/disease/7_3/with-symptoms.json"),
+            Path.of("src/test/resources/disease/7_3/with-symptoms-expected.json")));
+  }
+
+  @Test
+  void shouldSetPractitionerReferenceWithoutUrnUuidWhenParametersNotificationIsReceived()
+      throws IOException {
+    final String source =
+        Files.readString(Path.of("src/test/resources/disease/7_3/parameters-notification.json"));
+
+    final IParser iParser = FhirContext.forR4().newJsonParser();
+    iParser.setPrettyPrint(true);
+
+    final Parameters original = (Parameters) iParser.parseResource(source);
+    Bundle originalBundle = (Bundle) original.getParameter().getFirst().getResource();
+
+    Bundle copy = NotificationBundleDiseaseNonNominalDataBuilder.deepCopy(originalBundle);
+
+    assertThat(copy.getEntryFirstRep().getFullUrl())
+        .isEqualTo("https://demis.rki.de/fhir/Composition/9bb7aeba-581a-47ce-8791-5cdb319d6267");
+    Resource resource = copy.getEntry().get(3).getResource();
+    assertThat(resource).isInstanceOf(PractitionerRole.class);
+    PractitionerRole practitionerRole = (PractitionerRole) resource;
+    assertThat(practitionerRole.getOrganization().getReference())
+        .hasToString("Organization/2ac04fbc-e807-4eb1-a07e-8a941ae1b7d7");
+
+    final String expected =
+        Files.readString(
+            Path.of("src/test/resources/disease/7_3/parameters-notification-expected.json"));
+
+    assertThat(iParser.encodeResourceToString(copy)).isEqualToIgnoringWhitespace(expected);
+  }
+
+  @Nonnull
+  private Bundle createBundle(@Nonnull final Path path) {
+    try {
+      final String source = Files.readString(path);
+      final IParser iParser = FhirContext.forR4().newJsonParser();
+      iParser.setPrettyPrint(true);
+      return (Bundle) iParser.parseResource(source);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   @Test
   void testBundleNonNominalBuilderProfileUrl() {

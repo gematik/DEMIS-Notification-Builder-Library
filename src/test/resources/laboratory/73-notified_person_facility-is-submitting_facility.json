@@ -1,26 +1,26 @@
 {
   "resourceType": "Bundle",
-  "id": "cee13102-f9ef-46b5-bce5-2df1dd69d2fe",
+  "id": "166cd14c-62c0-4104-86b1-108c4dec04db",
   "meta": {
     "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationBundleLaboratoryNonNominal" ]
   },
   "identifier": {
     "system": "https://demis.rki.de/fhir/NamingSystem/NotificationBundleId",
-    "value": "6ce05650-260c-404a-9476-92e55ce6b7e7"
+    "value": "221b0881-bd9e-4e34-9999-1c076495c32b"
   },
   "type": "document",
-  "timestamp": "2025-07-29T06:22:16.957+02:00",
+  "timestamp": "2025-08-21T13:05:41.526+02:00",
   "entry": [ {
-    "fullUrl": "https://demis.rki.de/fhir/Composition/07873699-f249-47a8-a465-04ba0d82ecde",
+    "fullUrl": "https://demis.rki.de/fhir/Composition/e4d0a83b-fc3c-46b9-9c62-1d21117f7de0",
     "resource": {
       "resourceType": "Composition",
-      "id": "07873699-f249-47a8-a465-04ba0d82ecde",
+      "id": "e4d0a83b-fc3c-46b9-9c62-1d21117f7de0",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationLaboratoryNonNominal" ]
       },
       "identifier": {
         "system": "https://demis.rki.de/fhir/NamingSystem/NotificationId",
-        "value": "6469bccd-603a-472b-9eb2-337983079516"
+        "value": "cc7a0eaf-4603-46e4-a8b7-d9122fd11cdc"
       },
       "status": "preliminary",
       "type": {
@@ -31,13 +31,13 @@
         } ]
       },
       "subject": {
-        "reference": "Patient/cd6804c4-122f-475f-b0dc-05b4f1261e57"
+        "reference": "Patient/35b59d46-b92a-4270-957b-95719b5e59aa"
       },
-      "date": "2025-07-29T06:22:16+02:00",
+      "date": "2025-08-21T13:05:42+02:00",
       "author": [ {
-        "reference": "PractitionerRole/cda02fbb-4a71-4770-a0af-ced432efeadf"
+        "reference": "PractitionerRole/9cd8d0f3-01f2-44e9-894d-cdd3c22f1fb6"
       } ],
-      "title": "Erregernachweismeldung",
+      "title": "Meldung gemäß §7 Absatz 3 IfSG",
       "section": [ {
         "code": {
           "coding": [ {
@@ -47,21 +47,47 @@
           } ]
         },
         "entry": [ {
-          "reference": "DiagnosticReport/f6386e98-07bf-4adb-8739-f388f41ec769"
+          "reference": "DiagnosticReport/3874811f-f85b-4329-887e-1f36acecc045"
         } ]
       } ]
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Patient/cd6804c4-122f-475f-b0dc-05b4f1261e57",
+    "fullUrl": "https://demis.rki.de/fhir/Patient/35b59d46-b92a-4270-957b-95719b5e59aa",
     "resource": {
       "resourceType": "Patient",
-      "id": "cd6804c4-122f-475f-b0dc-05b4f1261e57",
+      "id": "35b59d46-b92a-4270-957b-95719b5e59aa",
       "meta": {
-        "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonNotByName" ]
+        "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPerson" ]
       },
+      "name": [ {
+        "text": "Max Power",
+        "family": "Power",
+        "given": [ "Max" ]
+      } ],
+      "telecom": [ {
+        "system": "phone",
+        "value": "012345767"
+      }, {
+        "system": "email",
+        "value": "testerino@test.de"
+      } ],
       "gender": "male",
-      "birthDate": "2025-07",
+      "birthDate": "2025-08-21",
       "address": [ {
+        "extension": [ {
+          "url": "https://demis.rki.de/fhir/StructureDefinition/FacilityAddressNotifiedPerson",
+          "valueReference": {
+            "reference": "Organization/b0b2f52d-deb1-47e6-b5ce-3278b636e4f1"
+          }
+        }, {
+          "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",
+          "valueCoding": {
+            "system": "https://demis.rki.de/fhir/CodeSystem/addressUse",
+            "code": "current",
+            "display": "Derzeitiger Aufenthaltsort"
+          }
+        } ]
+      }, {
         "extension": [ {
           "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",
           "valueCoding": {
@@ -70,27 +96,29 @@
             "display": "Hauptwohnsitz"
           }
         } ],
-        "postalCode": "214",
+        "line": [ "Wohnsitzstraße 1" ],
+        "city": "Berlin",
+        "postalCode": "21481",
         "country": "DE"
       } ]
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/PractitionerRole/cda02fbb-4a71-4770-a0af-ced432efeadf",
+    "fullUrl": "https://demis.rki.de/fhir/PractitionerRole/9cd8d0f3-01f2-44e9-894d-cdd3c22f1fb6",
     "resource": {
       "resourceType": "PractitionerRole",
-      "id": "cda02fbb-4a71-4770-a0af-ced432efeadf",
+      "id": "9cd8d0f3-01f2-44e9-894d-cdd3c22f1fb6",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifierRole" ]
       },
       "organization": {
-        "reference": "Organization/6078fa75-7811-49fe-9ae9-4985492906c2"
+        "reference": "Organization/5cd60464-90a5-4968-9d71-4bb946c69c99"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Organization/6078fa75-7811-49fe-9ae9-4985492906c2",
+    "fullUrl": "https://demis.rki.de/fhir/Organization/5cd60464-90a5-4968-9d71-4bb946c69c99",
     "resource": {
       "resourceType": "Organization",
-      "id": "6078fa75-7811-49fe-9ae9-4985492906c2",
+      "id": "5cd60464-90a5-4968-9d71-4bb946c69c99",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifierFacility" ]
       },
@@ -130,24 +158,24 @@
       } ]
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/PractitionerRole/ddad6dbe-bc99-4d54-8219-7423c68ce36f",
+    "fullUrl": "https://demis.rki.de/fhir/PractitionerRole/95d17ead-cf82-44df-a94a-9db1ec0add8e",
     "resource": {
       "resourceType": "PractitionerRole",
-      "id": "ddad6dbe-bc99-4d54-8219-7423c68ce36f",
+      "id": "95d17ead-cf82-44df-a94a-9db1ec0add8e",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/SubmittingRole" ]
       },
       "organization": {
-        "reference": "Organization/8dd9c02e-3d12-4c6b-a003-d44f29ca9b33"
+        "reference": "Organization/b0b2f52d-deb1-47e6-b5ce-3278b636e4f1"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Organization/8dd9c02e-3d12-4c6b-a003-d44f29ca9b33",
+    "fullUrl": "https://demis.rki.de/fhir/Organization/b0b2f52d-deb1-47e6-b5ce-3278b636e4f1",
     "resource": {
       "resourceType": "Organization",
-      "id": "8dd9c02e-3d12-4c6b-a003-d44f29ca9b33",
+      "id": "b0b2f52d-deb1-47e6-b5ce-3278b636e4f1",
       "meta": {
-        "profile": [ "https://demis.rki.de/fhir/StructureDefinition/SubmittingFacility" ]
+        "profile": [ "https://demis.rki.de/fhir/StructureDefinition/SubmittingFacility", "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonFacility" ]
       },
       "type": [ {
         "coding": [ {
@@ -156,26 +184,26 @@
           "display": "Sonstige private Untersuchungsstelle"
         } ]
       } ],
-      "name": "Das Einsenderinstitut",
+      "name": "TEST Organisation",
       "telecom": [ {
         "system": "phone",
-        "value": "012345678",
+        "value": "0182736912388889",
         "use": "work"
       }, {
         "system": "email",
-        "value": "einsender@einsenderinstitut.de"
+        "value": "testerino@test.de"
       } ],
       "address": [ {
-        "line": [ "Am Einsenderdamm 1" ],
-        "city": "Einsendercity",
+        "line": [ "Im Himmelreich 1" ],
+        "city": "Frühling",
         "postalCode": "21481",
         "country": "DE"
       } ],
       "contact": [ {
         "name": {
-          "text": "Frau Dr Einsenderina Einsenderson",
-          "family": "Einsenderson",
-          "given": [ "Einsenderina" ],
+          "text": "Herr Dr Melderina Melderson",
+          "family": "Melderson",
+          "given": [ "Melderina" ],
           "prefix": [ "Dr" ]
         },
         "address": {
@@ -184,10 +212,10 @@
       } ]
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Specimen/b2eba2d4-cd73-4e90-a55b-d23a96c157f0",
+    "fullUrl": "https://demis.rki.de/fhir/Specimen/f88bde16-1c0d-4d06-98d2-d7c43a3317a3",
     "resource": {
       "resourceType": "Specimen",
-      "id": "b2eba2d4-cd73-4e90-a55b-d23a96c157f0",
+      "id": "f88bde16-1c0d-4d06-98d2-d7c43a3317a3",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/SpecimenHIVP" ]
       },
@@ -200,21 +228,21 @@
         } ]
       },
       "subject": {
-        "reference": "Patient/cd6804c4-122f-475f-b0dc-05b4f1261e57"
+        "reference": "Patient/35b59d46-b92a-4270-957b-95719b5e59aa"
       },
-      "receivedTime": "2025-07-29T00:00:00+02:00",
+      "receivedTime": "2025-08-21T00:00:00+02:00",
       "collection": {
         "collector": {
-          "reference": "PractitionerRole/ddad6dbe-bc99-4d54-8219-7423c68ce36f"
+          "reference": "PractitionerRole/95d17ead-cf82-44df-a94a-9db1ec0add8e"
         },
-        "collectedDateTime": "2025-07-29T00:00:00+02:00"
+        "collectedDateTime": "2025-08-21T00:00:00+02:00"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/Observation/54754dcb-2e4c-458c-bde6-02ae275ae5cd",
+    "fullUrl": "https://demis.rki.de/fhir/Observation/65be6e66-313f-4b2a-8a7d-8e9011ba0845",
     "resource": {
       "resourceType": "Observation",
-      "id": "54754dcb-2e4c-458c-bde6-02ae275ae5cd",
+      "id": "65be6e66-313f-4b2a-8a7d-8e9011ba0845",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/PathogenDetectionHIVP" ]
       },
@@ -235,7 +263,7 @@
         } ]
       },
       "subject": {
-        "reference": "Patient/cd6804c4-122f-475f-b0dc-05b4f1261e57"
+        "reference": "Patient/35b59d46-b92a-4270-957b-95719b5e59aa"
       },
       "valueCodeableConcept": {
         "coding": [ {
@@ -260,14 +288,14 @@
         } ]
       },
       "specimen": {
-        "reference": "Specimen/b2eba2d4-cd73-4e90-a55b-d23a96c157f0"
+        "reference": "Specimen/f88bde16-1c0d-4d06-98d2-d7c43a3317a3"
       }
     }
   }, {
-    "fullUrl": "https://demis.rki.de/fhir/DiagnosticReport/f6386e98-07bf-4adb-8739-f388f41ec769",
+    "fullUrl": "https://demis.rki.de/fhir/DiagnosticReport/3874811f-f85b-4329-887e-1f36acecc045",
     "resource": {
       "resourceType": "DiagnosticReport",
-      "id": "f6386e98-07bf-4adb-8739-f388f41ec769",
+      "id": "3874811f-f85b-4329-887e-1f36acecc045",
       "meta": {
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportHIVP" ]
       },
@@ -281,11 +309,11 @@
         } ]
       },
       "subject": {
-        "reference": "Patient/cd6804c4-122f-475f-b0dc-05b4f1261e57"
+        "reference": "Patient/35b59d46-b92a-4270-957b-95719b5e59aa"
       },
-      "issued": "2025-07-29T06:22:16.958+02:00",
+      "issued": "2025-08-21T13:05:42.044+02:00",
       "result": [ {
-        "reference": "Observation/54754dcb-2e4c-458c-bde6-02ae275ae5cd"
+        "reference": "Observation/65be6e66-313f-4b2a-8a7d-8e9011ba0845"
       } ],
       "conclusionCode": [ {
         "coding": [ {
@@ -296,4 +324,3 @@
     }
   } ]
 }
-

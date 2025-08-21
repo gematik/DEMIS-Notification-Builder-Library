@@ -94,20 +94,6 @@
         } ],
         "postalCode": "123",
         "country": "20422"
-      }, {
-        "extension": [ {
-          "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",
-          "valueCoding": {
-            "system": "https://demis.rki.de/fhir/CodeSystem/addressUse",
-            "code": "current",
-            "display": "Derzeitiger Aufenthaltsort"
-          }
-        }, {
-          "url": "https://demis.rki.de/fhir/StructureDefinition/FacilityAddressNotifiedPerson",
-          "valueReference": {
-            "reference": "urn:uuid:0ec30241-eabc-4529-9060-2a93f2732cd0"
-          }
-        } ]
       } ]
     }
   }, {
@@ -136,6 +122,15 @@
       },
       "onsetDateTime": "2022-01-01",
       "recordedDate": "2022-01-02",
+      "evidence": [ {
+        "code": [ {
+          "coding": [ {
+            "system": "http://snomed.info/sct",
+            "code": "386661006",
+            "display": "Fever (finding)"
+          } ]
+        } ]
+      } ],
       "note": [ {
         "text": "Textueller Hinweis"
       } ]
@@ -318,18 +313,6 @@
             "display": "Ausübung von Sexarbeit"
           }
         } ]
-      } ]
-    }
-  }, {
-    "fullUrl": "urn:uuid:0ec30241-eabc-4529-9060-2a93f2732cd0",
-    "resource": {
-      "resourceType": "Organization",
-      "meta": {
-        "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonFacility" ]
-      },
-      "address": [ {
-        "postalCode": "214",
-        "country": "20422"
       } ]
     }
   } ]

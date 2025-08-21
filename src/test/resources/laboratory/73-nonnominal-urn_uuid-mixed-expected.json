@@ -81,19 +81,7 @@
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonNotByName" ]
       },
       "gender": "male",
-      "birthDate": "2024-11",
-      "address": [ {
-        "extension": [ {
-          "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",
-          "valueCoding": {
-            "system": "https://demis.rki.de/fhir/CodeSystem/addressUse",
-            "code": "current",
-            "display": "Derzeitiger Aufenthaltsort"
-          }
-        } ],
-        "postalCode": "214",
-        "country": "DE"
-      } ]
+      "birthDate": "2024-11"
     }
   }, {
     "fullUrl": "https://demis.rki.de/fhir/PractitionerRole/4c12f797-1662-4ebe-bd43-f0ecf756c745",

@@ -36,11 +36,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Observation;
-import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Provenance;
@@ -100,19 +100,6 @@ record BundleBuilderContext(
         provenance);
   }
 
-  private static List<Organization> getNotifiedPersonFacilities(
-      List<Bundle.BundleEntryComponent> entries) {
-    return entries.stream()
-        .filter(
-            e ->
-                e.getResource()
-                    .getMeta()
-                    .hasProfile(DemisConstants.PROFILE_NOTIFIED_PERSON_FACILITY))
-        .map(Bundle.BundleEntryComponent::getResource)
-        .map(Organization.class::cast)
-        .toList();
-  }
-
   /**
    * Copy all resources contained in this context. Some resources like the subject require special
    * transformers.
@@ -122,7 +109,7 @@ record BundleBuilderContext(
    *     have been processed. Use the provided context to access the already copied resources.
    */
   public BundleBuilderContext copyWith(
-      final Function<Patient, Patient> subjectTransformer,
+      final UnaryOperator<Patient> subjectTransformer,
       final BiFunction<Composition, BundleBuilderContext, Composition> compositionTransformer) {
     final Patient subject = subjectTransformer.apply(this.subject);
     final PractitionerRole submitter = PractitionerRoleBuilder.deepCopy(this.submitter);
