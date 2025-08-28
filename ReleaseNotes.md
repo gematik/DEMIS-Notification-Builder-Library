@@ -2,8 +2,12 @@
 
 # Release-Notes notification-builder-library
 
-## 6.3.11
-- 7.3 ressources: don't copy current AddressUse Tag and NotifiedPersonFacility
+## 7.1.0
+- Updated HAPI FHIR to 8.4.0
+
+## 7.0.0 
+- Updated libraries
+- 7.3 resources: don't copy current AddressUse Tag and NotifiedPersonFacility
 - 7.3 resources: copy symptoms for disease bundles
 
 ## 6.3.10
