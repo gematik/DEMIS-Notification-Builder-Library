@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>7.0.0</version>
+    <version>7.1.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json,
@@ -32,9 +32,10 @@
         <asm.version>9.8</asm.version>
         <surefire.plugin.version>3.5.3</surefire.plugin.version>
         <jacoco.plugin.version>0.8.13</jacoco.plugin.version>
-        <fhir.parser.lib.version>2.5.0</fhir.parser.lib.version>
-        <ca.uhn.hapi.fhir.version>8.2.0</ca.uhn.hapi.fhir.version>
+        <fhir.parser.lib.version>2.6.0</fhir.parser.lib.version>
+        <ca.uhn.hapi.fhir.version>8.4.0</ca.uhn.hapi.fhir.version>
         <junit.version>5.13.4</junit.version>
+        <slf4j.version>2.0.17</slf4j.version>
         <sonar.exclusions>
             **/de/gematik/demis/notification/builder/demis/fhir/notification/utils/DemisConstants.java
         </sonar.exclusions>
@@ -70,12 +71,12 @@
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>org.hl7.fhir.r4</artifactId>
-                <version>6.5.18</version>
+                <version>6.5.27</version>
             </dependency>
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>org.hl7.fhir.utilities</artifactId>
-                <version>6.5.18</version>
+                <version>6.5.27</version>
             </dependency>
 
             <dependency>
@@ -92,6 +93,16 @@
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>1.19.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -428,6 +439,10 @@
                 <exclusion>
                     <groupId>com.google.errorprone</groupId>
                     <artifactId>error_prone_annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>caffeine</artifactId>
+                    <groupId>com.github.ben-manes.caffeine</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
