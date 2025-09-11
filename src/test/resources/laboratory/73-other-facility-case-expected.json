@@ -57,6 +57,7 @@
       "resourceType": "Patient",
       "id": "cd6804c4-122f-475f-b0dc-05b4f1261e57",
       "meta": {
+        "lastUpdated": "2025-09-10T14:23:28.000+02:00",
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonNotByName" ]
       },
       "gender": "male",
@@ -296,4 +297,3 @@
     }
   } ]
 }
-

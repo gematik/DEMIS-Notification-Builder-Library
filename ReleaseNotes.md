@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## 7.2.0
+- Added lastUpdate field to Patient and Notification Builders
+
 ## 7.1.0
 - Updated HAPI FHIR to 8.4.0
 

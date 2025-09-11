@@ -74,6 +74,7 @@
       "resourceType": "Patient",
       "id": "555-42-23-7",
       "meta": {
+        "lastUpdated": "2025-09-10T14:23:28.000+02:00",
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonNotByName" ]
       },
       "extension": [ {

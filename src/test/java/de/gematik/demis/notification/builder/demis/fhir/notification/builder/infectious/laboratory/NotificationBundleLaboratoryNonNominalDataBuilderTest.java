@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import de.gematik.demis.notification.builder.demis.fhir.testUtils.TestObjects;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,6 +53,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
@@ -210,84 +213,96 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
   @ParameterizedTest
   void thatCopyingCreatesTheExpectedResult(final Path inputPath, final Path expectedPath)
       throws IOException {
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
+    try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
+      utilities.when(Utils::getCurrentDate).thenReturn(TestObjects.mockDate());
+      utilities.when(() -> Utils.getShortReferenceOrUrnUuid(Mockito.any())).thenCallRealMethod();
+      final IParser iParser = FhirContext.forR4().newJsonParser();
+      iParser.setPrettyPrint(true);
 
-    // GIVEN a bundle with NonNominal profiles and a notified person
+      // GIVEN a bundle with NonNominal profiles and a notified person
 
-    // THEN
-    final String source = Files.readString(inputPath);
+      // THEN
+      final String source = Files.readString(inputPath);
 
-    final Bundle original = (Bundle) iParser.parseResource(source);
-    final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
+      final Bundle original = (Bundle) iParser.parseResource(source);
+      final Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
 
-    final String expected = Files.readString(expectedPath);
+      final String expected = Files.readString(expectedPath);
 
-    final String result = iParser.encodeResourceToString(copy);
-    assertThat(result).isEqualToIgnoringNewLines(expected);
+      final String result = iParser.encodeResourceToString(copy);
+      assertThat(result).isEqualToIgnoringNewLines(expected);
+    }
   }
 
   @Test
   void shouldSetPractitionerReferenceWithoutUrnUuidWhenParametersNotificationisReceived()
       throws IOException {
-    final String source =
-        Files.readString(
-            Path.of("src/test/resources/laboratory/73-laboratory-parameters-notification.json"));
+    try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
+      utilities.when(Utils::getCurrentDate).thenReturn(TestObjects.mockDate());
+      utilities.when(() -> Utils.getShortReferenceOrUrnUuid(Mockito.any())).thenCallRealMethod();
 
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
+      final String source =
+          Files.readString(
+              Path.of("src/test/resources/laboratory/73-laboratory-parameters-notification.json"));
 
-    final Parameters original = (Parameters) iParser.parseResource(source);
-    Bundle originalBundle = (Bundle) original.getParameter().getFirst().getResource();
+      final IParser iParser = FhirContext.forR4().newJsonParser();
+      iParser.setPrettyPrint(true);
 
-    Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
+      final Parameters original = (Parameters) iParser.parseResource(source);
+      Bundle originalBundle = (Bundle) original.getParameter().getFirst().getResource();
 
-    assertThat(copy.getEntryFirstRep().getFullUrl())
-        .isEqualTo("https://demis.rki.de/fhir/Composition/6ed88a19-70e9-3292-8272-b45740eb82b6");
-    Resource resource = copy.getEntry().get(2).getResource();
-    assertThat(resource).isInstanceOf(PractitionerRole.class);
-    PractitionerRole practitionerRole = (PractitionerRole) resource;
-    assertThat(practitionerRole.getOrganization().getReference())
-        .hasToString("Organization/f66f699c-4ca5-3c54-9405-d2ef4305791e");
+      Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
 
-    Resource resource2 = copy.getEntry().get(4).getResource();
-    assertThat(resource2).isInstanceOf(PractitionerRole.class);
-    PractitionerRole practitionerRole2 = (PractitionerRole) resource2;
-    assertThat(practitionerRole2.getOrganization().getReference())
-        .hasToString("Organization/e9dddc3f-2110-38ad-9f1a-479f2a656074");
+      assertThat(copy.getEntryFirstRep().getFullUrl())
+          .isEqualTo("https://demis.rki.de/fhir/Composition/6ed88a19-70e9-3292-8272-b45740eb82b6");
+      Resource resource = copy.getEntry().get(2).getResource();
+      assertThat(resource).isInstanceOf(PractitionerRole.class);
+      PractitionerRole practitionerRole = (PractitionerRole) resource;
+      assertThat(practitionerRole.getOrganization().getReference())
+          .hasToString("Organization/f66f699c-4ca5-3c54-9405-d2ef4305791e");
 
-    final String expected =
-        Files.readString(
-            Path.of(
-                "src/test/resources/laboratory/73-laboratory-parameters-notification-copy.json"));
+      Resource resource2 = copy.getEntry().get(4).getResource();
+      assertThat(resource2).isInstanceOf(PractitionerRole.class);
+      PractitionerRole practitionerRole2 = (PractitionerRole) resource2;
+      assertThat(practitionerRole2.getOrganization().getReference())
+          .hasToString("Organization/e9dddc3f-2110-38ad-9f1a-479f2a656074");
 
-    IParser iParser1 = FhirContext.forR4Cached().newJsonParser();
-    iParser1.setPrettyPrint(true);
-    String actual = iParser1.encodeResourceToString(copy);
-    assertThat(actual).isEqualToIgnoringWhitespace(expected);
+      final String expected =
+          Files.readString(
+              Path.of(
+                  "src/test/resources/laboratory/73-laboratory-parameters-notification-copy.json"));
+
+      IParser iParser1 = FhirContext.forR4Cached().newJsonParser();
+      iParser1.setPrettyPrint(true);
+      String actual = iParser1.encodeResourceToString(copy);
+      assertThat(actual).isEqualToIgnoringWhitespace(expected);
+    }
   }
 
   @Test
   void shouldNotCopyNotifiedPersonFacility() throws IOException {
-    final String source =
-        Files.readString(Path.of("src/test/resources/laboratory/73-other-facility-case.json"));
+    try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
+      utilities.when(Utils::getCurrentDate).thenReturn(TestObjects.mockDate());
+      final String source =
+          Files.readString(Path.of("src/test/resources/laboratory/73-other-facility-case.json"));
 
-    final IParser iParser = FhirContext.forR4().newJsonParser();
-    iParser.setPrettyPrint(true);
+      final IParser iParser = FhirContext.forR4().newJsonParser();
+      iParser.setPrettyPrint(true);
 
-    final Parameters original = (Parameters) iParser.parseResource(source);
-    Bundle originalBundle = (Bundle) original.getParameter().getFirst().getResource();
+      final Parameters original = (Parameters) iParser.parseResource(source);
+      Bundle originalBundle = (Bundle) original.getParameter().getFirst().getResource();
 
-    Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
+      Bundle copy = NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
 
-    final String expected =
-        Files.readString(
-            Path.of("src/test/resources/laboratory/73-other-facility-case-expected.json"));
+      final String expected =
+          Files.readString(
+              Path.of("src/test/resources/laboratory/73-other-facility-case-expected.json"));
 
-    IParser iParser1 = FhirContext.forR4Cached().newJsonParser();
-    iParser1.setPrettyPrint(true);
-    String actual = iParser1.encodeResourceToString(copy);
-    assertThat(actual).isEqualToIgnoringWhitespace(expected);
+      IParser iParser1 = FhirContext.forR4Cached().newJsonParser();
+      iParser1.setPrettyPrint(true);
+      String actual = iParser1.encodeResourceToString(copy);
+      assertThat(actual).isEqualToIgnoringWhitespace(expected);
+    }
   }
 
   private static Bundle getBundle() {
