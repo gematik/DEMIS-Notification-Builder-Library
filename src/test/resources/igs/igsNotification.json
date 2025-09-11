@@ -18,7 +18,7 @@
       "resource": {
         "resourceType": "Composition",
         "id": "4a19589d-3ae8-3439-baea-b2e0f60a98b2",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/igs/StructureDefinition/NotificationSequence"
           ]
@@ -95,7 +95,7 @@
       "resource": {
         "resourceType": "Patient",
         "id": "3661f735-d3db-3c22-909d-3a16a7334c1d",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonNotByName"
           ]
@@ -123,7 +123,7 @@
       "resource": {
         "resourceType": "PractitionerRole",
         "id": "c92c9646-e0c8-3c3d-840c-33e505648a5c",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotifierRole"
           ]
@@ -138,7 +138,7 @@
       "resource": {
         "resourceType": "Organization",
         "id": "227a66a4-a2fe-34b9-ad24-55981d0d1d82",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotifierFacility"
           ]
@@ -185,7 +185,7 @@
       "resource": {
         "resourceType": "PractitionerRole",
         "id": "d1b92d45-3811-3064-bad7-b3336e70e08c",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/SubmittingRole"
           ]
@@ -200,7 +200,7 @@
       "resource": {
         "resourceType": "Organization",
         "id": "a42f380e-b23a-3f50-a096-26665a6e4257",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/SubmittingFacility"
           ]
@@ -262,7 +262,7 @@
       "resource": {
         "resourceType": "DiagnosticReport",
         "id": "2e24f26e-c450-301c-ac1e-da2205a69e39",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/igs/StructureDefinition/LaboratoryReportSequence"
           ]
@@ -305,7 +305,7 @@
       "resource": {
         "resourceType": "Observation",
         "id": "30aefd63-f71c-39b2-9191-8c162310c9c2",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/igs/StructureDefinition/PathogenDetectionSequence"
           ]
@@ -371,7 +371,7 @@
       "resource": {
         "resourceType": "Specimen",
         "id": "43b3b82f-656f-3e3d-a510-0109771c9e97",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/igs/StructureDefinition/SpecimenSequence"
           ]
@@ -417,7 +417,7 @@
       "resource": {
         "resourceType": "Device",
         "id": "b075aba8-edcb-38f7-973a-6ba64b240a3e",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/igs/StructureDefinition/SequencingDevice"
           ]
@@ -444,7 +444,7 @@
       "resource": {
         "resourceType": "MolecularSequence",
         "id": "26038f18-8c2d-3ad7-90e6-f52cfd779262",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/igs/StructureDefinition/Sequence"
           ]

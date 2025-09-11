@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>7.1.0</version>
+    <version>7.2.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json,
@@ -336,7 +336,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.7</version>
+                        <version>3.2.8</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -415,7 +415,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.38</version>
+            <version>1.18.40</version>
             <scope>provided</scope>
         </dependency>
 

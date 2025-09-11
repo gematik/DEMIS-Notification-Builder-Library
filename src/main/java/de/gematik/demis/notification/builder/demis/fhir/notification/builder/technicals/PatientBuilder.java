@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.Address;
@@ -58,6 +59,7 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
   private List<ContactPoint> telecom = new ArrayList<>();
   private String profileUrl;
   private Type pseudonym;
+  private Date lastUpdated;
 
   /**
    * allows to add additional profile url to a patient resource
@@ -127,6 +129,9 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
     }
     if (pseudonym != null) {
       patient.addExtension(new Extension(EXTENSION_URL_PSEUDONYM).setValue(pseudonym));
+    }
+    if (lastUpdated != null) {
+      patient.getMeta().setLastUpdated(lastUpdated);
     }
     return patient;
   }

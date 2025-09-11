@@ -28,6 +28,9 @@ package de.gematik.demis.notification.builder.demis.fhir.testUtils;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
@@ -41,6 +44,11 @@ import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Specimen;
 
 public class TestObjects {
+
+  public static Date mockDate() {
+    LocalDateTime ldt = LocalDateTime.of(2025, 9, 10, 14, 23, 28);
+    return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+  }
 
   public static Coding sectionCoding() {
     return new Coding()

@@ -36,6 +36,7 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.builder.tec
 import de.gematik.demis.notification.builder.demis.fhir.notification.types.AddressUse;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.time.YearMonth;
@@ -186,6 +187,7 @@ public class NotifiedPersonNonNominalDataBuilder {
         .setGender(gender)
         .setAddress(address)
         .setPseudonym(pseudonym)
+        .setLastUpdated(Utils.getCurrentDate())
         .build();
   }
 

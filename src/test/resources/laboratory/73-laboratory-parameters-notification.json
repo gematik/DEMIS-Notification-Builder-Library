@@ -5,7 +5,7 @@
       "name": "content",
       "resource": {
         "resourceType": "Bundle",
-        "meta": {
+       "meta": {
           "lastUpdated": "2021-03-04T20:16:01.000+01:00",
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotificationBundleLaboratoryNonNominal"
@@ -23,7 +23,7 @@
             "resource": {
               "resourceType": "Composition",
               "id": "6ed88a19-70e9-3292-8272-b45740eb82b6",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/NotificationLaboratoryNonNominal"
                 ]
@@ -89,7 +89,7 @@
             "resource": {
               "resourceType": "Patient",
               "id": "aabb3705-f9f3-37e9-b2bb-6f3da1f55bd3",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/NotifiedPerson"
                 ]
@@ -161,7 +161,7 @@
             "resource": {
               "resourceType": "PractitionerRole",
               "id": "4711cac3-7552-36ef-babe-89351ad9cf01",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/NotifierRole"
                 ]
@@ -176,7 +176,7 @@
             "resource": {
               "resourceType": "Organization",
               "id": "f66f699c-4ca5-3c54-9405-d2ef4305791e",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/NotifierFacility"
                 ]
@@ -227,7 +227,7 @@
             "resource": {
               "resourceType": "PractitionerRole",
               "id": "4587a97f-bb58-3d5c-ba5a-19abc300135b",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/SubmittingRole"
                 ]
@@ -242,7 +242,7 @@
             "resource": {
               "resourceType": "Organization",
               "id": "e9dddc3f-2110-38ad-9f1a-479f2a656074",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/SubmittingFacility"
                 ]
@@ -278,7 +278,7 @@
             "resource": {
               "resourceType": "Specimen",
               "id": "8a71a3d6-fd64-3e89-9eea-7ad16a7ed4cf",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/SpecimenHIVP"
                 ]
@@ -316,7 +316,7 @@
             "resource": {
               "resourceType": "Observation",
               "id": "5f375f7f-b7ed-35f1-a304-28dc77e8c6e1",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/PathogenDetectionHIVP"
                 ]
@@ -391,7 +391,7 @@
             "resource": {
               "resourceType": "DiagnosticReport",
               "id": "3feae929-5b17-32aa-94e1-37355cbb32f0",
-              "meta": {
+             "meta": {
                 "profile": [
                   "https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportHIVP"
                 ]

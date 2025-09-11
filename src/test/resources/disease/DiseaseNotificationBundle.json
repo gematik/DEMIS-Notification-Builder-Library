@@ -24,7 +24,7 @@
       "resource": {
         "resourceType": "Composition",
         "id": "9bb7aeba-581a-47ce-8791-5cdb319d6267",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotificationDiseaseCVDD"
           ]
@@ -133,7 +133,7 @@
       "resource": {
         "resourceType": "Organization",
         "id": "0ec30241-eabc-4529-9060-2a93f2732cd0",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonFacility"
           ]
@@ -213,7 +213,7 @@
       "resource": {
         "resourceType": "Patient",
         "id": "458a9cb4-1e94-424e-bfd2-64cbd3efa41e",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotifiedPerson"
           ]
@@ -300,7 +300,7 @@
       "resource": {
         "resourceType": "Condition",
         "id": "0b435ebe-a544-4a70-ada0-90bc5c9777df",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/DiseaseCVDD"
           ]
@@ -419,7 +419,7 @@
       "resource": {
         "resourceType": "Organization",
         "id": "2ac04fbc-e807-4eb1-a07e-8a941ae1b7d7",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotifierFacility"
           ]
@@ -499,7 +499,7 @@
       "resource": {
         "resourceType": "PractitionerRole",
         "id": "dec9b121-b3fa-4815-8825-ca5c06a4c22d",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/NotifierRole"
           ]
@@ -514,7 +514,7 @@
       "resource": {
         "resourceType": "Encounter",
         "id": "5931672c-8ad9-44d0-8849-70dee8b2741f",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/Hospitalization"
           ]
@@ -548,7 +548,7 @@
       "resource": {
         "resourceType": "Encounter",
         "id": "b70e195a-b696-4868-a188-a8ecab14d6da",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/Hospitalization"
           ]
@@ -584,7 +584,7 @@
       "resource": {
         "resourceType": "QuestionnaireResponse",
         "id": "6352a61f-d1d6-45d1-a15a-604b1c4b04f4",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/DiseaseInformationCommon"
           ]
@@ -837,7 +837,7 @@
       "resource": {
         "resourceType": "Organization",
         "id": "38da54d4-03b4-4cc3-be8a-f9c54e12d4a2",
-        "meta": {
+       "meta": {
           "profile": [
             "http://hl7.org/fhir/StructureDefinition/Organization"
           ]
@@ -884,7 +884,7 @@
       "resource": {
         "resourceType": "Organization",
         "id": "26d231c9-f6f0-4186-97b6-787d885801b0",
-        "meta": {
+       "meta": {
           "profile": [
             "http://hl7.org/fhir/StructureDefinition/Organization"
           ]
@@ -931,7 +931,7 @@
       "resource": {
         "resourceType": "QuestionnaireResponse",
         "id": "f9605664-9301-4588-9cf5-a4ec796c57db",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/DiseaseInformationCVDD"
           ]
@@ -1063,7 +1063,7 @@
       "resource": {
         "resourceType": "Immunization",
         "id": "9ac976ff-cd37-4328-b4ec-afba82bf430b",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD"
           ]
@@ -1094,7 +1094,7 @@
       "resource": {
         "resourceType": "Immunization",
         "id": "188c91bd-90c9-411e-813a-a2928e76edc6",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD"
           ]
@@ -1125,7 +1125,7 @@
       "resource": {
         "resourceType": "Immunization",
         "id": "1d92e482-6b95-4da9-b734-c3976a155195",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD"
           ]
@@ -1156,7 +1156,7 @@
       "resource": {
         "resourceType": "Immunization",
         "id": "825e1a39-379c-4b1c-bae7-f28504c49149",
-        "meta": {
+       "meta": {
           "profile": [
             "https://demis.rki.de/fhir/StructureDefinition/ImmunizationInformationCVDD"
           ]
