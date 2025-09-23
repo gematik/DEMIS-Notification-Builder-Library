@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## 7.3.0
+- Bumped dependencies
+
 ## 7.2.0
 - Added lastUpdate field to Patient and Notification Builders
 
