@@ -28,6 +28,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
 
 import static de.gematik.demis.notification.builder.demis.fhir.testUtils.TestFhirParser.getJsonParser;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,8 +37,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Year;
+import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class PatientBuilderTest {
 
@@ -65,12 +71,51 @@ class PatientBuilderTest {
         .isEqualTo(expectedComposition);
   }
 
+  @ParameterizedTest
+  @ValueSource(strings = {"0", "13", "November"})
+  void shouldNotBuildPatientWithInvalidHostBirthMonth(String hostBirthMonth) {
+    PatientBuilder builder = configureBuilderWithTestData(hostBirthMonth, "1978", "male");
+
+    assertThatThrownBy(builder::buildResource)
+        .isInstanceOf(InvalidInputDataException.class)
+        .hasMessageContaining(String.format("Invalid birthday month: %s", hostBirthMonth));
+  }
+
+  @ParameterizedTest
+  @MethodSource("invalidBirthYears")
+  void shouldNotBuildPatientWithInvalidHostBirthYear(String hostBirthYear) {
+    PatientBuilder builder = configureBuilderWithTestData("11", hostBirthYear, "male");
+
+    assertThatThrownBy(builder::buildResource)
+        .isInstanceOf(InvalidInputDataException.class)
+        .hasMessageContaining(String.format("Invalid birthday year: %s", hostBirthYear));
+  }
+
+  static Stream<String> invalidBirthYears() {
+    int currentYear = Year.now().getValue();
+    return Stream.of("1799", String.valueOf(currentYear + 1), "twenty twenty");
+  }
+
+  @Test
+  void shouldNotBuildPatientWithInvalidHostSex() {
+    PatientBuilder builder = configureBuilderWithTestData("11", "1979", "androgymous");
+
+    assertThatThrownBy(builder::buildResource)
+        .isInstanceOf(InvalidInputDataException.class)
+        .hasMessageContaining("Unknown AdministrativeGender code 'androgymous'");
+  }
+
   private PatientBuilder configureBuilderWithTestData() {
+    return configureBuilderWithTestData("9", "1978", "male");
+  }
+
+  private PatientBuilder configureBuilderWithTestData(
+      String hostBirthMonth, String hostBirthYear, String hostSex) {
     IgsOverviewData data =
         IgsOverviewData.builder()
-            .hostBirthMonth("9")
-            .hostBirthYear("1978")
-            .hostSex("male")
+            .hostBirthMonth(hostBirthMonth)
+            .hostBirthYear(hostBirthYear)
+            .hostSex(hostSex)
             .geographicLocation("130")
             .build();
     return PatientBuilder.builder().data(data).build();

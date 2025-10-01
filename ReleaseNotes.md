@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## 7.3.1
+- Handling of invalid input data for host birthdate and sex
+
 ## 7.3.0
 - Bumped dependencies
 

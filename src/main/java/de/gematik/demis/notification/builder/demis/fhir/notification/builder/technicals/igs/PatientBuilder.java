@@ -31,11 +31,13 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_NOT_BY_NAME;
 import static java.lang.String.format;
 
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
@@ -60,17 +62,48 @@ public class PatientBuilder extends AbstractIgsResourceBuilder<Patient> {
     patient.setId(UUID.randomUUID().toString());
     setAddress(patient);
     setBirthdate(patient);
-    patient.setGender(AdministrativeGender.fromCode(data.getHostSex()));
+    try {
+      patient.setGender(AdministrativeGender.fromCode(data.getHostSex()));
+    } catch (FHIRException exception) {
+      throw new InvalidInputDataException(exception.getMessage());
+    }
     return Optional.of(patient);
   }
 
   private void setBirthdate(Patient patient) {
     if (StringUtils.isNotBlank(data.getHostBirthMonth())
         && StringUtils.isNotBlank(data.getHostBirthYear())) {
+      checkBirthdayMonth(data.getHostBirthMonth());
+      checkBirthdayYear(data.getHostBirthYear());
       int month = Integer.parseInt(data.getHostBirthMonth());
       String formattedMonth = String.format("%02d", month);
       patient.setBirthDateElement(
           new DateType(format("%s-%s", data.getHostBirthYear(), formattedMonth)));
+    }
+  }
+
+  private void checkBirthdayMonth(String birthdayMonth) {
+    int month;
+    try {
+      month = Integer.parseInt(birthdayMonth);
+    } catch (NumberFormatException e) {
+      throw new InvalidInputDataException("Invalid birthday month: " + birthdayMonth);
+    }
+    if (month < 1 || month > 12) {
+      throw new InvalidInputDataException("Invalid birthday month: " + birthdayMonth);
+    }
+  }
+
+  private void checkBirthdayYear(String birthdayYear) {
+    int year;
+    try {
+      year = Integer.parseInt(birthdayYear);
+    } catch (NumberFormatException e) {
+      throw new InvalidInputDataException("Invalid birthday year: " + birthdayYear);
+    }
+    int currentYear = Year.now().getValue();
+    if (year < 1800 || year > currentYear) {
+      throw new InvalidInputDataException("Invalid birthday year: " + birthdayYear);
     }
   }
 
