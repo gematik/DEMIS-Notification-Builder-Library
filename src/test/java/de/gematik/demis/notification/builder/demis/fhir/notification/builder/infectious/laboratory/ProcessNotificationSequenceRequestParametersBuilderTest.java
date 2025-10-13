@@ -56,7 +56,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PREFIX_SPECIMEN;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_ADAPTER_SUBSTANCE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_MOLECULAR_SEQUENCE;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_NOT_BY_NAME;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_ANONYMOUS;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIER_FACILITY;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_SEQUENCING_DEVICE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.SYSTEM_SNOMED;
@@ -311,7 +311,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(patient.getMeta()).isNotNull();
     assertThat(patient.getMeta().getProfile()).isNotNull().hasSize(1);
     CanonicalType metaProfile = patient.getMeta().getProfile().getFirst();
-    assertThat(metaProfile.getValue()).isNotNull().isEqualTo(PROFILE_NOTIFIED_PERSON_NOT_BY_NAME);
+    assertThat(metaProfile.getValue()).isNotNull().isEqualTo(PROFILE_NOTIFIED_PERSON_ANONYMOUS);
 
     assertThat(patient.getId()).isNotNull().matches(REGULAR_EXPRESSION_UUID_EXACTLY);
 

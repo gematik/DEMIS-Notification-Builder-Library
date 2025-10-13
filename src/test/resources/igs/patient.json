@@ -3,7 +3,7 @@
   "id": "3661f735-d3db-3c22-909d-3a16a7334c1d",
   "meta": {
     "profile": [
-      "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonNotByName"
+      "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonAnonymous"
     ]
   },
   "gender": "male",

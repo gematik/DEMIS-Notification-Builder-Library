@@ -28,7 +28,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.ADDRESS_USE_URL;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_ADDRESS_USE;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_NOT_BY_NAME;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_ANONYMOUS;
 import static java.lang.String.format;
 
 import java.time.Year;
@@ -55,10 +55,7 @@ public class PatientBuilder extends AbstractIgsResourceBuilder<Patient> {
   public Optional<Patient> buildResource() {
     Patient patient = new Patient();
     patient.setMeta(
-        MetaBuilder.builder()
-            .metaProfile(PROFILE_NOTIFIED_PERSON_NOT_BY_NAME)
-            .initialize()
-            .build());
+        MetaBuilder.builder().metaProfile(PROFILE_NOTIFIED_PERSON_ANONYMOUS).initialize().build());
     patient.setId(UUID.randomUUID().toString());
     setAddress(patient);
     setBirthdate(patient);

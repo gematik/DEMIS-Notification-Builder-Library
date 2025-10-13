@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>7.3.1</version>
+    <version>7.4.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json,
@@ -23,18 +23,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.maven.javadoc>3.11.2</version.maven.javadoc>
+        <version.maven.javadoc>3.12.0</version.maven.javadoc>
         <version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <fmt.maven.plugin.version>2.29</fmt.maven.plugin.version>
-        <enforcer.plugin.version>3.6.1</enforcer.plugin.version>
-        <asm.version>9.8</asm.version>
+        <enforcer.plugin.version>3.6.2</enforcer.plugin.version>
+        <asm.version>9.9</asm.version>
         <surefire.plugin.version>3.5.4</surefire.plugin.version>
         <jacoco.plugin.version>0.8.13</jacoco.plugin.version>
         <fhir.parser.lib.version>2.6.1</fhir.parser.lib.version>
         <ca.uhn.hapi.fhir.version>8.4.0</ca.uhn.hapi.fhir.version>
-        <junit.version>5.13.4</junit.version>
+        <junit.version>6.0.0</junit.version>
         <slf4j.version>2.0.17</slf4j.version>
         <sonar.exclusions>
             **/de/gematik/demis/notification/builder/demis/fhir/notification/utils/DemisConstants.java
@@ -52,7 +52,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.18.0</version>
+                <version>3.19.0</version>
             </dependency>
 
             <!-- HAPI FHIR -->
@@ -71,12 +71,12 @@
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>org.hl7.fhir.r4</artifactId>
-                <version>6.5.27</version>
+                <version>6.7.1</version>
             </dependency>
             <dependency>
                 <groupId>ca.uhn.hapi.fhir</groupId>
                 <artifactId>org.hl7.fhir.utilities</artifactId>
-                <version>6.5.27</version>
+                <version>6.7.1</version>
             </dependency>
 
             <dependency>
