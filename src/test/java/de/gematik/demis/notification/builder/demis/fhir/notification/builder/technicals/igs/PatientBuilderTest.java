@@ -49,6 +49,8 @@ class PatientBuilderTest {
 
   private static final String PATH_TO_EXPECTED_COMPOSITION_NOTIFICATION_ID =
       "src/test/resources/igs/patient.json";
+  private static final String PATH_TO_EXPECTED_COMPOSITION_NOTIFICATION_ID_GENDER_OTHER =
+      "src/test/resources/igs/patientGenderOther.json";
 
   @Test
   void shouldBuildPatient() throws IOException {
@@ -105,8 +107,35 @@ class PatientBuilderTest {
         .hasMessageContaining("Unknown AdministrativeGender code 'androgymous'");
   }
 
+  @Test
+  void shouldSetExtensionIfHostSexIsOther() throws IOException {
+    PatientBuilder builder = configureBuilderWithTestDataGenderOther();
+
+    Patient patient = builder.buildResource().get();
+
+    String actualCompositionAsString = getJsonParser().encodeResourceToString(patient);
+    String expectedCompositionAsString =
+        Files.readString(
+            Path.of(PATH_TO_EXPECTED_COMPOSITION_NOTIFICATION_ID_GENDER_OTHER),
+            StandardCharsets.UTF_8);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    JsonNode actualComposition = objectMapper.readTree(actualCompositionAsString);
+    JsonNode expectedComposition = objectMapper.readTree(expectedCompositionAsString);
+
+    assertThat(actualComposition)
+        .usingRecursiveComparison()
+        .ignoringFields("_children.id._value")
+        .isEqualTo(expectedComposition);
+  }
+
   private PatientBuilder configureBuilderWithTestData() {
     return configureBuilderWithTestData("9", "1978", "male");
+  }
+
+  private PatientBuilder configureBuilderWithTestDataGenderOther() {
+    return configureBuilderWithTestData("9", "1978", "other");
   }
 
   private PatientBuilder configureBuilderWithTestData(

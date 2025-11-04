@@ -733,7 +733,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>6.0.0</version>
+      <version>6.0.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -745,7 +745,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>6.0.0</version>
+      <version>6.0.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -757,7 +757,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <version>6.0.0</version>
+      <version>6.0.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -769,7 +769,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-commons</artifactId>
-      <version>6.0.0</version>
+      <version>6.0.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -781,7 +781,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-engine</artifactId>
-      <version>6.0.0</version>
+      <version>6.0.1</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>

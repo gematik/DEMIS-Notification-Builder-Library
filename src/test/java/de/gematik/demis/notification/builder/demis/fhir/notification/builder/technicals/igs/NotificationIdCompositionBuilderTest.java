@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsConstants.LOINC_VERSION;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.createOptionalResourceWithId;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.parseDateByDateTimeString;
 import static de.gematik.demis.notification.builder.demis.fhir.testUtils.TestFhirParser.getJsonParser;
@@ -90,6 +91,7 @@ class NotificationIdCompositionBuilderTest {
         .sectionEntryReference(
             createOptionalResourceWithId(DiagnosticReport.class, SECTION_ENTRY_ID))
         .data(data)
+        .loincVersion(LOINC_VERSION)
         .build();
   }
 }

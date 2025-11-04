@@ -65,6 +65,7 @@ public class NotificationIdCompositionBuilder extends AbstractIgsResourceBuilder
   private Optional<Patient> subjectReference;
   private Optional<DiagnosticReport> sectionEntryReference;
   private Optional<PractitionerRole> authorReference;
+  private String loincVersion;
 
   /**
    * Builds the FHIR object representing the entry Composition/NotificationId.
@@ -87,7 +88,7 @@ public class NotificationIdCompositionBuilder extends AbstractIgsResourceBuilder
     subjectReference.ifPresent(resource -> composition.setSubject(internalReference(resource)));
 
     CodeableConcept categoryCodeableConcept =
-        generateCodeableConcept(SYSTEM_LOINC, CODING_CODE, LABORATORY_REPORT);
+        generateCodeableConcept(SYSTEM_LOINC, CODING_CODE, LABORATORY_REPORT, loincVersion);
     composition.setCategory(List.of(categoryCodeableConcept));
 
     composition.setId(UUID.randomUUID().toString());
@@ -100,12 +101,13 @@ public class NotificationIdCompositionBuilder extends AbstractIgsResourceBuilder
           componentSection.setEntry(
               List.of(new Reference(PREFIX_DIAGNOSTIC_REPORT + resource.getId())));
           componentSection.setCode(
-              generateCodeableConcept(SYSTEM_LOINC, CODING_CODE, LABORATORY_REPORT));
+              generateCodeableConcept(SYSTEM_LOINC, CODING_CODE, LABORATORY_REPORT, loincVersion));
           composition.setSection(List.of(componentSection));
         });
 
     composition.setStatus(CompositionStatus.fromCode(data.getStatus()));
-    composition.setType(generateCodeableConcept(SYSTEM_LOINC, TYPE_CODE, TYPE_DISPLAY));
+    composition.setType(
+        generateCodeableConcept(SYSTEM_LOINC, TYPE_CODE, TYPE_DISPLAY, loincVersion));
 
     authorReference.ifPresent(
         resource ->

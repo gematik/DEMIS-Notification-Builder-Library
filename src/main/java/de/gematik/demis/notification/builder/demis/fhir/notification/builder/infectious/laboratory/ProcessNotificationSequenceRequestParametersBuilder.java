@@ -49,6 +49,7 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.builder.tec
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.SpecimenSequenceBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.SubstanceBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.IgsOverviewData;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.VersionInfos;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,10 +78,14 @@ public class ProcessNotificationSequenceRequestParametersBuilder {
 
   private final Bundle document;
   private final IgsOverviewData data;
+  private final VersionInfos versionInfos;
 
-  public ProcessNotificationSequenceRequestParametersBuilder(IgsOverviewData data) {
+  public ProcessNotificationSequenceRequestParametersBuilder(
+      IgsOverviewData data, VersionInfos versionInfos) {
     this.data = data;
     this.document = new Bundle();
+    validateVersionInfos(versionInfos);
+    this.versionInfos = versionInfos;
   }
 
   /**
@@ -101,6 +106,18 @@ public class ProcessNotificationSequenceRequestParametersBuilder {
     document.setTimestamp(DateTimeType.now().getValue());
     document.setEntry(generateEntries());
     return this.document;
+  }
+
+  private void validateVersionInfos(VersionInfos versionInfos) {
+    if (versionInfos == null) {
+      throw new IllegalArgumentException("VersionInfos must not be null");
+    }
+    if (versionInfos.loincVersion() == null || versionInfos.loincVersion().isBlank()) {
+      throw new IllegalArgumentException("LOINC version must not be null or blank");
+    }
+    if (versionInfos.snomedVersion() == null || versionInfos.snomedVersion().isBlank()) {
+      throw new IllegalArgumentException("SNOMED version must not be null or blank");
+    }
   }
 
   private List<Bundle.BundleEntryComponent> generateEntries() {
@@ -143,6 +160,7 @@ public class ProcessNotificationSequenceRequestParametersBuilder {
             .primerSchemeReference(primerSubstance)
             .collectionCollectorReference(submittingRole)
             .data(data)
+            .snomedVersion(versionInfos.snomedVersion())
             .build()
             .buildResource();
     Optional<MolecularSequence> molecularSequence =
@@ -151,6 +169,7 @@ public class ProcessNotificationSequenceRequestParametersBuilder {
             .deviceReference(sequencingDevice)
             .performerReference(demisLaboratory)
             .data(data)
+            .snomedVersion(versionInfos.snomedVersion())
             .build()
             .buildResource();
     Optional<Observation> observation =
@@ -160,6 +179,7 @@ public class ProcessNotificationSequenceRequestParametersBuilder {
             .molecularReference(molecularSequence)
             .deviceReference(sequencingDevice)
             .data(data)
+            .versionInfos(versionInfos)
             .build()
             .buildResource();
     Optional<DiagnosticReport> laboratoryReportSequence =
@@ -175,6 +195,7 @@ public class ProcessNotificationSequenceRequestParametersBuilder {
             .subjectReference(notifiedPersonNotByName)
             .authorReference(notifierRole)
             .data(data)
+            .loincVersion(versionInfos.loincVersion())
             .build()
             .buildResource();
 

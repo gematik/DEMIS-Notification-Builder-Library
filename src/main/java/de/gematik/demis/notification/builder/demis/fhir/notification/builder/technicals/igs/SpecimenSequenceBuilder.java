@@ -55,6 +55,7 @@ public class SpecimenSequenceBuilder extends AbstractIgsResourceBuilder<Specimen
   private Optional<PractitionerRole> collectionCollectorReference;
   private Optional<Substance> adapterReference;
   private Optional<Substance> primerSchemeReference;
+  private String snomedVersion;
 
   /**
    * Builds the FHIR object representing the entry Specimen/SpecimenSequence.
@@ -72,7 +73,10 @@ public class SpecimenSequenceBuilder extends AbstractIgsResourceBuilder<Specimen
     specimen.setStatus(AVAILABLE);
     specimen.setType(
         IgsBuilderUtils.generateCodeableConcept(
-            SYSTEM_SNOMED, data.getIsolationSourceCode(), data.getIsolationSource()));
+            SYSTEM_SNOMED,
+            data.getIsolationSourceCode(),
+            data.getIsolationSource(),
+            snomedVersion));
 
     specimen.setExtension(
         List.of(

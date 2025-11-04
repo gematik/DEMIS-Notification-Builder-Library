@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsConstants.SNOMED_VERSION;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.createOptionalResourceWithId;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.parseDateByDateTimeString;
 import static de.gematik.demis.notification.builder.demis.fhir.testUtils.TestFhirParser.getJsonParser;
@@ -64,9 +65,6 @@ class SpecimenSequenceBuilderTest {
   public static final String SEQUENCING_STRATEGY = "amplicon";
   private static final boolean INCLUDE_DATE_OF_SAMPLING = true;
   private static final boolean INCLUDE_PRCTITIONER_ROLE = true;
-  private static final String
-      PATH_TO_EXPECTED_SPECIMEN_SEQUENCE_NO_DATE_OF_SAMPLING_NO_PRACTITIONER_ROLE =
-          "src/test/resources/igs/specimenSequenceNoSamplingDateNoPractitionerRole.json";
   private static final String PATH_TO_EXPECTED_SPECIMEN_SEQUENCE_NO_SAMPLING_DATE =
       "src/test/resources/igs/specimenSequenceNoSamplingDate.json";
   private static final String PATH_TO_EXPECTED_SPECIMEN_SEQUENCE_NO_PRACTITIONER_ROLE =
@@ -134,7 +132,8 @@ class SpecimenSequenceBuilderTest {
             .adapterReference(createOptionalResourceWithId(Substance.class, ADAPTER_SUBSTANCE))
             .primerSchemeReference(
                 createOptionalResourceWithId(Substance.class, PRIMER_SCHEME_SUBSTANCE))
-            .data(data);
+            .data(data)
+            .snomedVersion(SNOMED_VERSION);
     if (includePrctitionerRole) {
       specimenSequenceBuilder.collectionCollectorReference(
           createOptionalResourceWithId(PractitionerRole.class, PRACTITIONER_ROLE_ID));

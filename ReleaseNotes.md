@@ -2,6 +2,10 @@
 
 # Release-Notes notification-builder-library
 
+## 8.0.0
+- Enforcing strict profiles for IGS notifications
+- IGS Patient Builder sets extension gender-amtlich when host sex is other
+
 ## 7.3.1
 - Handling of invalid input data for host birthdate and sex
 

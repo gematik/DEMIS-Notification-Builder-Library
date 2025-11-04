@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsConstants.SNOMED_VERSION;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.createOptionalResourceWithId;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.parseDateByDateString;
 import static de.gematik.demis.notification.builder.demis.fhir.testUtils.TestFhirParser.getJsonParser;
@@ -68,12 +69,6 @@ class MolecularSequenceBuilderTest {
   public static final String REPOSITORY_NAME = "gisaid";
   public static final String REPOSITORY_LINK = "https://pubmlst.org/2348234";
   public static final String REPOSITORY_DATASET_ID = "EPI_ISL_16883504";
-  public static final String URL_SEQUENCE_UPLOAD_DATE =
-      "https://demis.rki.de/fhir/StructureDefinition/SequenceUploadDate";
-  public static final String URL_SEQUENCE_UPLOAD_STATUS =
-      "https://demis.rki.de/fhir/StructureDefinition/SequenceUploadStatus";
-  public static final String URL_SEQUENCE_UPLOAD_SUBMITTER =
-      "https://demis.rki.de/fhir/StructureDefinition/SequenceUploadSubmitter";
   private static final String PATH_TO_EXPECTED_MOLECULAR_SEQUENCE =
       "src/test/resources/igs/molecularSequence.json";
   private static final String PATH_TO_EXPECTED_MOLECULAR_SEQUENCE_WITHOUT_REPOSITORY =
@@ -129,6 +124,7 @@ class MolecularSequenceBuilderTest {
         .deviceReference(createOptionalResourceWithId(Device.class, DEVICE_ID))
         .performerReference(createOptionalResourceWithId(Organization.class, PERFORMER_ID))
         .data(data)
+        .snomedVersion(SNOMED_VERSION)
         .build();
   }
 

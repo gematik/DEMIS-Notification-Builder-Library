@@ -73,10 +73,11 @@ class PatientBuilderTest {
         .containsIgnoringWhitespaces(
             """
                   <gender value="other">
-                      <extension url="https://demis.rki.de/fhir/StructureDefinition/gender-amtlich-de">
+                      <extension url="http://fhir.de/StructureDefinition/gender-amtlich-de">
                           <valueCoding>
-                              <system value="https://demis.rki.de/fhir/CodeSystem/gender-amtlich-de"></system>
+                              <system value="http://fhir.de/CodeSystem/gender-amtlich-de"></system>
                               <code value="D"></code>
+                                <display value="divers"></display>
                           </valueCoding>
                       </extension>
                   </gender>""");

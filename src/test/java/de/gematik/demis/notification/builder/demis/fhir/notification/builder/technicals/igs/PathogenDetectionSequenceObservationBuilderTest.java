@@ -26,6 +26,8 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsConstants.LOINC_VERSION;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsConstants.SNOMED_VERSION;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.createOptionalResourceWithId;
 import static de.gematik.demis.notification.builder.demis.fhir.testUtils.TestFhirParser.getJsonParser;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.IgsOverviewData;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.VersionInfos;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -86,6 +89,7 @@ class PathogenDetectionSequenceObservationBuilderTest {
         .molecularReference(createOptionalResourceWithId(MolecularSequence.class, DERIVED_FROM_ID))
         .specimenReference(createOptionalResourceWithId(Specimen.class, SPECIMEN_ID))
         .data(data)
+        .versionInfos(new VersionInfos(LOINC_VERSION, SNOMED_VERSION))
         .build();
   }
 }
