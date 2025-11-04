@@ -1,0 +1,37 @@
+{
+  "resourceType": "Patient",
+  "id": "3661f735-d3db-3c22-909d-3a16a7334c1d",
+  "meta": {
+    "profile": [
+      "https://demis.rki.de/fhir/StructureDefinition/NotifiedPersonAnonymous"
+    ]
+  },
+  "gender": "other",
+  "_gender": {
+    "extension": [
+      {
+        "url": "http://fhir.de/StructureDefinition/gender-amtlich-de",
+        "valueCoding": {
+          "system": "http://fhir.de/CodeSystem/gender-amtlich-de",
+          "code": "D",
+          "display": "divers"
+        }
+      }
+    ]
+  },
+  "birthDate": "1978-09",
+  "address": [
+    {
+      "extension": [
+        {
+          "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",
+          "valueCoding": {
+            "system": "https://demis.rki.de/fhir/CodeSystem/addressUse",
+            "code": "primary"
+          }
+        }
+      ],
+      "postalCode": "130"
+    }
+  ]
+}

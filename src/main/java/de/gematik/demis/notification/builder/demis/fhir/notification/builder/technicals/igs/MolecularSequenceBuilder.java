@@ -66,6 +66,7 @@ public class MolecularSequenceBuilder extends AbstractIgsResourceBuilder<Molecul
   private Optional<Specimen> specimenReference;
   private Optional<Device> deviceReference;
   private Optional<Organization> performerReference;
+  private String snomedVersion;
 
   @Override
   public Optional<MolecularSequence> buildResource() {
@@ -131,7 +132,8 @@ public class MolecularSequenceBuilder extends AbstractIgsResourceBuilder<Molecul
       extensions.add(
           ExtensionBuilder.builder()
               .url(STRUCTURE_DEFINITION_SEQUENCE_UPLOAD_STATUS)
-              .valueCoding(new Coding(SYSTEM_SNOMED, data.getUploadStatus(), null))
+              .valueCoding(
+                  new Coding(SYSTEM_SNOMED, data.getUploadStatus(), null).setVersion(snomedVersion))
               .initialize()
               .build());
     }
@@ -150,7 +152,9 @@ public class MolecularSequenceBuilder extends AbstractIgsResourceBuilder<Molecul
                 .build(),
             ExtensionBuilder.builder()
                 .url(STRUCTURE_DEFINITION_SEQUENCING_REASON)
-                .valueCoding(new Coding(SYSTEM_SNOMED, data.getSequencingReason(), null))
+                .valueCoding(
+                    new Coding(SYSTEM_SNOMED, data.getSequencingReason(), null)
+                        .setVersion(snomedVersion))
                 .initialize()
                 .build()));
     if (StringUtils.isNotBlank(data.getFileOneDocumentReference())) {

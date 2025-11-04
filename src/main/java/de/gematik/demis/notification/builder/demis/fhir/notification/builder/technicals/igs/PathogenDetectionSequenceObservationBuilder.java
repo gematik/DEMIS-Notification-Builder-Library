@@ -38,6 +38,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.SYSTEM_SNOMED;
 import static org.hl7.fhir.r4.model.Observation.ObservationStatus.FINAL;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.VersionInfos;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,6 +66,7 @@ public class PathogenDetectionSequenceObservationBuilder
   private Optional<Specimen> specimenReference;
   private Optional<Device> deviceReference;
   private Optional<MolecularSequence> molecularReference;
+  private VersionInfos versionInfos;
 
   /**
    * Builds the FHIR object representing the entry Observation/PathogenDetectionSequence.
@@ -90,16 +92,23 @@ public class PathogenDetectionSequenceObservationBuilder
         resource -> observation.setSubject(new Reference(PREFIX_PATIENT + resource.getId())));
 
     observation.setValue(
-        generateCodeableConcept(SYSTEM_SNOMED, data.getSpeciesCode(), data.getSpecies()));
+        generateCodeableConcept(
+            SYSTEM_SNOMED, data.getSpeciesCode(), data.getSpecies(), versionInfos.snomedVersion()));
 
     observation.setCode(
         new CodeableConcept()
-            .addCoding(new Coding().setCode(CODING_CODE).setSystem(LOINC_ORG_SYSTEM)));
+            .addCoding(
+                new Coding()
+                    .setCode(CODING_CODE)
+                    .setSystem(LOINC_ORG_SYSTEM)
+                    .setVersion(versionInfos.loincVersion())));
     observation.setInterpretation(
         List.of(
             generateCodeableConcept(CODE_SYSTEM_OBSERVATION_INTERPRETATION, POSITIVE_CODE, null)));
 
-    observation.setMethod(generateCodeableConcept(SYSTEM_SNOMED, METHOD_CODE, METHOD_DISPLAY));
+    observation.setMethod(
+        generateCodeableConcept(
+            SYSTEM_SNOMED, METHOD_CODE, METHOD_DISPLAY, versionInfos.snomedVersion()));
 
     specimenReference.ifPresent(
         resource -> observation.setSpecimen(new Reference(PREFIX_SPECIMEN + resource.getId())));

@@ -15,6 +15,7 @@
       "url": "https://demis.rki.de/fhir/igs/StructureDefinition/SequencingReason",
       "valueCoding": {
         "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/11000274103/version/20241115",
         "code": "255226008"
       }
     },
@@ -57,6 +58,7 @@
           "url": "https://demis.rki.de/fhir/igs/StructureDefinition/SequenceUploadStatus",
           "valueCoding": {
             "system": "http://snomed.info/sct",
+            "version": "http://snomed.info/sct/11000274103/version/20241115",
             "code": "385645004"
           }
         }

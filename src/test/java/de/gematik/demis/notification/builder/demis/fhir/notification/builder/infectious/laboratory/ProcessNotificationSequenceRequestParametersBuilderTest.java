@@ -26,6 +26,8 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsConstants.LOINC_VERSION;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsConstants.SNOMED_VERSION;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.RECEIVED_DATE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.REPOSITORY_LINK;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsTestDataUtils.SAMPLING_DATE;
@@ -61,10 +63,13 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_SEQUENCING_DEVICE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.SYSTEM_SNOMED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hl7.fhir.r4.model.MolecularSequence.RepositoryType.LOGIN;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.IgsOverviewData;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.VersionInfos;
 import java.util.Date;
 import java.util.List;
 import org.hl7.fhir.r4.model.Address;
@@ -91,9 +96,12 @@ import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Specimen;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Substance;
+import org.hl7.fhir.r4.model.Type;
 import org.hl7.fhir.r4.model.codesystems.SequenceType;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class ProcessNotificationSequenceRequestParametersBuilderTest {
 
@@ -112,12 +120,13 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
   })
   void shouldBuildProcessNotificationSequenceRequestParameters(
       boolean withRepository, boolean withPrimeDiagnosticLab) {
+    VersionInfos versionInfos = new VersionInfos(LOINC_VERSION, SNOMED_VERSION);
     ProcessNotificationSequenceRequestParametersBuilder builder =
         new ProcessNotificationSequenceRequestParametersBuilder(
-            getIgsTestOverviewData(withRepository, WITH_PRIME_DIAGNOSTIC_LAB));
+            getIgsTestOverviewData(withRepository, withPrimeDiagnosticLab), versionInfos);
     Bundle bundle = builder.build();
 
-    assertBundle(bundle, withRepository, WITH_PRIME_DIAGNOSTIC_LAB);
+    assertBundle(bundle, withRepository, withPrimeDiagnosticLab);
   }
 
   private void assertBundle(Bundle bundle, boolean withRepository, boolean withPrimeDiagnosticLab) {
@@ -263,6 +272,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(category.getCoding()).isNotNull().hasSize(1);
     Coding categoryCoding = category.getCoding().getFirst();
     assertThat(categoryCoding.getSystem()).isNotNull().isEqualTo(LOINC_ORG_SYSTEM);
+    assertThat(categoryCoding.getVersion()).isNotNull().isEqualTo(LOINC_VERSION);
     assertThat(categoryCoding.getDisplay()).isNotNull().isEqualTo("Laboratory report");
     assertThat(categoryCoding.getCode()).isNotNull().isEqualTo("11502-2");
 
@@ -281,6 +291,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(section.getCode().getCoding()).isNotNull().hasSize(1);
     Coding sectionCoding = section.getCode().getCoding().getFirst();
     assertThat(sectionCoding.getSystem()).isNotNull().isEqualTo(LOINC_ORG_SYSTEM);
+    assertThat(sectionCoding.getVersion()).isNotNull().isEqualTo(LOINC_VERSION);
     assertThat(sectionCoding.getDisplay()).isNotNull().isEqualTo("Laboratory report");
     assertThat(sectionCoding.getCode()).isNotNull().isEqualTo("11502-2");
 
@@ -290,6 +301,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(composition.getType().getCoding()).isNotNull().hasSize(1);
     Coding typeCoding = composition.getType().getCoding().getFirst();
     assertThat(typeCoding.getSystem()).isNotNull().isEqualTo(LOINC_ORG_SYSTEM);
+    assertThat(typeCoding.getVersion()).isNotNull().isEqualTo(LOINC_VERSION);
     assertThat(typeCoding.getDisplay()).isNotNull().isEqualTo("Infectious disease Note");
     assertThat(typeCoding.getCode()).isNotNull().isEqualTo("34782-3");
 
@@ -560,6 +572,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(specimen.getType().getCoding()).isNotNull().hasSize(1);
     Coding typeCoding = specimen.getType().getCoding().getFirst();
     assertThat(typeCoding.getSystem()).isNotNull().isEqualTo(SYSTEM_SNOMED);
+    assertThat(typeCoding.getVersion()).isNotNull().isEqualTo(SNOMED_VERSION);
     assertThat(typeCoding.getCode()).isNotNull().isEqualTo("258604001");
     assertThat(typeCoding.getDisplay())
         .isNotNull()
@@ -625,6 +638,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(observation.getCode()).isNotNull();
     Coding codeCoding = observation.getCode().getCoding().getFirst();
     assertThat(codeCoding.getSystem()).isNotNull().isEqualTo(LOINC_ORG_SYSTEM);
+    assertThat(codeCoding.getVersion()).isNotNull().isEqualTo(LOINC_VERSION);
     assertThat(codeCoding.getCode()).isNotNull().isEqualTo("41852-5");
 
     assertThat(observation.getSubject()).isNotNull();
@@ -637,6 +651,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(codeableConcept.getCoding()).isNotNull().hasSize(1);
     Coding valueCoding = codeableConcept.getCoding().getFirst();
     assertThat(valueCoding.getSystem()).isNotNull().isEqualTo(SYSTEM_SNOMED);
+    assertThat(valueCoding.getVersion()).isNotNull().isEqualTo(SNOMED_VERSION);
     assertThat(valueCoding.getCode()).isNotNull().isEqualTo("96741-4");
     assertThat(valueCoding.getDisplay())
         .isNotNull()
@@ -653,6 +668,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(observation.getMethod()).isNotNull();
     Coding methodCoding = observation.getMethod().getCoding().getFirst();
     assertThat(methodCoding.getSystem()).isNotNull().isEqualTo(SYSTEM_SNOMED);
+    assertThat(methodCoding.getVersion()).isNotNull().isEqualTo(SNOMED_VERSION);
     assertThat(methodCoding.getCode()).isNotNull().isEqualTo("117040002");
     assertThat(methodCoding.getDisplay())
         .isNotNull()
@@ -706,7 +722,8 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertThat(molecularSequence.getExtension().get(1).getValue().getClass())
         .isEqualTo(Coding.class);
     Coding extensionCoding = (Coding) molecularSequence.getExtension().get(1).getValue();
-    assertThat(extensionCoding.getSystem()).isNotNull().isEqualTo("http://snomed.info/sct");
+    assertThat(extensionCoding.getSystem()).isNotNull().isEqualTo(SYSTEM_SNOMED);
+    assertThat(extensionCoding.getVersion()).isNotNull().isEqualTo(SNOMED_VERSION);
     assertThat(extensionCoding.getCode()).isNotNull().isEqualTo("255226008");
     assertThat(molecularSequence.getExtension().get(2).getValue()).isNotNull();
     assertThat(molecularSequence.getExtension().get(2).getValue().getClass())
@@ -763,10 +780,9 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
       assertThat(repository.getExtension().get(2).getUrl())
           .isNotNull()
           .isEqualTo("https://demis.rki.de/fhir/igs/StructureDefinition/SequenceUploadStatus");
-      assertThat(repository.getExtension().get(2).getValue())
-          .isNotNull()
-          .extracting("system")
-          .isEqualTo("http://snomed.info/sct");
+      Type extensionValue = repository.getExtension().get(2).getValue();
+      assertThat(extensionValue).isNotNull().extracting("system").isEqualTo(SYSTEM_SNOMED);
+      assertThat(extensionValue).isNotNull().extracting("version").isEqualTo(SNOMED_VERSION);
       assertThat(repository.getExtension().get(2).getValue())
           .isNotNull()
           .extracting("code")
@@ -779,5 +795,40 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
       return fullUrl.substring(fullUrl.lastIndexOf("/") + 1);
     }
     return "";
+  }
+
+  @Test
+  void shouldThrowExceptionOnNoVersionInfos() {
+    IgsOverviewData igsOverviewData = getIgsTestOverviewData(true, true);
+    assertThatThrownBy(
+            () -> new ProcessNotificationSequenceRequestParametersBuilder(igsOverviewData, null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("VersionInfos must not be null");
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  void shouldThrowExceptionOnNoLoincVersion(String loincVersion) {
+    IgsOverviewData igsOverviewData = getIgsTestOverviewData(true, true);
+    VersionInfos versionInfos = new VersionInfos(loincVersion, SNOMED_VERSION);
+    assertThatThrownBy(
+            () ->
+                new ProcessNotificationSequenceRequestParametersBuilder(
+                    igsOverviewData, versionInfos))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("LOINC version must not be null or blank");
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  void shouldThrowExceptionOnNoSnomedVersion(String snomedVersion) {
+    IgsOverviewData igsOverviewData = getIgsTestOverviewData(true, true);
+    VersionInfos versionInfos = new VersionInfos(LOINC_VERSION, snomedVersion);
+    assertThatThrownBy(
+            () ->
+                new ProcessNotificationSequenceRequestParametersBuilder(
+                    igsOverviewData, versionInfos))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("SNOMED version must not be null or blank");
   }
 }

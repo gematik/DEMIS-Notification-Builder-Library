@@ -41,6 +41,7 @@ import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Patient;
@@ -53,6 +54,7 @@ public class PatientBuilder extends AbstractIgsResourceBuilder<Patient> {
 
   @Override
   public Optional<Patient> buildResource() {
+
     Patient patient = new Patient();
     patient.setMeta(
         MetaBuilder.builder().metaProfile(PROFILE_NOTIFIED_PERSON_ANONYMOUS).initialize().build());
@@ -60,7 +62,16 @@ public class PatientBuilder extends AbstractIgsResourceBuilder<Patient> {
     setAddress(patient);
     setBirthdate(patient);
     try {
-      patient.setGender(AdministrativeGender.fromCode(data.getHostSex()));
+      AdministrativeGender gender = AdministrativeGender.fromCode(data.getHostSex());
+      patient.setGender(gender);
+
+      if (Enumerations.AdministrativeGender.OTHER.equals(gender)) {
+        var extension = new Extension("http://fhir.de/StructureDefinition/gender-amtlich-de");
+        extension.setValue(
+            new Coding("http://fhir.de/CodeSystem/gender-amtlich-de", "D", "divers"));
+
+        patient.getGenderElement().addExtension(extension);
+      }
     } catch (FHIRException exception) {
       throw new InvalidInputDataException(exception.getMessage());
     }

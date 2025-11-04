@@ -11,6 +11,7 @@
     "coding": [
       {
         "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/11000274103/version/20241115",
         "code": "258604001",
         "display": "Upper respiratory swab specimen (specimen)"
       }

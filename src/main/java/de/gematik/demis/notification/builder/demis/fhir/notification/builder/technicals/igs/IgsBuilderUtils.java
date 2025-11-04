@@ -66,7 +66,24 @@ public class IgsBuilderUtils {
    */
   public static CodeableConcept generateCodeableConcept(
       String codingSystem, String codingCode, String codingDisplay) {
+    return generateCodeableConcept(codingSystem, codingCode, codingDisplay, null);
+  }
+
+  /**
+   * Generate a CodeableConcept with a single Coding
+   *
+   * @param codingSystem - the system of the coding
+   * @param codingCode - the code of the coding
+   * @param codingDisplay - the display of the coding
+   * @param codingSystemVersion - the version of the coding system
+   * @return the generated CodeableConcept
+   */
+  public static CodeableConcept generateCodeableConcept(
+      String codingSystem, String codingCode, String codingDisplay, String codingSystemVersion) {
     Coding codeCoding = new Coding(codingSystem, codingCode, codingDisplay);
+    if (codingSystemVersion != null && !codingSystemVersion.isBlank()) {
+      codeCoding.setVersion(codingSystemVersion);
+    }
     CodeableConcept codeCodingCodeableConcept = new CodeableConcept();
     codeCodingCodeableConcept.setCoding(List.of(codeCoding));
     return codeCodingCodeableConcept;

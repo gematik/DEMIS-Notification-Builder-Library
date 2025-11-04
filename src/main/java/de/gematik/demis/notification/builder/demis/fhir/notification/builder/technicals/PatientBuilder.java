@@ -108,10 +108,9 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
     if (gender != null) {
       patient.setGender(gender);
       if (Enumerations.AdministrativeGender.OTHER.equals(gender)) {
-        var extension =
-            new Extension("https://demis.rki.de/fhir/StructureDefinition/gender-amtlich-de");
+        var extension = new Extension("http://fhir.de/StructureDefinition/gender-amtlich-de");
         extension.setValue(
-            new Coding("https://demis.rki.de/fhir/CodeSystem/gender-amtlich-de", "D", null));
+            new Coding("http://fhir.de/CodeSystem/gender-amtlich-de", "D", "divers"));
 
         patient.getGenderElement().addExtension(extension);
       }

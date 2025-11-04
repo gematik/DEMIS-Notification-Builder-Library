@@ -21,6 +21,7 @@
     "coding": [
       {
         "system": "http://loinc.org",
+        "version": "2.79",
         "code": "41852-5"
       }
     ]
@@ -32,6 +33,7 @@
     "coding": [
       {
         "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/11000274103/version/20241115",
         "code": "96741-4",
         "display": "Severe acute respiratory syndrome coronavirus 2 (organism)"
       }
@@ -51,6 +53,7 @@
     "coding": [
       {
         "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/11000274103/version/20241115",
         "code": "117040002",
         "display": "Nucleic acid sequencing (procedure)"
       }
