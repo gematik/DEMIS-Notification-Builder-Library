@@ -129,22 +129,6 @@ class NotificationLaboratoryNonNominalDataBuilderTest {
   }
 
   @Test
-  void shouldCopyCategory() {
-    setup();
-    Composition originalComposition = createComposition();
-
-    final Composition result =
-        NotificationLaboratoryNonNominalDataBuilder.deepCopy(
-            originalComposition, notifierRole, notifiedPerson, diagnosticReport);
-    assertThat(result.getCategoryFirstRep().getCodingFirstRep().getSystem())
-        .isEqualTo("categorySystem");
-    assertThat(result.getCategoryFirstRep().getCodingFirstRep().getCode())
-        .isEqualTo("categoryCode");
-    assertThat(result.getCategoryFirstRep().getCodingFirstRep().getDisplay())
-        .isEqualTo("categoryDisplay");
-  }
-
-  @Test
   void shouldCopyDate() {
     setup();
     Composition originalComposition = createComposition();

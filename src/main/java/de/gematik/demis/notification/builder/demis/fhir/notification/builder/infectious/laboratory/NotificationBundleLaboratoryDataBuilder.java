@@ -26,18 +26,29 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.Bundles.*;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder.*;
+
+import com.google.common.collect.ImmutableSet;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nonnull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
+import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Specimen;
 
 /**
@@ -121,5 +132,62 @@ public class NotificationBundleLaboratoryDataBuilder extends BundleDataBuilder {
     if (this.notificationLaboratory != null) {
       addEntry(this.notificationLaboratory);
     }
+  }
+
+  public static Bundle createNonNominalExcerpt(@Nonnull final Bundle originalBundle) {
+    final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle.getEntry());
+
+    final Patient notifiedPerson =
+        NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(ctx.subject());
+
+    final PractitionerRole submitter = deepCopy73(ctx.submitter());
+    final PractitionerRole notifier = deepCopy73(ctx.notifier());
+
+    final ObservationCopyResult observationCopyResult =
+        copyObservations(ctx.observations(), notifiedPerson, submitter);
+    final ImmutableSet<Observation> observations = observationCopyResult.observations();
+    final ImmutableSet<Specimen> specimen = observationCopyResult.specimen();
+    final DiagnosticReport diagnosticReport =
+        LaboratoryReportDataBuilder.deepCopy(ctx.diagnosticReport(), notifiedPerson, observations);
+
+    final Composition composition =
+        NotificationLaboratoryNonNominalDataBuilder.excerptCopy(
+            ctx.composition(), notifier, notifiedPerson, diagnosticReport);
+
+    final NotificationBundleLaboratoryDataBuilder builder =
+        new NotificationBundleLaboratoryDataBuilder()
+            .setNotificationLaboratory(composition)
+            .setNotifiedPerson(notifiedPerson)
+            .setNotifierRole(notifier)
+            .setSubmitterRole(submitter)
+            .setLaboratoryReport(diagnosticReport)
+            .setPathogenDetection(observations)
+            .setSpecimen(specimen);
+
+    ctx.provenance().map(Provenance::copy).ifPresent(builder::addAdditionalEntry);
+
+    // Ensure this is called before builder.build()!
+    originalBundle.getMeta().getTag().forEach(builder::addTag);
+
+    final String originalBundleIdentifier = originalBundle.getIdentifier().getValue();
+    final Identifier newIdentifierForCopiedBundle =
+        new Identifier()
+            .setValue(Utils.generateUuidString())
+            .setSystem(DemisConstants.NAMING_SYSTEM_NOTIFICATION_BUNDLE_ID);
+
+    final Coding referenceTagToOriginalBundle =
+        new Coding(
+            DemisConstants.RELATED_NOTIFICATION_CODING_SYSTEM,
+            originalBundleIdentifier,
+            "Relates to message with identifier: " + originalBundleIdentifier);
+    return builder
+        .setId(originalBundle.getId())
+        .setProfileUrl(builder.getDefaultProfileUrl())
+        .setIdentifier(newIdentifierForCopiedBundle)
+        .setType(Bundle.BundleType.DOCUMENT)
+        .setTimestamp(originalBundle.getTimestamp())
+        .setLastUpdated(originalBundle.getMeta().getLastUpdated())
+        .addTag(referenceTagToOriginalBundle)
+        .build();
   }
 }

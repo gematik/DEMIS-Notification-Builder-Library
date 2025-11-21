@@ -42,11 +42,11 @@
       },
       "date": "2025-08-20T17:46:04+02:00",
       "author": [ {
-        "reference": "https://demis.rki.de/fhir/PractitionerRole/911a9ae4-9be6-4e89-9baf-64c81ef9e0ac"
+        "reference": "PractitionerRole/911a9ae4-9be6-4e89-9baf-64c81ef9e0ac"
       } ],
       "title": "Meldung gemäß §7 Absatz 3 IfSG",
       "section": [ {
-        "title": "disease",
+        "title": "Diagnose",
         "code": {
           "coding": [ {
             "system": "https://demis.rki.de/fhir/CodeSystem/sectionCode",
@@ -55,7 +55,7 @@
           } ]
         },
         "entry": [ {
-          "reference": "https://demis.rki.de/fhir/Condition/769ab003-adf6-4d3b-a157-21e6840b338b"
+          "reference": "Condition/769ab003-adf6-4d3b-a157-21e6840b338b"
         } ]
       }, {
         "title": "Meldetatbestandsspezifische klinische und epidemiologische Angaben",
@@ -67,7 +67,7 @@
           } ]
         },
         "entry": [ {
-          "reference": "https://demis.rki.de/fhir/QuestionnaireResponse/30db6591-2640-4b33-88c8-55ccfce7f78d"
+          "reference": "QuestionnaireResponse/30db6591-2640-4b33-88c8-55ccfce7f78d"
         } ]
       } ]
     }

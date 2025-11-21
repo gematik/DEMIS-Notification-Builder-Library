@@ -6,7 +6,7 @@
 
     <groupId>de.gematik.demis</groupId>
     <artifactId>notification-builder-library</artifactId>
-    <version>8.0.0</version>
+    <version>9.0.0</version>
     <packaging>jar</packaging>
     <name>notification-builder-library</name>
     <description>This project is used to generate example and test messages in various formats (including FHIR-json,
@@ -32,7 +32,7 @@
         <asm.version>9.9</asm.version>
         <surefire.plugin.version>3.5.4</surefire.plugin.version>
         <jacoco.plugin.version>0.8.13</jacoco.plugin.version>
-        <fhir.parser.lib.version>2.6.1</fhir.parser.lib.version>
+        <fhir.parser.lib.version>2.6.2</fhir.parser.lib.version>
         <ca.uhn.hapi.fhir.version>8.4.0</ca.uhn.hapi.fhir.version>
         <junit.version>6.0.1</junit.version>
         <slf4j.version>2.0.17</slf4j.version>

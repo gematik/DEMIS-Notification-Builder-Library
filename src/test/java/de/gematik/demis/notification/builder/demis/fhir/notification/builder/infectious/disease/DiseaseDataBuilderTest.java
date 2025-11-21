@@ -63,7 +63,7 @@ public final class DiseaseDataBuilderTest {
     Patient notifiedPerson = new Patient();
     DiseaseDataBuilder builder = createCvddBuilder();
     String note = "some note";
-    Condition actual = builder.setNotifiedPerson(notifiedPerson).setNote(note).build();
+    Condition actual = builder.setNotifiedPerson(notifiedPerson).addNote(note).build();
 
     // then
     assertThat(actual).isNotNull();

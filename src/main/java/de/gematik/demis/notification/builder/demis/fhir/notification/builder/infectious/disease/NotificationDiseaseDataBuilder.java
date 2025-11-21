@@ -32,6 +32,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.DISEASE_NOTIFICATION_TYPE_CODE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.DISEASE_NOTIFICATION_TYPE_DISPLAY;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_NOTIFICATION_ID;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NICHTNAMENTLICH;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_CODE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_DISPLAY;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_SYSTEM;
@@ -84,6 +85,19 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   @CheckForNull private QuestionnaireResponse commonQuestionnaireResponse;
   private QuestionnaireResponse specificQuestionnaireResponse;
   @CheckForNull private Composition.CompositionRelatesToComponent relatesTo;
+
+  @Nonnull
+  public static Composition excerptCopy(
+      @Nonnull final Composition original,
+      @Nonnull final Condition condition,
+      @Nonnull final Patient notifiedPerson,
+      @Nonnull final PractitionerRole notifier,
+      @Nonnull final QuestionnaireResponse specificQuestionnaireResponse) {
+    Composition composition =
+        deepCopy(original, condition, notifiedPerson, notifier, specificQuestionnaireResponse);
+    composition.setTitle(composition.getTitle() + NICHTNAMENTLICH);
+    return composition;
+  }
 
   @Nonnull
   public static Composition deepCopy(
@@ -314,7 +328,7 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   private void addDiseaseSection(Condition disease, Composition composition) {
     composition.addSection(
         new Composition.SectionComponent()
-            .setTitle("disease")
+            .setTitle("Diagnose")
             .setCode(
                 new CodeableConcept(new Coding(CODE_SYSTEM_SECTION_CODE, "diagnosis", "Diagnose")))
             .addEntry(new Reference(disease)));

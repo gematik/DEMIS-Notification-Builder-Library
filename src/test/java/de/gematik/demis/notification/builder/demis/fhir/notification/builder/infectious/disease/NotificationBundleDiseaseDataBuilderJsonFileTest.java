@@ -26,7 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.AnswerDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.CommonInformationDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.ItemDataBuilder;
@@ -135,11 +135,11 @@ class NotificationBundleDiseaseDataBuilderJsonFileTest {
             .setCountry("20422")
             .build();
     var notifiedPerson =
-        new NotifiedPersonDataBuilder()
-            .setDefaults()
+        new NotifiedPersonNominalDataBuilder()
+            .setDefault()
             .setId("5")
             .setGender(Enumerations.AdministrativeGender.FEMALE)
-            .setBirthdate("09.06.1999")
+            .setBirthdate(new DateType(1999, 5, 9))
             .setHumanName(name)
             .addAddress(address)
             .build();

@@ -30,17 +30,12 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.SYSTEM_SNOMED;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils.internalReference;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDate;
-import static java.util.Objects.requireNonNullElse;
 import static org.hl7.fhir.r4.model.Specimen.SpecimenStatus.AVAILABLE;
 import static org.hl7.fhir.r4.model.Specimen.SpecimenStatus.ENTEREDINERROR;
 import static org.hl7.fhir.r4.model.Specimen.SpecimenStatus.UNAVAILABLE;
 import static org.hl7.fhir.r4.model.Specimen.SpecimenStatus.UNSATISFACTORY;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -52,9 +47,7 @@ import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
-import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Specimen;
-import org.hl7.fhir.r4.model.Type;
 
 @Setter
 public class SpecimenDataBuilder {
@@ -67,28 +60,7 @@ public class SpecimenDataBuilder {
   private String typeDisplay;
   private String typeCodingVersion;
 
-  /**
-   * @deprecated Use {@code dateTimeElement} instead. This field uses {@link java.util.Date}, which
-   *     does not reliably preserve millisecond precision when serializing or deserializing FHIR
-   *     resources. For full precision and to ensure the original timestamp (including milliseconds)
-   *     is retained in FHIR JSON/XML, use the new {@link org.hl7.fhir.r4.model.DateTimeType} field
-   *     and set it via {@code setDateElement()}.
-   */
-  @Deprecated(forRemoval = true)
-  private Date collectedDate;
-
   private DateTimeType collectedDateTime;
-
-  /**
-   * @deprecated Use {@code dateTimeElement} instead. This field uses {@link java.util.Date}, which
-   *     does not reliably preserve millisecond precision when serializing or deserializing FHIR
-   *     resources. For full precision and to ensure the original timestamp (including milliseconds)
-   *     is retained in FHIR JSON/XML, use the new {@link org.hl7.fhir.r4.model.DateTimeType} field
-   *     and set it via {@code setDateElement()}.
-   */
-  @Deprecated(forRemoval = true)
-  private Date receivedTime;
-
   private DateTimeType receivedDateTime;
   private String metaProfileUrl;
   @CheckForNull private Patient notifiedPerson;
@@ -154,22 +126,14 @@ public class SpecimenDataBuilder {
       specimen.setSubject(internalReference(notifiedPerson));
     }
 
-    if (receivedDateTime != null) {
-      specimen.setReceivedTimeElement(receivedDateTime);
-    } else if (receivedTime != null) {
-      specimen.setReceivedTime(receivedTime);
-    }
+    specimen.setReceivedTimeElement(receivedDateTime);
 
     Specimen.SpecimenCollectionComponent specimenCollectionComponent =
         new Specimen.SpecimenCollectionComponent();
     if (submittingRole != null) {
       specimenCollectionComponent.setCollector(internalReference(submittingRole));
     }
-    if (collectedDateTime != null) {
-      specimenCollectionComponent.setCollected(collectedDateTime);
-    } else if (collectedDate != null) {
-      specimenCollectionComponent.setCollected(new DateTimeType(collectedDate));
-    }
+    specimenCollectionComponent.setCollected(collectedDateTime);
     specimen.setCollection(specimenCollectionComponent);
     specimen.setMeta(new Meta().addProfile(metaProfileUrl));
     specimen.setNote(notes);
@@ -213,55 +177,5 @@ public class SpecimenDataBuilder {
   public SpecimenDataBuilder setStatusToEnteredinerror() {
     specimenStatus = ENTEREDINERROR;
     return this;
-  }
-
-  @Deprecated(since = "1.2.1")
-  public Specimen buildSpecimen(Patient patient, PractitionerRole submittingRole) {
-
-    Coding coding = new Coding(typeSystem, typeCode, typeDisplay);
-
-    Specimen specimen = new Specimen();
-
-    specimen.setSubject(new Reference(patient));
-    specimen.setType(new CodeableConcept().addCoding(coding));
-    specimen.setReceivedTime(getCurrentDate());
-    Specimen.SpecimenCollectionComponent value = new Specimen.SpecimenCollectionComponent();
-
-    value.setCollector(new Reference(submittingRole));
-    Type collected = new DateTimeType(collectedDate);
-    value.setCollected(collected);
-
-    specimen.setCollection(value);
-    specimen.setId(specimenId);
-    specimen.setStatus(specimenStatus);
-
-    Meta meta = new Meta().addProfile(metaProfileUrl);
-    specimen.setMeta(meta);
-
-    specimen.setReceivedTime(receivedTime);
-
-    return specimen;
-  }
-
-  @Deprecated(since = "1.2.1")
-  public SpecimenDataBuilder addSpecimenId() {
-    return setSpecimenId(generateUuidString());
-  }
-
-  public Specimen buildExampleSpecimen(Patient patient, PractitionerRole submittingRole) {
-
-    specimenId = requireNonNullElse(specimenId, generateUuidString());
-    specimenStatus = requireNonNullElse(specimenStatus, AVAILABLE);
-
-    typeSystem = requireNonNullElse(typeSystem, "http://snomed.info/sct");
-    typeCode = requireNonNullElse(typeCode, "309164002");
-    typeDisplay = requireNonNullElse(typeDisplay, "Upper respiratory swab sample (specimen)");
-
-    LocalDate localDate = LocalDate.of(1980, 1, 1);
-    collectedDate =
-        requireNonNullElse(
-            collectedDate, Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-
-    return buildSpecimen(patient, submittingRole);
   }
 }

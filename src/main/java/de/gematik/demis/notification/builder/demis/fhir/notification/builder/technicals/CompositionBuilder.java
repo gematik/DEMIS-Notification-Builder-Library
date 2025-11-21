@@ -30,12 +30,11 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_DISPLAY;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_STANDARD_TYPE_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDate;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDateTime;
 import static org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.APPENDS;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.CheckForNull;
 import lombok.Getter;
@@ -60,37 +59,6 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
   @CheckForNull private PractitionerRole notifierRole;
   private Composition.CompositionStatus compositionStatus;
   private List<Extension> extensions;
-
-  /**
-   * @deprecated the strict profiles for laboratory notifications will not allow the use of
-   *     composition cateogry. so it can be removed from the builders
-   */
-  @Deprecated(forRemoval = true)
-  private String codeAndCategorySystem;
-
-  /**
-   * @deprecated the strict profiles for laboratory notifications will not allow the use of
-   *     composition cateogry. so it can be removed from the builders
-   */
-  @Deprecated(forRemoval = true)
-  private String codeAndCategoryCode;
-
-  /**
-   * @deprecated the strict profiles for laboratory notifications will not allow the use of
-   *     composition cateogry. so it can be removed from the builders
-   */
-  @Deprecated(forRemoval = true)
-  private String codeAndCategoryDisplay;
-
-  /**
-   * @deprecated Use {@code dateTimeElement} instead. This field uses {@link java.util.Date}, which
-   *     does not reliably preserve millisecond precision when serializing or deserializing FHIR
-   *     resources. For full precision and to ensure the original timestamp (including milliseconds)
-   *     is retained in FHIR JSON/XML, use the new {@link org.hl7.fhir.r4.model.DateTimeType} field
-   *     and set it via {@code setDateElement()}.
-   */
-  @Deprecated(forRemoval = true)
-  private Date date;
 
   /**
    * Stores the exact FHIR date/time value, including milliseconds, as a {@link DateTimeType}.
@@ -166,34 +134,6 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
     return (T) this;
   }
 
-  public T setCodeAndCategorySystem(String codeAndCategorySystem) {
-    this.codeAndCategorySystem = codeAndCategorySystem;
-    return (T) this;
-  }
-
-  public T setCodeAndCategoryCode(String codeAndCategoryCode) {
-    this.codeAndCategoryCode = codeAndCategoryCode;
-    return (T) this;
-  }
-
-  public T setCodeAndCategoryDisplay(String codeAndCategoryDisplay) {
-    this.codeAndCategoryDisplay = codeAndCategoryDisplay;
-    return (T) this;
-  }
-
-  /**
-   * @deprecated Use {@link #setDateTimeType(DateTimeType)} instead. Setting the date using a {@link
-   *     java.util.Date} does not guarantee preservation of millisecond precision when serializing
-   *     or deserializing FHIR resources. To ensure the exact timestamp (including milliseconds) is
-   *     retained in the FHIR output, use {@code setDateElement(DateTimeType)} with a {@link
-   *     DateTimeType} value.
-   */
-  @Deprecated(forRemoval = true)
-  public T setDate(Date date) {
-    this.date = date;
-    return (T) this;
-  }
-
   public T setDateTimeType(DateTimeType dateTimeType) {
     this.dateTimeElement = dateTimeType;
     return (T) this;
@@ -222,7 +162,7 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
     typeSystem = NOTIFICATION_STANDARD_TYPE_SYSTEM;
     typeCode = NOTIFICATION_STANDARD_TYPE_CODE;
     typeDisplay = NOTIFICATION_STANDARD_TYPE_DISPLAY;
-    date = getCurrentDate();
+    dateTimeElement = getCurrentDateTime();
     identifierValue = generateUuidString();
     notificationId = generateUuidString();
 
@@ -242,18 +182,7 @@ public abstract class CompositionBuilder<T extends CompositionBuilder> {
     }
     newComposition.setMeta(new Meta().addProfile(metaUrl));
 
-    if (codeAndCategorySystem != null && codeAndCategoryCode != null) {
-      Coding codeAndCategroyCoding =
-          new Coding(codeAndCategorySystem, codeAndCategoryCode, codeAndCategoryDisplay);
-      CodeableConcept categoryCodeableConcept = new CodeableConcept(codeAndCategroyCoding);
-      newComposition.addCategory(categoryCodeableConcept);
-    }
-
-    if (dateTimeElement != null) {
-      newComposition.setDateElement(dateTimeElement);
-    } else if (date != null) {
-      newComposition.setDate(date);
-    }
+    newComposition.setDateElement(dateTimeElement);
 
     Coding typeCoding = new Coding(typeSystem, typeCode, typeDisplay);
     CodeableConcept typeCodeableConcept = new CodeableConcept(typeCoding);

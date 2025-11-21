@@ -32,6 +32,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -72,18 +73,19 @@ public class DiseaseDataBuilder implements InitializableFhirObjectBuilder {
    */
   @Nonnull
   public static Condition deepCopy(
-      @Nonnull final Condition condition, @Nonnull final Patient notifiedPerson) {
-    final Coding verificationStatus = condition.getVerificationStatus().getCodingFirstRep().copy();
-    final Coding clinicalStatus = condition.getClinicalStatus().getCodingFirstRep().copy();
-    final Coding disease = condition.getCode().getCodingFirstRep().copy();
+      @Nonnull final Condition orginialCondition, @Nonnull final Patient notifiedPerson) {
+    final Coding verificationStatus =
+        orginialCondition.getVerificationStatus().getCodingFirstRep().copy();
+    final Coding clinicalStatus = orginialCondition.getClinicalStatus().getCodingFirstRep().copy();
+    final Coding disease = orginialCondition.getCode().getCodingFirstRep().copy();
     final List<Coding> evidence =
-        condition.getEvidence().stream()
+        orginialCondition.getEvidence().stream()
             .flatMap(e -> e.getCode().stream())
             .flatMap(concept -> concept.getCoding().stream())
             .map(Coding::copy)
             .toList();
 
-    final Set<String> profiles = Metas.profilesFrom(condition);
+    final Set<String> profiles = Metas.profilesFrom(orginialCondition);
     final DiseaseDataBuilder diseaseDataBuilder =
         new DiseaseDataBuilder()
             // we assume the caller has verified the correctness of the condition, we can't take
@@ -92,13 +94,15 @@ public class DiseaseDataBuilder implements InitializableFhirObjectBuilder {
             .setNotifiedPerson(notifiedPerson)
             .setVerificationStatus(verificationStatus)
             .setClinicalStatus(clinicalStatus)
-            .setRecordedDate(condition.getRecordedDateElement())
+            .setRecordedDate(orginialCondition.getRecordedDateElement())
             .setDisease(disease)
-            .setId(condition.getId())
-            .setOnset(condition.getOnsetDateTimeType())
+            .setId(Utils.getShortReferenceOrUrnUuid(orginialCondition))
+            .setOnset(orginialCondition.getOnsetDateTimeType())
             .setEvidences(evidence);
 
-    condition.getNote().stream().map(Annotation::getText).forEach(diseaseDataBuilder::addNote);
+    orginialCondition.getNote().stream()
+        .map(Annotation::getText)
+        .forEach(diseaseDataBuilder::addNote);
 
     return diseaseDataBuilder.build();
   }
@@ -262,19 +266,6 @@ public class DiseaseDataBuilder implements InitializableFhirObjectBuilder {
     if (StringUtils.isNotBlank(this.profileUrl)) {
       condition.setMeta(new Meta().addProfile(this.profileUrl));
     }
-  }
-
-  /**
-   * Add note to condition
-   *
-   * @param note note
-   * @return builder
-   * @deprecated use {@link #addNote(String)} instead
-   */
-  @Deprecated(forRemoval = true)
-  public DiseaseDataBuilder setNote(String note) {
-    addNote(note);
-    return this;
   }
 
   /**

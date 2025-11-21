@@ -80,7 +80,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
             "https://demis.rki.de/fhir/StructureDefinition/NotificationBundleLaboratoryNonNominal");
   }
 
-  private Bundle createBundle() {
+  private Bundle create73Bundle() {
     try {
       final String source =
           Files.readString(Path.of("src/test/resources/laboratory/73-nonnominal.json"));
@@ -94,7 +94,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
   @Test
   void shouldCopyMetaProfileUrl() {
-    Bundle originalBundle = createBundle();
+    Bundle originalBundle = create73Bundle();
 
     final Bundle result =
         NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
@@ -105,7 +105,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
   @Test
   void shouldCopyMetaTags() {
-    Bundle originalBundle = createBundle();
+    Bundle originalBundle = create73Bundle();
 
     final Bundle result =
         NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
@@ -116,7 +116,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
   @Test
   void shouldCopyIdentifier() {
-    Bundle originalBundle = createBundle();
+    Bundle originalBundle = create73Bundle();
 
     final Bundle result =
         NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
@@ -127,7 +127,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
   @Test
   void shouldCopyType() {
-    Bundle originalBundle = createBundle();
+    Bundle originalBundle = create73Bundle();
     final Bundle result =
         NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
     assertThat(result.getType()).isEqualTo(Bundle.BundleType.DOCUMENT);
@@ -135,7 +135,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
   @Test
   void shouldCopyLastUpdated() {
-    Bundle originalBundle = createBundle();
+    Bundle originalBundle = create73Bundle();
     Date lastUpdated = originalBundle.getMeta().getLastUpdated();
 
     final Bundle result =
@@ -145,7 +145,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
   @Test
   void shouldCopyTimestamp() {
-    Bundle originalBundle = createBundle();
+    Bundle originalBundle = create73Bundle();
     Date timestamp = originalBundle.getTimestamp();
 
     final Bundle result =
@@ -216,6 +216,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
     try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
       utilities.when(Utils::getCurrentDate).thenReturn(TestObjects.mockDate());
       utilities.when(() -> Utils.getShortReferenceOrUrnUuid(Mockito.any())).thenCallRealMethod();
+      utilities.when(Utils::generateUuidString).thenReturn("someMockedUuid");
       final IParser iParser = FhirContext.forR4().newJsonParser();
       iParser.setPrettyPrint(true);
 
@@ -240,6 +241,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
     try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
       utilities.when(Utils::getCurrentDate).thenReturn(TestObjects.mockDate());
       utilities.when(() -> Utils.getShortReferenceOrUrnUuid(Mockito.any())).thenCallRealMethod();
+      utilities.when(Utils::generateUuidString).thenReturn("804af4e1-6974-4b7a-a4f2-8c5d8cfbc9b0");
 
       final String source =
           Files.readString(
@@ -283,6 +285,8 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
   void shouldNotCopyNotifiedPersonFacility() throws IOException {
     try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
       utilities.when(Utils::getCurrentDate).thenReturn(TestObjects.mockDate());
+      utilities.when(Utils::generateUuidString).thenReturn("804af4e1-6974-4b7a-a4f2-8c5d8cfbc9b0");
+      utilities.when(() -> Utils.getShortReferenceOrUrnUuid(Mockito.any())).thenCallRealMethod();
       final String source =
           Files.readString(Path.of("src/test/resources/laboratory/73-other-facility-case.json"));
 

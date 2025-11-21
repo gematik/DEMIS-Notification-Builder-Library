@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Type;
 
 public final class Utils {
@@ -47,6 +48,10 @@ public final class Utils {
 
   public static Date getCurrentDate() {
     return new Date();
+  }
+
+  public static DateTimeType getCurrentDateTime() {
+    return new DateTimeType(new Date());
   }
 
   @Nonnull

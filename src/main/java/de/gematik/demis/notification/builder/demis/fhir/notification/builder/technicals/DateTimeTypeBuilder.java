@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.hl7.fhir.r4.model.DateTimeType;
 
 @Setter
@@ -92,7 +93,7 @@ public class DateTimeTypeBuilder implements FhirObjectBuilder {
   }
 
   private static boolean isIso8601(String dateTime) {
-    return StringUtils.containsAny(dateTime, "T", "+", "-");
+    return Strings.CS.containsAny(dateTime, "T", "+", "-");
   }
 
   private static void parseGermanLocalDateTime(String dateTime, DateTimeType fhirTimestamp) {

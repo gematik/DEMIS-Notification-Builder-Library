@@ -31,7 +31,6 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.SYSTEM_SNOMED;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils.internalReference;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
-import static java.util.Objects.requireNonNullElse;
 
 import javax.annotation.CheckForNull;
 import lombok.Setter;
@@ -42,7 +41,6 @@ import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Quantity;
-import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Specimen;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Type;
@@ -237,101 +235,5 @@ public class PathogenDetectionDataBuilder {
     observation.addNote(note);
 
     return observation;
-  }
-
-  @Deprecated(since = "1.2.1")
-  public Observation buildPathogenDetection(Patient notifiedPerson, Specimen specimen) {
-    Observation observation = new Observation();
-    observation.setStatus(status);
-
-    observation.setSubject(new Reference(notifiedPerson));
-    observation.setSpecimen(new Reference(specimen));
-    observation.setId(pathogenDetectionId);
-    observation.setStatus(status);
-
-    observation.setMeta(new Meta().addProfile(profileUrl));
-
-    observation.setValue(value);
-
-    CodeableConcept codeableConceptLaboratory = new CodeableConcept();
-    codeableConceptLaboratory.addCoding(new Coding(categorySystem, categoryCode, categoryDisplay));
-    observation.addCategory(codeableConceptLaboratory);
-
-    CodeableConcept codeableCOnceptInterpretation = new CodeableConcept();
-    codeableCOnceptInterpretation.addCoding(
-        new Coding(interpretationSystem, interpretationCode, interpretationDisplay));
-    observation.addInterpretation(codeableCOnceptInterpretation);
-
-    Coding coding = new Coding(observationCodeSystem, observationCodeCode, observationCodeDisplay);
-    observation.setCode(new CodeableConcept().addCoding(coding));
-
-    CodeableConcept codeableConceptMethod = new CodeableConcept();
-    codeableConceptMethod.addCoding(new Coding(methodSystem, methodCode, methodDisplay));
-    observation.setMethod(codeableConceptMethod);
-
-    return observation;
-  }
-
-  @Deprecated(since = "1.2.1")
-  public Observation buildExamplePathogenDetection(Patient notifiedPerson, Specimen specimen) {
-
-    checkAndSetOberservationCode();
-    checkAndSetCategoryCode();
-    checkAndSetInterpretationCode();
-    checkAndSetMethodCode();
-    checkAndSetValueCode();
-
-    pathogenDetectionId = requireNonNullElse(pathogenDetectionId, generateUuidString());
-    status = Observation.ObservationStatus.FINAL;
-
-    return buildPathogenDetection(notifiedPerson, specimen);
-  }
-
-  @Deprecated(since = "1.2.1")
-  private void checkAndSetValueCode() {
-
-    valueSystem = requireNonNullElse(valueSystem, "http://loinc.org");
-    valueCode = requireNonNullElse(valueCode, "100156-9");
-    valueDisplay =
-        requireNonNullElse(
-            valueDisplay,
-            "SARS-CoV-2 (COVID-19) variant [Type] in Specimen by NAA with probe detection");
-  }
-
-  @Deprecated(since = "1.2.1")
-  private void checkAndSetCategoryCode() {
-    categorySystem = requireNonNullElse(categorySystem, LABORATORY_CATEGORY_SYSTEM);
-    categoryCode = requireNonNullElse(categoryCode, LABORATORY_CATEGORY_CODE);
-    categoryDisplay = requireNonNullElse(categoryDisplay, LABORATORY_CATEGORY_DISPLAY);
-  }
-
-  @Deprecated(since = "1.2.1")
-  private void checkAndSetOberservationCode() {
-    observationCodeSystem = requireNonNullElse(observationCodeSystem, "http://loinc.org");
-    observationCodeCode = requireNonNullElse(observationCodeCode, "100156-9");
-    observationCodeDisplay =
-        requireNonNullElse(
-            observationCodeDisplay,
-            "ARS-CoV-2 (COVID-19) variant [Type] in Specimen by NAA with probe detection");
-  }
-
-  @Deprecated(since = "1.2.1")
-  private void checkAndSetInterpretationCode() {
-    interpretationSystem =
-        requireNonNullElse(interpretationSystem, OBSERVATION_INTERPRETATION_SYSTEM);
-    interpretationCode = requireNonNullElse(interpretationCode, "POS");
-    interpretationDisplay = requireNonNullElse(interpretationDisplay, "Positive");
-  }
-
-  @Deprecated(since = "1.2.1")
-  private void checkAndSetMethodCode() {
-    methodSystem = requireNonNullElse(methodSystem, "http://snomed.info/sct");
-    methodCode = requireNonNullElse(methodCode, "398545005");
-    methodDisplay = requireNonNullElse(methodDisplay, "Nucleic acid assay (procedure)");
-  }
-
-  @Deprecated(since = "1.2.1")
-  public PathogenDetectionDataBuilder addId() {
-    return setPathogenDetectionId(generateUuidString());
   }
 }

@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NICHTNAMENTLICH;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_7_3_COMPOSITION_TITLE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_LABORATORY_NON_NOMINAL;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.RECEPTION_TIME_STAMP_TYPE;
@@ -38,6 +39,16 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 
 public class NotificationLaboratoryNonNominalDataBuilder extends NotificationLaboratoryDataBuilder {
+
+  public static Composition excerptCopy(
+      @Nonnull final Composition original,
+      @Nonnull final PractitionerRole author,
+      @Nonnull final Patient subject,
+      @Nonnull final DiagnosticReport diagnosticReport) {
+    Composition composition = deepCopy(original, author, subject, diagnosticReport);
+    composition.setTitle(composition.getTitle() + NICHTNAMENTLICH);
+    return composition;
+  }
 
   public static Composition deepCopy(
       @Nonnull final Composition original,

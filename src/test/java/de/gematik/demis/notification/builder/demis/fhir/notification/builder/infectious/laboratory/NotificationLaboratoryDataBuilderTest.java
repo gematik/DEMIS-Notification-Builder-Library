@@ -137,25 +137,6 @@ class NotificationLaboratoryDataBuilderTest {
   }
 
   @Test
-  void shoudlSetCodeAndCategoryAsGiven() {
-
-    notificationLaboratoryDataBuilder.setCodeAndCategoryCode("codeAndCategoryCode");
-    notificationLaboratoryDataBuilder.setCodeAndCategorySystem("codeAndCategorySystem");
-    notificationLaboratoryDataBuilder.setCodeAndCategoryDisplay("codeAndCategoryDisplay");
-
-    Composition composition = notificationLaboratoryDataBuilder.build();
-
-    assertThat(composition.getCategory()).hasSize(1);
-    assertThat(composition.getCategory().get(0).getCoding()).hasSize(1);
-    assertThat(composition.getCategory().get(0).getCoding().get(0).getCode())
-        .isEqualTo("codeAndCategoryCode");
-    assertThat(composition.getCategory().get(0).getCoding().get(0).getSystem())
-        .isEqualTo("codeAndCategorySystem");
-    assertThat(composition.getCategory().get(0).getCoding().get(0).getDisplay())
-        .isEqualTo("codeAndCategoryDisplay");
-  }
-
-  @Test
   void shoudlSetIdentifierSystemAndValue() {
 
     notificationLaboratoryDataBuilder.setIdentifierSystem("identifierSystem");

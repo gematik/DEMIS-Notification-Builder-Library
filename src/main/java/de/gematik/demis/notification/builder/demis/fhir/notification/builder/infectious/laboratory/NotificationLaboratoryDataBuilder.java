@@ -30,13 +30,9 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LOINC_ORG_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NOTIFICATION_ID_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_LABORATORY;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDate;
-import static java.util.Objects.requireNonNullElse;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.CompositionBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.RelatesToBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import java.util.List;
 import javax.annotation.CheckForNull;
@@ -47,7 +43,6 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Reference;
@@ -76,8 +71,6 @@ public class NotificationLaboratoryDataBuilder
     return this;
   }
 
-  // In NotificationLaboratoryDataBuilder.java
-
   protected void deepCopyFields(
       @Nonnull final Composition original,
       @Nonnull final PractitionerRole author,
@@ -86,7 +79,6 @@ public class NotificationLaboratoryDataBuilder
     setDefault();
     setNotificationId(original.getIdElement().getIdPart());
     setTypeCode(original.getType().getCodingFirstRep());
-    setCategoryCode(original.getCategoryFirstRep().getCodingFirstRep());
     setIdentifierSystem(original.getIdentifier().getSystem());
     setIdentifierValue(original.getIdentifier().getValue());
     setCompositionStatus(original.getStatus());
@@ -147,12 +139,6 @@ public class NotificationLaboratoryDataBuilder
         .setTypeSystem(type.getSystem());
   }
 
-  protected NotificationLaboratoryDataBuilder setCategoryCode(final Coding category) {
-    return this.setCodeAndCategoryCode(category.getCode())
-        .setCodeAndCategoryDisplay(category.getDisplay())
-        .setCodeAndCategorySystem(category.getSystem());
-  }
-
   protected NotificationLaboratoryDataBuilder setSectionCode(final Coding section) {
     return this.setSectionComponentCode(section.getCode())
         .setSectionComponentDisplay(section.getDisplay())
@@ -162,145 +148,5 @@ public class NotificationLaboratoryDataBuilder
   @Override
   protected String getDefaultProfileUrl() {
     return PROFILE_NOTIFICATION_LABORATORY;
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  public Composition buildNotificationLaboratory(
-      Patient notifiedPerson, PractitionerRole notifierRole, DiagnosticReport laboratoryReport) {
-    Composition newComposition = new Composition();
-    newComposition.setId(getNotificationId());
-    newComposition.setStatus(getCompositionStatus());
-
-    Composition.SectionComponent sectionComponent =
-        setMandatoryFields(notifiedPerson, notifierRole, laboratoryReport, newComposition);
-
-    Coding codeAndCategroyCoding =
-        new Coding(
-            getCodeAndCategorySystem(), getCodeAndCategoryCode(), getCodeAndCategoryDisplay());
-    CodeableConcept categoryCodeableConcept = new CodeableConcept(codeAndCategroyCoding);
-    newComposition.addCategory(categoryCodeableConcept);
-    sectionComponent.setCode(categoryCodeableConcept);
-
-    newComposition.setMeta(new Meta().addProfile(DemisConstants.PROFILE_NOTIFICATION_LABORATORY));
-    newComposition.setDate(getDate());
-    newComposition.setTitle(getTitle());
-
-    Identifier compositionIdentifier =
-        new Identifier().setSystem(getIdentifierSystem()).setValue(getIdentifierValue());
-    newComposition.setIdentifier(compositionIdentifier);
-
-    Coding typeCoding = new Coding(getTypeSystem(), getTypeCode(), getTypeDisplay());
-    CodeableConcept typeCodeableConcept = new CodeableConcept(typeCoding);
-    newComposition.setType(typeCodeableConcept);
-
-    return newComposition;
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  public Composition buildExampleComposition(
-      Patient notifiedPerson, PractitionerRole notifierRole, DiagnosticReport laboratoryReport) {
-    setNotificationId(requireNonNullElse(getNotificationId(), generateUuidString()));
-    setExampleCompositionStatus();
-    setExampleType();
-    setExampleCodeAndCategory();
-    setExampleIdentifier();
-    setDate(requireNonNullElse(getDate(), getCurrentDate()));
-    setTitle(requireNonNullElse(getTitle(), "Erregernachweismeldung"));
-    return buildNotificationLaboratory(notifiedPerson, notifierRole, laboratoryReport);
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  public NotificationLaboratoryDataBuilder addIdentifier() {
-    return addIdentifier(
-        generateUuidString(), "https://demis.rki.de/fhir/NamingSystem/NotificationId");
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  private NotificationLaboratoryDataBuilder addIdentifier(String value, String system) {
-    setIdentifierSystem(system);
-    setIdentifierValue(value);
-    return this;
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  private void setExampleIdentifier() {
-    setIdentifierSystem(
-        requireNonNullElse(
-            getIdentifierSystem(), "https://demis.rki.de/fhir/NamingSystem/NotificationId"));
-    setIdentifierValue(requireNonNullElse(getIdentifierValue(), generateUuidString()));
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  private void setExampleCodeAndCategory() {
-    setCodeAndCategorySystem(requireNonNullElse(getCodeAndCategorySystem(), "http://loinc.org"));
-    setCodeAndCategoryCode(requireNonNullElse(getCodeAndCategoryCode(), "11502-2"));
-    setCodeAndCategoryDisplay(requireNonNullElse(getCodeAndCategoryDisplay(), "Laboratory report"));
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  private void setExampleType() {
-    setTypeSystem(requireNonNullElse(getTypeSystem(), "http://loinc.org"));
-    setTypeCode(requireNonNullElse(getTypeCode(), "34782-3"));
-    setTypeDisplay(requireNonNullElse(getTypeDisplay(), "Infectious disease Note"));
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  private Composition.SectionComponent setMandatoryFields(
-      Patient notifiedPerson,
-      PractitionerRole notifierRole,
-      DiagnosticReport laboratoryReport,
-      Composition newComposition) {
-    newComposition.setSubject(new Reference(notifiedPerson));
-    newComposition.addAuthor(new Reference(notifierRole));
-    Reference laboratoryReportReference = new Reference(laboratoryReport);
-    Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
-    sectionComponent.addEntry(laboratoryReportReference);
-    sectionComponent.setCode(
-        new CodeableConcept(
-            new Coding(sectionComponentSystem, sectionComponentCode, sectionComponentDisplay)));
-    newComposition.addSection(sectionComponent);
-    return sectionComponent;
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  private void setExampleCompositionStatus() {
-    setCompositionStatus(
-        requireNonNullElse(getCompositionStatus(), Composition.CompositionStatus.FINAL));
-  }
-
-  /**
-   * @deprecated will be removed. new structure for builder incoming.
-   */
-  @Deprecated(since = "1.2.1")
-  public NotificationLaboratoryDataBuilder addNotificationLaboratoryId() {
-    setNotificationId(generateUuidString());
-    return this;
   }
 }

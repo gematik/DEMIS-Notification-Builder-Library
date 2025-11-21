@@ -30,7 +30,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_BUNDLE_DISEASE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.CommonInformationDataBuilderTest;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.SpecificInformationDataBuilderTest;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.HumanNameDataBuilder;
@@ -99,10 +99,7 @@ class NotificationBundleDiseaseDataBuilderDynamicTest {
 
   private PractitionerRole setPractitionerRole() {
     HumanName name =
-        new HumanNameDataBuilder()
-            .addGivenName("Paul")
-            .setFamilyName("Practitioneer")
-            .buildHumanName();
+        new HumanNameDataBuilder().addGivenName("Paul").setFamilyName("Practitioneer").build();
     Practitioner practitioner =
         new PractitionerBuilder()
             .setPractitionerName(name)
@@ -117,12 +114,9 @@ class NotificationBundleDiseaseDataBuilderDynamicTest {
 
   private Patient setNotifiedPerson() {
     HumanName name =
-        new HumanNameDataBuilder()
-            .addGivenName("Markus")
-            .setFamilyName("Musterpatient")
-            .buildHumanName();
+        new HumanNameDataBuilder().addGivenName("Markus").setFamilyName("Musterpatient").build();
     Patient notifiedPerson =
-        new NotifiedPersonDataBuilder().setDefaults().setHumanName(name).build();
+        new NotifiedPersonNominalDataBuilder().setDefault().setHumanName(name).build();
     this.builder.setNotifiedPerson(notifiedPerson);
     return notifiedPerson;
   }

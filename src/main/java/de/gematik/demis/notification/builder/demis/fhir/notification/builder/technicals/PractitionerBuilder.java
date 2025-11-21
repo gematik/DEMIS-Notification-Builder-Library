@@ -55,6 +55,7 @@ public class PractitionerBuilder implements InitializableFhirObjectBuilder {
   private boolean isNotifierPrac = false;
 
   private String metaProfileUrl;
+  private List<Identifier> identifier;
 
   /**
    * sets all relevant notifier data
@@ -94,6 +95,7 @@ public class PractitionerBuilder implements InitializableFhirObjectBuilder {
     practitioner.setTelecom(telecomList);
     practitioner.addAddress(address);
     practitioner.setActive(active);
+    practitioner.setIdentifier(identifier);
     if (isNotifierPrac && salutationCode != null) {
       Extension t = new Extension(SALUTATION_SYSTEM);
       t.setValue(new Coding(SALUTATION_SYSTEM, salutationCode, salutationDisplay));

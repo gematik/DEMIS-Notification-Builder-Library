@@ -33,15 +33,12 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.SYSTEM_SNOMED;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils.internalReference;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDate;
 import static java.util.Collections.singletonList;
-import static java.util.Objects.requireNonNullElse;
 import static org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.AMENDED;
 import static org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.CORRECTED;
 import static org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.FINAL;
 import static org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.PRELIMINARY;
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -150,61 +147,6 @@ public class LaboratoryReportDataBuilder {
     return List.of(newBasedOn);
   }
 
-  /**
-   * based on <a href="https://simplifier.net/rki.demis.laboratory/laboratoryreport">simplifier
-   * laboratory report in rki.demis.laboratory</a>
-   *
-   * @param diagnosticReport
-   * @return
-   */
-  public LaboratoryReportDataBuilder copyOf(final DiagnosticReport diagnosticReport) {
-
-    // meta
-    this.metaProfileUrl = diagnosticReport.getMeta().getProfile().getFirst().getValueAsString();
-
-    // extension -> reason for testing
-    Extension extensionByUrl = diagnosticReport.getExtensionByUrl(REASON_CODE_EXTENSION_URL);
-    if (extensionByUrl != null) {
-      extensionList.add(new Extension(extensionByUrl.getUrl()).setValue(extensionByUrl.getValue()));
-    }
-    //    identifier
-    // is left out on purpose. field is not must support or mandatory
-
-    // based on
-    if (!diagnosticReport.getBasedOn().isEmpty()) {
-      Reference basedOnFirstRep = diagnosticReport.getBasedOnFirstRep();
-      Identifier oldIdentifier = basedOnFirstRep.getIdentifier();
-      Identifier value =
-          new Identifier().setSystem(oldIdentifier.getSystem()).setValue(oldIdentifier.getValue());
-      Reference newBasedOn =
-          new Reference().setType(basedOnFirstRep.getType()).setIdentifier(value);
-      basedOnReferenceList.add(newBasedOn);
-    }
-    // status
-    this.status = diagnosticReport.getStatus();
-    // code
-    Coding code = diagnosticReport.getCode().getCodingFirstRep();
-    this.codeCode = code.getCode();
-    this.codeSystem = code.getSystem();
-    this.codeDisplay = code.getDisplay();
-    // subject
-    //    needs to be added later
-    // issued
-    issued = diagnosticReport.getIssued();
-    // result
-    //    needs to be added later
-    // conclusion Text
-    if (diagnosticReport.getConclusion() != null) {
-      this.conclusion = diagnosticReport.getConclusion();
-    }
-    // conclusionCode
-    Coding conclusionCode = diagnosticReport.getConclusionCode().getFirst().getCodingFirstRep();
-    this.conclusionCodeCode = conclusionCode.getCode();
-    this.conclusionCodeSystem = conclusionCode.getSystem();
-    this.conclusionCodeDisplay = conclusionCode.getDisplay();
-    return this;
-  }
-
   public LaboratoryReportDataBuilder setReportStatusToPreliminary() {
     status = PRELIMINARY;
     return this;
@@ -250,6 +192,7 @@ public class LaboratoryReportDataBuilder {
     codeSystem = CODE_SYSTEM_NOTIFICATION_CATEGORY;
     conclusionCodeSystem = CONCLUSION_CODE_SYSTEM;
     laboratoryId = generateUuidString();
+    issued = new Date();
     return this;
   }
 
@@ -314,145 +257,11 @@ public class LaboratoryReportDataBuilder {
     return diagnosticReport;
   }
 
-  /**
-   * @param notifiedPerson
-   * @param pathogenDetection
-   * @return
-   * @deprecated please use {@link #build()} instead.
-   */
-  @Deprecated(since = "1.2.1")
-  public DiagnosticReport buildLaboratoryReport(
-      Patient notifiedPerson, Observation pathogenDetection) {
-    return buildLaboratoryReport(notifiedPerson, singletonList(pathogenDetection));
-  }
-
-  /**
-   * @param notifiedPerson
-   * @param pathogenDetectionList
-   * @return
-   * @deprecated please use {@link #build()} instead.
-   */
-  @Deprecated(since = "1.2.1")
-  public DiagnosticReport buildLaboratoryReport(
-      Patient notifiedPerson, List<Observation> pathogenDetectionList) {
-    DiagnosticReport diagnosticReport = new DiagnosticReport();
-
-    diagnosticReport.setId(laboratoryId);
-    diagnosticReport.setStatus(status);
-
-    CodeableConcept codeableConceptConclusionCode = new CodeableConcept();
-    Coding codeConclusionCode =
-        new Coding(conclusionCodeSystem, conclusionCodeCode, conclusionCodeDisplay);
-    codeableConceptConclusionCode.addCoding(codeConclusionCode);
-    diagnosticReport.addConclusionCode(codeableConceptConclusionCode);
-
-    diagnosticReport.setSubject(new Reference(notifiedPerson));
-    for (Observation pathogenDetection : pathogenDetectionList) {
-      diagnosticReport.addResult(new Reference(pathogenDetection));
+  public LaboratoryReportDataBuilder addPathogenDetection(Observation pathogenDetection) {
+    if (pathogenDetections == null) {
+      pathogenDetections = new ArrayList<>();
     }
-    diagnosticReport.setIssued(issued);
-
-    Coding coding = new Coding(codeSystem, codeCode, codeDisplay);
-    diagnosticReport.setCode(new CodeableConcept().addCoding(coding));
-
-    diagnosticReport.setMeta(new Meta().addProfile(metaProfileUrl));
-    return diagnosticReport;
-  }
-
-  /**
-   * @return
-   * @deprecated please use {@link #setDefaultData()} instead.
-   */
-  @Deprecated(since = "1.2.1")
-  public LaboratoryReportDataBuilder addLaboratoryId() {
-    return setLaboratoryId(generateUuidString());
-  }
-
-  /**
-   * @param notifiedPerson
-   * @param pathogenDetection
-   * @return
-   * @deprecated no example code data will be provided in the future. please create your own
-   *     testdata in your project.
-   */
-  @Deprecated(since = "1.2.1")
-  public DiagnosticReport buildExampleCVDPLaboratoryReport(
-      Patient notifiedPerson, Observation pathogenDetection) {
-    return buildExampleCVDPLaboratoryReport(notifiedPerson, singletonList(pathogenDetection));
-  }
-
-  /**
-   * @param notifiedPerson
-   * @param pathogenDetection
-   * @return
-   * @deprecated no example code data will be provided in the future. please create your own
-   *     testdata in your project.
-   */
-  @Deprecated(since = "1.2.1")
-  public DiagnosticReport buildExampleCVDPLaboratoryReport(
-      Patient notifiedPerson, List<Observation> pathogenDetection) {
-    laboratoryId = requireNonNullElse(laboratoryId, generateUuidString());
-    status = requireNonNullElse(status, FINAL);
-    setExampleCodeData();
-    setExampleConclusionCodeData();
-    issued = requireNonNullElse(issued, getCurrentDate());
-    metaProfileUrl = DemisConstants.PROFILE_LABORATORY_REPORT_CVDP;
-    return buildLaboratoryReport(notifiedPerson, pathogenDetection);
-  }
-
-  /**
-   * @return
-   * @deprecated no example code data will be provided in the future. please create your own
-   *     testdata in your project.
-   */
-  @Deprecated(since = "1.2.1")
-  private LaboratoryReportDataBuilder setExampleConclusionCodeData() {
-    conclusionCodeSystem =
-        requireNonNullElse(
-            conclusionCodeSystem, HTTPS_DEMIS_RKI_DE_FHIR_CODE_SYSTEM_CONCLUSION_CODE);
-    conclusionCodeCode = requireNonNullElse(conclusionCodeCode, PATHOGEN_DETECTED);
-    conclusionCodeDisplay =
-        requireNonNullElse(conclusionCodeDisplay, "Meldepflichtiger Erreger nachgewiesen");
-    return this;
-  }
-
-  /**
-   * @return
-   * @deprecated no example code data will be provided in the future. please create your own
-   *     testdata in your project.
-   */
-  @Deprecated(since = "1.2.1")
-  private LaboratoryReportDataBuilder setExampleCodeData() {
-    codeSystem =
-        requireNonNullElse(codeSystem, "https://demis.rki.de/fhir/CodeSystem/notificationCategory");
-    codeCode = requireNonNullElse(codeCode, "cvdp");
-    codeDisplay =
-        requireNonNullElse(
-            codeDisplay, "Severe-Acute-Respiratory-Syndrome-Coronavirus-2 (SARS-CoV-2)");
-    return this;
-  }
-
-  /**
-   * @return
-   * @deprecated use {@link #setConclusionCodeStatusToDetected()} instead.
-   */
-  @Deprecated(since = "1.2.1")
-  public LaboratoryReportDataBuilder setConclusionCodeToNachgewiesen() {
-    conclusionCodeCode = PATHOGEN_DETECTED;
-    conclusionCodeDisplay = "Meldepflichtiger Erreger nachgewiesen";
-    conclusionCodeSystem = HTTPS_DEMIS_RKI_DE_FHIR_CODE_SYSTEM_CONCLUSION_CODE;
-    return this;
-  }
-
-  /**
-   * @return
-   * @deprecated use {@link #setConclusionCodeStatusToNotDetected()} instead.
-   */
-  @Deprecated(since = "1.2.1")
-  public LaboratoryReportDataBuilder setConclusionCodeToNichtNachgewiesen() {
-    conclusionCodeCode = "pathogenNotDetected";
-    conclusionCodeDisplay = "Meldepflichtiger Erreger nicht nachgewiesen";
-    conclusionCodeSystem = HTTPS_DEMIS_RKI_DE_FHIR_CODE_SYSTEM_CONCLUSION_CODE;
+    pathogenDetections.add(pathogenDetection);
     return this;
   }
 }

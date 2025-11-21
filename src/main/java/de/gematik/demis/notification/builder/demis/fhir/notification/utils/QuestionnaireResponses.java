@@ -73,4 +73,32 @@ public class QuestionnaireResponses {
 
     return Optional.of(result.getFirst());
   }
+
+  @Nonnull
+  public static Optional<QuestionnaireResponse> commonForm(@Nonnull final Composition composition) {
+    if (!composition.hasSection()) {
+      return Optional.empty();
+    }
+
+    final List<Composition.SectionComponent> section = composition.getSection();
+    final List<QuestionnaireResponse> result =
+        section.stream()
+            .filter(
+                CodeableConcepts.hasCode(
+                    DemisConstants.CODE_SYSTEM_SECTION_CODE,
+                    DemisConstants.DISEASE_SECTION_COMMON_CODE))
+            .map(Composition.SectionComponent::getEntry)
+            .flatMap(Collection::stream)
+            .map(Reference::getResource)
+            .filter(Predicate.not(IBase::isEmpty))
+            .filter(QuestionnaireResponse.class::isInstance)
+            .map(QuestionnaireResponse.class::cast)
+            .toList();
+
+    if (result.size() != 1) {
+      return Optional.empty();
+    }
+
+    return Optional.of(result.getFirst());
+  }
 }

@@ -39,6 +39,7 @@ import lombok.Setter;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
@@ -60,6 +61,8 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
   private String profileUrl;
   private Type pseudonym;
   private Date lastUpdated;
+  private DateTimeType deceased;
+  private List<Extension> extensions;
 
   /**
    * allows to add additional profile url to a patient resource
@@ -131,6 +134,12 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
     }
     if (lastUpdated != null) {
       patient.getMeta().setLastUpdated(lastUpdated);
+    }
+    if (deceased != null) {
+      patient.setDeceased(deceased);
+    }
+    if (extensions != null) {
+      patient.setExtension(extensions);
     }
     return patient;
   }

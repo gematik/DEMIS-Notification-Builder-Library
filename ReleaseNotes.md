@@ -2,6 +2,10 @@
 
 # Release-Notes notification-builder-library
 
+## 9.0.0
+- fix laboratory nonnominal bundle deep copy to create excerpts for §6.1, §7.1 and §7.3
+- remove deprecated methods from laboratory/pathogen creation builder
+
 ## 8.0.0
 - Enforcing strict profiles for IGS notifications
 - IGS Patient Builder sets extension gender-amtlich when host sex is other
