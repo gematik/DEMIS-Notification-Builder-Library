@@ -30,8 +30,12 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.FhirObjectBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import lombok.Data;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
@@ -109,6 +113,30 @@ public abstract class QuestionnaireResponseBuilder implements FhirObjectBuilder 
     this.items.clear();
     this.items.addAll(items);
     return this;
+  }
+
+  /**
+   * @param notifiedPerson Ensure that only a copy of the resource is passed.
+   */
+  @Nonnull
+  public static QuestionnaireResponse deepCopy(
+      @Nonnull final QuestionnaireResponse originalQuestionnaireResponse,
+      @Nonnull final Patient notifiedPerson) {
+    final QuestionnaireResponseBuilder result =
+        new SpecificInformationDataBuilder()
+            .setQuestionnaireUrl(originalQuestionnaireResponse.getQuestionnaire())
+            .setId(Utils.getShortReferenceOrUrnUuid(originalQuestionnaireResponse))
+            .setItems(
+                originalQuestionnaireResponse.getItem().stream()
+                    .map(QuestionnaireResponse.QuestionnaireResponseItemComponent::copy)
+                    .toList())
+            .setStatus(originalQuestionnaireResponse.getStatus().toCode())
+            .setNotifiedPerson(notifiedPerson);
+
+    final Optional<String> anyProfile =
+        Metas.profilesFrom(originalQuestionnaireResponse).stream().findFirst();
+    anyProfile.ifPresent(result::setProfileUrl);
+    return result.build();
   }
 
   private void addItems(QuestionnaireResponse questionnaireResponse) {

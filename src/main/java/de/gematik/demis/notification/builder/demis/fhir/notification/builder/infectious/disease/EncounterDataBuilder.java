@@ -28,6 +28,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_ACT_CODE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.STRUCTURE_DEFINITION_HOSPITALIZATION_NOTE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.STRUCTURE_DEFINITION_HOSPITALIZATION_REGION;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
 import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -176,7 +177,7 @@ public class EncounterDataBuilder implements InitializableFhirObjectBuilder {
   private void addHospitalizationRegionIfSet(Encounter encounter) {
     if (this.hospitalizationRegion != null) {
       Extension region = new Extension();
-      region.setUrl(DemisConstants.STRUCTURE_DEFINITION_HOSPITALIZATION_REGION);
+      region.setUrl(STRUCTURE_DEFINITION_HOSPITALIZATION_REGION);
       region.setValue(new CodeableConcept(this.hospitalizationRegion));
       encounter.addExtension(region);
     }
@@ -218,5 +219,42 @@ public class EncounterDataBuilder implements InitializableFhirObjectBuilder {
     if (this.classification != null) {
       encounter.setClass_(this.classification);
     }
+  }
+
+  public static Encounter deepCopy(Encounter originalEncounter, Patient notifiedPerson) {
+    EncounterDataBuilder encounterDataBuilder = new EncounterDataBuilder();
+
+    encounterDataBuilder
+        .setNotifiedPerson(notifiedPerson)
+        .setId(Utils.getShortReferenceOrUrnUuid(originalEncounter))
+        .setProfileUrl(originalEncounter.getMeta().getProfile().getFirst().getValue())
+        .setStatus(originalEncounter.getStatus().toCode())
+        .setClassification(originalEncounter.getClass_())
+        .setServiceType(originalEncounter.getServiceType().getCodingFirstRep())
+        .setPeriodStart(originalEncounter.getPeriod().getStartElement())
+        .setPeriodEnd(originalEncounter.getPeriod().getEndElement());
+
+    List<CodeableConcept> reasonCode = originalEncounter.getReasonCode();
+    if (reasonCode != null && !reasonCode.isEmpty()) {
+      encounterDataBuilder.setReason(reasonCode.getFirst().getCodingFirstRep());
+    }
+
+    Extension hospitalizationNote =
+        originalEncounter.getExtensionByUrl(STRUCTURE_DEFINITION_HOSPITALIZATION_NOTE);
+    if (hospitalizationNote != null) {
+      encounterDataBuilder.setHospitalizationNote(hospitalizationNote.getValue().toString());
+    }
+
+    Extension hospitalizationRegionExtension =
+        originalEncounter.getExtensionByUrl(STRUCTURE_DEFINITION_HOSPITALIZATION_REGION);
+    if (hospitalizationRegionExtension != null) {
+      CodeableConcept hospitalizationRegionCC =
+          (CodeableConcept) hospitalizationRegionExtension.getValue();
+      encounterDataBuilder.setHospitalizationRegion(hospitalizationRegionCC.getCodingFirstRep());
+    }
+
+    Encounter encounter = encounterDataBuilder.build();
+    encounter.setServiceProvider(originalEncounter.getServiceProvider());
+    return encounter;
   }
 }

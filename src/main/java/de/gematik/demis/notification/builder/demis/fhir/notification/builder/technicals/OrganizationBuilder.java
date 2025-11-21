@@ -45,7 +45,7 @@ import org.hl7.fhir.r4.model.*;
 @Setter
 public class OrganizationBuilder implements InitializableFhirObjectBuilder {
 
-  private static Set<String> SUBMITTING_FACILITIES =
+  private static final Set<String> SUBMITTING_FACILITIES =
       Set.of(PROFILE_SUBMITTING_FACILITY, PROFILE_NOTIFIED_PERSON_FACILITY);
   private String participantId;
   private String laboratoryId;

@@ -26,7 +26,6 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  * #L%
  */
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder;
 import java.util.Objects;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -37,15 +36,6 @@ public final class ReferenceUtils {
 
   private ReferenceUtils() {
     throw new NotImplementedException("you shall not use this constructor");
-  }
-
-  /**
-   * @deprecated Use {@link
-   *     de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder#createFullUrl(Resource)}
-   */
-  @Deprecated(since = "2.4.0", forRemoval = true)
-  public static String getFullUrl(Resource resource) {
-    return BundleDataBuilder.createFullUrl(resource);
   }
 
   public static Reference internalReference(final Resource toReference) {

@@ -31,14 +31,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import ca.uhn.fhir.context.FhirContext;
 import de.gematik.demis.fhirparserlibrary.FhirParser;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.NotifierDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.LaboratoryReportDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NotificationBundleLaboratoryDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.NotificationLaboratoryDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.PathogenDetectionDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.SpecimenDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.SubmitterDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.HumanNameDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.OrganizationBuilder;
@@ -58,6 +56,8 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;
@@ -219,8 +219,9 @@ class LaboratoryNotificationExamplesTest {
      */
 
     // NotifiedPerson
-    NotifiedPersonDataBuilder notifiedPersonDataBuilder = new NotifiedPersonDataBuilder();
-    notifiedPersonDataBuilder.setDefaults();
+    NotifiedPersonNominalDataBuilder notifiedPersonDataBuilder =
+        new NotifiedPersonNominalDataBuilder();
+    notifiedPersonDataBuilder.setDefault();
     // name
     HumanNameDataBuilder humanNameDataBuilder = new HumanNameDataBuilder();
     humanNameDataBuilder.setFamilyName(familyName);
@@ -249,7 +250,7 @@ class LaboratoryNotificationExamplesTest {
         asList(telephoneNumberCP, emailCP)); // alternative version of adding telecom data
 
     // birthdate (opt)
-    notifiedPersonDataBuilder.setBirthdate(birthdate);
+    notifiedPersonDataBuilder.setBirthdate(new DateType(birthdate));
 
     // address
     AddressDataBuilder addressDataBuilder = new AddressDataBuilder();
@@ -267,8 +268,8 @@ class LaboratoryNotificationExamplesTest {
     Patient notifiedPerson = notifiedPersonDataBuilder.build();
 
     // Notifier
-    NotifierDataBuilder notifierDataBuilder = new NotifierDataBuilder();
-    notifierDataBuilder.setNotifierType(notifierOrgType);
+    OrganizationBuilder notifierDataBuilder = new OrganizationBuilder();
+    notifierDataBuilder.setDefaults().asNotifierFacility();
 
     notifierDataBuilder.addIdentifier(
         new Identifier()
@@ -278,21 +279,19 @@ class LaboratoryNotificationExamplesTest {
         new Identifier()
             .setValue(notifierIdentifierExampleValue2)
             .setSystem(notifierIdentifiertExampleSystem2));
-    notifierDataBuilder.setNotifierFacilityTypeCode(notifierTypeCode);
-    notifierDataBuilder.setNotifierFacilityTypeDisplay(notifierTypeDisplay);
-    notifierDataBuilder.setNotifierFacilityTypeSystem(notifierTypeSystem);
+    notifierDataBuilder.setTypeCode(notifierTypeCode);
+    notifierDataBuilder.setTypeDisplay(notifierTypeDisplay);
+    notifierDataBuilder.setTypeSystem(notifierTypeSystem);
 
-    notifierDataBuilder.setNotifierFacilityName(notifierName);
+    notifierDataBuilder.setFacilityName(notifierName);
 
     TelecomDataBuilder telecomDataBuilder = new TelecomDataBuilder();
     telecomDataBuilder.setValue(notiferPhoneValue);
     telecomDataBuilder.setSystem(notifierPhoneSystem);
     telecomDataBuilder.setUse(notifierPhoneUse);
 
-    notifierDataBuilder.addNotifierId();
-
     ContactPoint phoneCP = telecomDataBuilder.build();
-    notifierDataBuilder.addNotifierTelecom(phoneCP);
+    notifierDataBuilder.addTelecom(phoneCP);
 
     AddressDataBuilder notifierAddressData = new AddressDataBuilder();
     notifierAddressData.setHouseNumber(notifierHouseNumber);
@@ -301,17 +300,21 @@ class LaboratoryNotificationExamplesTest {
     notifierAddressData.setPostalCode(notifierPostalCode);
     notifierAddressData.setCountry(notifierCountry);
     Address notifierAddress = notifierAddressData.build();
-    notifierDataBuilder.setNotifierAddress(notifierAddress);
+    notifierDataBuilder.setAddress(notifierAddress);
 
-    PractitionerRole notifierRole = notifierDataBuilder.buildNotifierData();
+    PractitionerRole notifierRole =
+        new PractitionerRoleBuilder()
+            .asNotifierRole()
+            .withOrganization(notifierDataBuilder.build())
+            .build();
 
     // Submitter
-    SubmitterDataBuilder submitterDataBuilder = new SubmitterDataBuilder();
-    submitterDataBuilder.setPractitionerType(PractitionerType.ORGANIZATION);
+    OrganizationBuilder submitterDataBuilder =
+        new OrganizationBuilder().asSubmittingFacility().setDefaults();
     submitterDataBuilder.addIdentifier(
         new Identifier().setValue(identifierBSNR).setSystem(identifierBSNRSystem));
-    submitterDataBuilder.setSubmittingFacilityName(submitterName);
-    submitterDataBuilder.addSubmitterTelecom(
+    submitterDataBuilder.setFacilityName(submitterName);
+    submitterDataBuilder.addTelecom(
         new TelecomDataBuilder()
             .setValue(submitterEmailValue)
             .setUse(submitterEmailUse)
@@ -325,27 +328,32 @@ class LaboratoryNotificationExamplesTest {
     submitterAddressBuilder.setCountry(submitterCountry);
 
     Address submitterAddress = submitterAddressBuilder.build();
-    submitterDataBuilder.setSubmitterAddress(submitterAddress);
+    submitterDataBuilder.setAddress(submitterAddress);
 
-    submitterDataBuilder.addSubmitterId();
-
-    PractitionerRole submitterRole = submitterDataBuilder.buildSubmitterData();
+    PractitionerRole submitterRole =
+        new PractitionerRoleBuilder()
+            .asSubmittingRole()
+            .withOrganization(submitterDataBuilder.build())
+            .build();
 
     // Specimen
     SpecimenDataBuilder specimenDataBuilder = new SpecimenDataBuilder();
+    specimenDataBuilder.setDefaultData();
     specimenDataBuilder.setSpecimenStatus(specimenStatus);
     specimenDataBuilder.setTypeCode(specimenTypeCode);
     specimenDataBuilder.setTypeSystem(specimenTypeSystem);
     specimenDataBuilder.setTypeDisplay(specimentTypeDisplay);
-    specimenDataBuilder.setReceivedTime(receivedTime);
+    specimenDataBuilder.setReceivedDateTime(new DateTimeType(receivedTime));
 
     specimenDataBuilder.setMetaProfileUrl(specimenProfileUrl);
-    specimenDataBuilder.addSpecimenId();
+    specimenDataBuilder.setNotifiedPerson(notifiedPerson);
+    specimenDataBuilder.setSubmittingRole(submitterRole);
 
-    Specimen specimen = specimenDataBuilder.buildSpecimen(notifiedPerson, submitterRole);
+    Specimen specimen = specimenDataBuilder.build();
 
     // PathogenDetection
     PathogenDetectionDataBuilder pathogenDetectionDataBuilder = new PathogenDetectionDataBuilder();
+    pathogenDetectionDataBuilder.setDefaultData();
     pathogenDetectionDataBuilder.setStatus(pathogenDetectionStatus);
     pathogenDetectionDataBuilder.setCategoryCode(categoryCode);
     pathogenDetectionDataBuilder.setCategorySystem(categorySystem);
@@ -360,27 +368,27 @@ class LaboratoryNotificationExamplesTest {
     pathogenDetectionDataBuilder.setMethodDisplay(methodDisplay);
 
     pathogenDetectionDataBuilder.setProfileUrl(pathogenDetectionProfileUrl);
-    pathogenDetectionDataBuilder.addId();
+    pathogenDetectionDataBuilder.setNotifiedPerson(notifiedPerson);
+    pathogenDetectionDataBuilder.setSpecimen(specimen);
 
-    Observation pathogenDetection =
-        pathogenDetectionDataBuilder.buildPathogenDetection(notifiedPerson, specimen);
+    Observation pathogenDetection = pathogenDetectionDataBuilder.build();
 
     // Laboratory Report
 
     LaboratoryReportDataBuilder laboratoryReportDataBuilder = new LaboratoryReportDataBuilder();
-
+    laboratoryReportDataBuilder.setDefaultData();
     laboratoryReportDataBuilder.setStatus(diagnosticReportStatus);
     laboratoryReportDataBuilder.setCodeCode(laboratoryCode);
     laboratoryReportDataBuilder.setCodeSystem(laboratoryCodeSystem);
     laboratoryReportDataBuilder.setCodeDisplay(laboratoryCodeDisplay);
     laboratoryReportDataBuilder.setIssued(now);
-    laboratoryReportDataBuilder.setConclusionCodeToNachgewiesen();
-    laboratoryReportDataBuilder.addLaboratoryId();
+    laboratoryReportDataBuilder.setConclusionCodeStatusToDetected();
 
     laboratoryReportDataBuilder.setMetaProfileUrl(laboratoryReportProfileUrl);
+    laboratoryReportDataBuilder.setNotifiedPerson(notifiedPerson);
+    laboratoryReportDataBuilder.addPathogenDetection(pathogenDetection);
 
-    DiagnosticReport laboratoryReport =
-        laboratoryReportDataBuilder.buildLaboratoryReport(notifiedPerson, pathogenDetection);
+    DiagnosticReport laboratoryReport = laboratoryReportDataBuilder.build();
 
     // NotificationLaboratory
 
@@ -392,13 +400,7 @@ class LaboratoryNotificationExamplesTest {
     notificationLaboratoryDataBuilder.setTypeDisplay(notificationLaboratoryTypeDisplay);
     notificationLaboratoryDataBuilder.setTypeSystem(notificationLaboratoryTypeSystem);
 
-    notificationLaboratoryDataBuilder.setCodeAndCategoryCode(notificationLaboratoryCategoryCode);
-    notificationLaboratoryDataBuilder.setCodeAndCategoryDisplay(
-        notificationLaboratoryCategoryDisplay);
-    notificationLaboratoryDataBuilder.setCodeAndCategorySystem(
-        notificationLaboratoryCategorySystem);
-
-    notificationLaboratoryDataBuilder.setDate(now);
+    notificationLaboratoryDataBuilder.setDateTimeType(new DateTimeType(now));
     notificationLaboratoryDataBuilder.setTitle("Erregernachweismeldung");
 
     notificationLaboratoryDataBuilder.setSectionComponentSystem(
@@ -433,7 +435,7 @@ class LaboratoryNotificationExamplesTest {
   }
 
   @Test
-  void shouldCreateACustomLaboratoyCVDPNotification() {
+  void shouldCreateACustomLaboratoryCVDPNotification() {
 
     /*
      * ********************Data input that has to be mapped*********************
@@ -552,13 +554,14 @@ class LaboratoryNotificationExamplesTest {
      */
 
     // NotifiedPerson
-    NotifiedPersonDataBuilder notifiedPersonDataBuilder = new NotifiedPersonDataBuilder();
+    NotifiedPersonNominalDataBuilder notifiedPersonDataBuilder =
+        new NotifiedPersonNominalDataBuilder();
     // name
     HumanNameDataBuilder humanNameDataBuilder = new HumanNameDataBuilder();
     humanNameDataBuilder.setFamilyName(familyName);
     humanNameDataBuilder.addGivenName(givenName);
     humanNameDataBuilder.addPrefix(prefix);
-    HumanName humanName = humanNameDataBuilder.buildHumanName();
+    HumanName humanName = humanNameDataBuilder.build();
     notifiedPersonDataBuilder.setHumanName(humanName);
     // gender
     notifiedPersonDataBuilder.setGender(gender);
@@ -581,7 +584,7 @@ class LaboratoryNotificationExamplesTest {
         asList(telephoneNumberCP, emailCP)); // alternative version of adding telecom data
 
     // birthdate (opt)
-    notifiedPersonDataBuilder.setBirthdate(birthdate);
+    notifiedPersonDataBuilder.setBirthdate(new DateType(birthdate));
 
     // address
     AddressDataBuilder addressDataBuilder = new AddressDataBuilder();
@@ -599,8 +602,8 @@ class LaboratoryNotificationExamplesTest {
     Patient notifiedPerson = notifiedPersonDataBuilder.build();
 
     // Notifier
-    NotifierDataBuilder notifierDataBuilder = new NotifierDataBuilder();
-    notifierDataBuilder.setNotifierType(notifierOrgType);
+    OrganizationBuilder notifierDataBuilder =
+        new OrganizationBuilder().setDefaults().asNotifierFacility();
 
     notifierDataBuilder.addIdentifier(
         new Identifier()
@@ -610,21 +613,19 @@ class LaboratoryNotificationExamplesTest {
         new Identifier()
             .setValue(notifierIdentifierExampleValue2)
             .setSystem(notifierIdentifiertExampleSystem2));
-    notifierDataBuilder.setNotifierFacilityTypeCode(notifierTypeCode);
-    notifierDataBuilder.setNotifierFacilityTypeDisplay(notifierTypeDisplay);
-    notifierDataBuilder.setNotifierFacilityTypeSystem(notifierTypeSystem);
+    notifierDataBuilder.setTypeCode(notifierTypeCode);
+    notifierDataBuilder.setTypeDisplay(notifierTypeDisplay);
+    notifierDataBuilder.setTypeSystem(notifierTypeSystem);
 
-    notifierDataBuilder.setNotifierFacilityName(notifierName);
+    notifierDataBuilder.setFacilityName(notifierName);
 
     TelecomDataBuilder telecomDataBuilder = new TelecomDataBuilder();
     telecomDataBuilder.setValue(notiferPhoneValue);
     telecomDataBuilder.setSystem(notifierPhoneSystem);
     telecomDataBuilder.setUse(notifierPhoneUse);
 
-    notifierDataBuilder.addNotifierId();
-
     ContactPoint phoneCP = telecomDataBuilder.build();
-    notifierDataBuilder.addNotifierTelecom(phoneCP);
+    notifierDataBuilder.addTelecom(phoneCP);
 
     AddressDataBuilder notifierAddressData = new AddressDataBuilder();
     notifierAddressData.setHouseNumber(notifierHouseNumber);
@@ -633,9 +634,13 @@ class LaboratoryNotificationExamplesTest {
     notifierAddressData.setPostalCode(notifierPostalCode);
     notifierAddressData.setCountry(notifierCountry);
     Address notifierAddress = notifierAddressData.build();
-    notifierDataBuilder.setNotifierAddress(notifierAddress);
+    notifierDataBuilder.setAddress(notifierAddress);
 
-    PractitionerRole notifierRole = notifierDataBuilder.buildNotifierData();
+    PractitionerRole notifierRole =
+        new PractitionerRoleBuilder()
+            .setDefaults()
+            .withOrganization(notifierDataBuilder.build())
+            .build();
 
     // Submitter
     Identifier bsnrIdentifier =
@@ -681,7 +686,7 @@ class LaboratoryNotificationExamplesTest {
             .setSpecimenStatus(specimenStatus)
             .setTypeCode(specimenTypeCode)
             .setTypeDisplay(specimentTypeDisplay)
-            .setReceivedTime(receivedTime)
+            .setReceivedDateTime(new DateTimeType(receivedTime))
             .setNotifiedPerson(notifiedPerson)
             .setSubmittingRole(submitterRole)
             .setMetaProfileUrl(specimenProfileUrl);

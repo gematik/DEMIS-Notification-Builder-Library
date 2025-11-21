@@ -89,7 +89,7 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
   @Nonnull
   public static PractitionerRole deepCopy73(@Nonnull final PractitionerRole original) {
     final PractitionerRole copy = new PractitionerRole();
-    copy.setId(original.getId());
+    copy.setId(Utils.getShortReferenceOrUrnUuid(original));
     copy.setMeta(original.getMeta());
     if (original.getPractitioner().getResource()
         instanceof final Practitioner referencedPractitioner) {

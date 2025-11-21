@@ -74,7 +74,8 @@ public abstract class BundleDataBuilder implements InitializableFhirObjectBuilde
    *
    * @param resource resource
    * @return full URL, like: <code>
-   * https://demis.rki.de/fhir/Organization/9d6c3dcd-cba3-4fcc-9eae-6b7b19e60148</code> or <code>
+   * <a href="https://demis.rki.de/fhir/Organization/9d6c3dcd-cba3-4fcc-9eae-6b7b19e60148">...</a>
+   *     </code> or <code>
    *     urn:uuid:45e4eee9-bf7f-472f-bdd3-3d8731b71c9f</code>
    */
   public static String createFullUrl(Resource resource) {
@@ -249,7 +250,26 @@ public abstract class BundleDataBuilder implements InitializableFhirObjectBuilde
     bundle.setMeta(meta.setLastUpdated(this.lastUpdated));
   }
 
-  public void addTag(Coding coding) {
+  public BundleDataBuilder addTag(Coding coding) {
     this.tagList.add(coding);
+    return this;
+  }
+
+  private static String validSuffix(String disease) {
+    if ((StringUtils.length(disease) != 4) || !StringUtils.isAlpha(disease)) {
+      throw new IllegalArgumentException("Not a four letter disease identifier: " + disease);
+    }
+    return disease.toUpperCase();
+  }
+
+  /**
+   * Create disease specific URL.
+   *
+   * @param url URL
+   * @param disease disease category code like: <code>cvdd</code>
+   * @return URL
+   */
+  public static String createDiseaseSpecificUrl(String url, String disease) {
+    return url + validSuffix(disease);
   }
 }

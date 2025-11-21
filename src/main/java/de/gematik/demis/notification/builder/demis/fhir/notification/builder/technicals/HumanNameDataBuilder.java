@@ -43,12 +43,6 @@ public class HumanNameDataBuilder implements FhirObjectBuilder {
   private String text;
   private Salutation salutation;
 
-  public HumanName buildExampleHumanName() {
-    familyName = "Mustermann";
-    addGivenName("Maxime");
-    return buildHumanName();
-  }
-
   public static HumanName with(
       final String prefix, final String givenName, final String familyName) {
     return new HumanNameDataBuilder()
@@ -72,17 +66,6 @@ public class HumanNameDataBuilder implements FhirObjectBuilder {
     createText();
     humanName.setText(text);
     return humanName;
-  }
-
-  /**
-   * Build human name FHIR object
-   *
-   * @return human name
-   * @deprecated Will be removed in version 4.x, use {@link HumanNameDataBuilder#build()} instead
-   */
-  @Deprecated(since = "3.0.2")
-  public HumanName buildHumanName() {
-    return build();
   }
 
   public HumanNameDataBuilder addPrefix(String prefix) {

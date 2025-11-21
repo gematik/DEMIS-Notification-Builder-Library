@@ -116,6 +116,21 @@ public class ImmunizationDataBuilder implements InitializableFhirObjectBuilder {
     return this;
   }
 
+  public static Immunization deepyCopy(Immunization originalImmunization, Patient notifiedPerson) {
+    ImmunizationDataBuilder immunizationDataBuilder = new ImmunizationDataBuilder();
+
+    immunizationDataBuilder
+        .setId(Utils.getShortReferenceOrUrnUuid(originalImmunization))
+        .setProfileUrl(originalImmunization.getMeta().getProfile().getFirst().getValue())
+        .setStatus(originalImmunization.getStatus().toCode())
+        .setVaccineCode(originalImmunization.getVaccineCode().getCodingFirstRep())
+        .setNotifiedPerson(notifiedPerson)
+        .setOccurrence(originalImmunization.getOccurrenceDateTimeType())
+        .setNotes(originalImmunization.getNote().stream().map(Annotation::getText).toList());
+
+    return immunizationDataBuilder.build();
+  }
+
   private void addNotes(Immunization immunization) {
     this.notes.stream().map(t -> new Annotation().setText(t)).forEach(immunization::addNote);
   }

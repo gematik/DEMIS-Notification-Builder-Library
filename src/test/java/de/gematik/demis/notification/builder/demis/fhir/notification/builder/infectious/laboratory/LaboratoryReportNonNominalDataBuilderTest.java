@@ -69,7 +69,9 @@ class LaboratoryReportNonNominalDataBuilderTest {
   @BeforeAll
   static void setUp() {
     notifiedPerson = new Patient();
+    notifiedPerson.setId("patientId");
     pathogenDetection = new Observation();
+    pathogenDetection.setId("observationId");
   }
 
   @BeforeEach
@@ -162,8 +164,10 @@ class LaboratoryReportNonNominalDataBuilderTest {
   @Test
   void shouldGivenDataOnLaboratoryReportNotifiedPersonAndPathogenDetection() {
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+        laboratoryReportDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .addPathogenDetection(pathogenDetection)
+            .build();
 
     assertThat(diagnosticReport.getSubject().getResource()).isEqualTo(notifiedPerson);
     assertThat(diagnosticReport.getResult()).hasSize(1);
@@ -176,9 +180,7 @@ class LaboratoryReportNonNominalDataBuilderTest {
     laboratoryReportDataBuilder.setCodeSystem("codeSystem");
     laboratoryReportDataBuilder.setCodeCode("codeCode");
 
-    DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+    DiagnosticReport diagnosticReport = laboratoryReportDataBuilder.build();
 
     assertThat(diagnosticReport.getCode().getCoding()).hasSize(1);
     assertThat(diagnosticReport.getCode().getCoding().get(0).getCode()).isEqualTo("codeCode");
@@ -192,9 +194,7 @@ class LaboratoryReportNonNominalDataBuilderTest {
     laboratoryReportDataBuilder.setConclusionCodeDisplay("concludSionCodeDisplay");
     laboratoryReportDataBuilder.setConclusionCodeSystem("concludSionCodeSystem");
 
-    DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+    DiagnosticReport diagnosticReport = laboratoryReportDataBuilder.build();
 
     assertThat(diagnosticReport.getConclusionCode()).hasSize(1);
     assertThat(diagnosticReport.getConclusionCode().get(0).getCoding()).hasSize(1);
@@ -210,18 +210,14 @@ class LaboratoryReportNonNominalDataBuilderTest {
   void shouldSetAllGivenDataOnLaboratoryReportStatus() {
     laboratoryReportDataBuilder.setStatus(FINAL);
 
-    DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+    DiagnosticReport diagnosticReport = laboratoryReportDataBuilder.build();
 
     assertThat(diagnosticReport.getStatus()).isEqualTo(FINAL);
   }
 
   @Test
   void shouldSetGeneratedDataForIssued() {
-    DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+    DiagnosticReport diagnosticReport = laboratoryReportDataBuilder.setDefaultData().build();
 
     assertThat(diagnosticReport.getIssued()).isNotNull();
     assertThat(diagnosticReport.getIssued()).isCloseTo(Date.from(Instant.now()), 1000L);
@@ -230,8 +226,10 @@ class LaboratoryReportNonNominalDataBuilderTest {
   @Test
   void shouldSetMeta() {
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+        laboratoryReportDataBuilder
+            .setDefaultData()
+            .setMetaProfileUrl("https://demis.rki.de/fhir/StructureDefinition/LaboratoryReportCVDP")
+            .build();
 
     assertThat(diagnosticReport.getMeta().getProfile()).hasSize(1);
     assertThat(diagnosticReport.getMeta().getProfile().get(0).getValue())
@@ -251,8 +249,10 @@ class LaboratoryReportNonNominalDataBuilderTest {
     observation2.setId("observation2");
 
     DiagnosticReport diagnosticReport =
-        laboratoryReportNonNomialDataBuilder1.buildLaboratoryReport(
-            notifiedPerson, Arrays.asList(observation1, observation2));
+        laboratoryReportNonNomialDataBuilder1
+            .setNotifiedPerson(notifiedPerson)
+            .setPathogenDetections(Arrays.asList(observation1, observation2))
+            .build();
 
     assertThat(diagnosticReport.getResult())
         .hasSize(2)

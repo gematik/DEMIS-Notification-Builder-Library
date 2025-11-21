@@ -28,7 +28,8 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.re
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.NotifierDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.OrganizationBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import java.util.List;
 import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,10 @@ class ReportBundleDataBuilderTest {
     String notificationBundleId = "notificationBundleId";
     builder.setIdentifierAsNotificationBundleId(notificationBundleId);
 
-    PractitionerRole notifierRole = new NotifierDataBuilder().buildReportExampleNotifierData();
+    Organization practitioner =
+        new OrganizationBuilder().setDefaults().asNotifierFacility().build();
+    PractitionerRole notifierRole =
+        new PractitionerRoleBuilder().asNotifierRole().withOrganization(practitioner).build();
     builder.setNotifierRole(notifierRole);
 
     QuestionnaireResponse bedOccupancy =

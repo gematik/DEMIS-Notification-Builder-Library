@@ -97,14 +97,6 @@ class SpecimenDataBuilderTest {
     }
   }
 
-  @Test
-  void shouldSetMandatoryData() {
-    Specimen specimen = specimenDataBuilder.buildExampleSpecimen(notifiedPerson, submittingRole);
-
-    assertThat(specimen.getSubject().getResource()).isEqualTo(notifiedPerson);
-    assertThat(specimen.getCollection().getCollector().getResource()).isEqualTo(submittingRole);
-  }
-
   @Nested
   @DisplayName("convenient status setter")
   class StatusSetterTests {

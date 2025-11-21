@@ -47,7 +47,7 @@
       } ],
       "title": "Meldung gemäß §7 Absatz 3 IfSG",
       "section": [ {
-        "title": "disease",
+        "title": "Diagnose",
         "code": {
           "coding": [ {
             "system": "https://demis.rki.de/fhir/CodeSystem/sectionCode",

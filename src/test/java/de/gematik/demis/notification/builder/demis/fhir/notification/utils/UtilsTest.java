@@ -109,9 +109,8 @@ class UtilsTest {
   }
 
   private static IBaseResource mockResourceWithId(String id, String type) {
-    IBaseResource resource = mock(IBaseResource.class);
-    when(resource.getIdElement()).thenReturn(new IdType(id));
-    when(resource.fhirType()).thenReturn(type);
+    IBaseResource resource = new Patient();
+    resource.setId(id);
     return resource;
   }
 }

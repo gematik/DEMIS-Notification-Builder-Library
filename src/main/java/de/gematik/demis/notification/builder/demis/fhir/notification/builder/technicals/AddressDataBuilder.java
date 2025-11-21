@@ -26,8 +26,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_ADDRESS_USE;
 import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.truncate;
 
 import com.google.common.base.Strings;
 import de.gematik.demis.notification.builder.demis.fhir.notification.types.AddressUse;
@@ -67,6 +69,24 @@ public class AddressDataBuilder implements FhirObjectBuilder {
 
   public static void copyExtensions(final Address source, final Address target) {
     target.setExtension(source.getExtension().stream().map(Extension::copy).toList());
+  }
+
+  public static String shortenPostalCode(final Address originalAddress) {
+    return truncate(originalAddress.getPostalCode(), 3);
+  }
+
+  public static List<Address> copyAllAddressesForExcerpt(List<Address> addresses) {
+    return addresses.stream().map(AddressDataBuilder::copyAddressWithPostalCodeCountryUse).toList();
+  }
+
+  public static Address copyAddressWithPostalCodeCountryUse(final Address original) {
+    AddressDataBuilder builder =
+        new AddressDataBuilder()
+            .setPostalCode(shortenPostalCode(original))
+            .setCountry(original.getCountry())
+            .withAddressUseExtension(original.getExtensionByUrl(CODE_SYSTEM_ADDRESS_USE));
+
+    return builder.build();
   }
 
   /**
@@ -150,6 +170,11 @@ public class AddressDataBuilder implements FhirObjectBuilder {
             .setUrl(DemisConstants.STRUCTURE_DEFINITION_FACILITY_ADDRESS_NOTIFIED_PERSON)
             .setValue(new Reference(organization));
     extensionList.add(organisationReference);
+    return this;
+  }
+
+  public AddressDataBuilder withAddressUseExtension(@Nonnull final Extension addressUseExtension) {
+    extensionList.add(addressUseExtension);
     return this;
   }
 

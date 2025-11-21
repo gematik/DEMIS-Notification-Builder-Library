@@ -69,7 +69,8 @@ public class NotificationBundleDiseaseNonNominalDataBuilder
     final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
     final Condition condition = DiseaseDataBuilder.deepCopy(ctx.condition(), notifiedPerson);
     final QuestionnaireResponse specificQuestionnaire =
-        SpecificInformationDataBuilder.deepCopy(ctx.specificQuestionnaire(), notifiedPerson);
+        SpecificInformationDataBuilder.deepCopy(
+            ctx.specificQuestionnaireResponse(), notifiedPerson);
     final Composition composition =
         NotificationDiseaseDataBuilder.deepCopy(
             ctx.composition(), condition, notifiedPerson, notifierRole, specificQuestionnaire);

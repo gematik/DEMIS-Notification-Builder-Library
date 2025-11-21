@@ -299,6 +299,11 @@ public final class DemisConstants {
   public static final String RECEPTION_TIME_STAMP_TYPE =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/ReceptionTimeStampType";
 
+  public static final String RELATED_NOTIFICATION_CODING_SYSTEM =
+      DEMIS_RKI_DE_FHIR + "CodeSystem/RelatedNotificationBundle";
+
+  public static final String NICHTNAMENTLICH = " (nichtnamentlich)";
+
   private DemisConstants() {
     throw new NotImplementedException("you shall not use this constructor");
   }

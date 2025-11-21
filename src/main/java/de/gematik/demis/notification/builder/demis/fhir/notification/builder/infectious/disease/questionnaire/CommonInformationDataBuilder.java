@@ -124,10 +124,7 @@ public class CommonInformationDataBuilder extends QuestionnaireResponseBuilder
   private QuestionnaireResponse.QuestionnaireResponseItemComponent getInitializedHospitalized() {
     Optional<QuestionnaireResponse.QuestionnaireResponseItemComponent> item =
         getItems().stream().filter(i -> HOSPITALIZED_LINK_ID.equals(i.getLinkId())).findFirst();
-    if (item.isPresent()) {
-      return item.get();
-    }
-    return createHospitalized();
+    return item.orElseGet(this::createHospitalized);
   }
 
   private QuestionnaireResponse.QuestionnaireResponseItemComponent createHospitalized() {

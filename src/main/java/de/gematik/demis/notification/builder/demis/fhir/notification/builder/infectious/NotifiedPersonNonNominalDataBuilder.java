@@ -51,6 +51,7 @@ import lombok.AccessLevel;
 import lombok.Setter;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
@@ -66,6 +67,8 @@ public class NotifiedPersonNonNominalDataBuilder {
   private DateType birthdate;
   private Enumerations.AdministrativeGender gender;
   private List<Address> address = new ArrayList<>();
+  private DateTimeType deceased;
+  private List<Extension> extensions;
 
   @Setter(AccessLevel.PRIVATE)
   private Type pseudonym;
@@ -92,9 +95,8 @@ public class NotifiedPersonNonNominalDataBuilder {
         AddressDataBuilder.copyOfRedactedAddress(addressesToCopy);
     builder.setAddress(List.copyOf(addresses));
 
-    if (patientToCopy.hasBirthDateElement()) {
-      copyBirthdate(patientToCopy, builder);
-    }
+    copyBirthdate(patientToCopy, builder);
+
     builder.setGender(patientToCopy.getGender());
     final IIdType idElement = patientToCopy.getIdElement();
     builder.setId(idElement.getIdPart());
@@ -105,18 +107,36 @@ public class NotifiedPersonNonNominalDataBuilder {
     return builder.build();
   }
 
+  @Nonnull
+  public static Patient createExcerptNotByNamePatient(@Nonnull final Patient patientToCopy) {
+    final NotifiedPersonNonNominalDataBuilder builder =
+        new NotifiedPersonNonNominalDataBuilder()
+            .setId(Utils.generateUuidString())
+            .setGender(patientToCopy.getGender())
+            .setDeceased(patientToCopy.getDeceasedDateTimeType())
+            .setAddress(AddressDataBuilder.copyAllAddressesForExcerpt(patientToCopy.getAddress()))
+            .addExtension(patientToCopy.getExtensionByUrl(EXTENSION_URL_PSEUDONYM));
+
+    copyBirthdate(patientToCopy, builder);
+
+    return builder.build();
+  }
+
   private static void copyBirthdate(
       final Patient patientToCopy, final NotifiedPersonNonNominalDataBuilder builder) {
-    final DateType birthDateElement = patientToCopy.getBirthDateElement();
-    final TemporalPrecisionEnum precision = birthDateElement.getPrecision();
-    if (TemporalPrecisionEnum.YEAR.equals(precision)
-        || TemporalPrecisionEnum.MONTH.equals(precision)) {
-      builder.setBirthdate(birthDateElement.getValueAsString());
-    } else {
-      final Date birthdate = birthDateElement.getValue();
-      // SonarQube prevents us from making this a static variable, and using it as instance variable
-      // breaks the code, so we just generate a new object for this case
-      builder.setBirthdate(new SimpleDateFormat("yyyy-MM").format(birthdate));
+    if (patientToCopy.hasBirthDateElement()) {
+      final DateType birthDateElement = patientToCopy.getBirthDateElement();
+      final TemporalPrecisionEnum precision = birthDateElement.getPrecision();
+      if (TemporalPrecisionEnum.YEAR.equals(precision)
+          || TemporalPrecisionEnum.MONTH.equals(precision)) {
+        builder.setBirthdate(birthDateElement.getValueAsString());
+      } else {
+        final Date birthdate = birthDateElement.getValue();
+        // SonarQube prevents us from making this a static variable, and using it as instance
+        // variable
+        // breaks the code, so we just generate a new object for this case
+        builder.setBirthdate(new SimpleDateFormat("yyyy-MM").format(birthdate));
+      }
     }
   }
 
@@ -188,6 +208,8 @@ public class NotifiedPersonNonNominalDataBuilder {
         .setAddress(address)
         .setPseudonym(pseudonym)
         .setLastUpdated(Utils.getCurrentDate())
+        .setDeceased(deceased)
+        .setExtensions(extensions)
         .build();
   }
 
@@ -231,6 +253,14 @@ public class NotifiedPersonNonNominalDataBuilder {
       throw new IllegalArgumentException("Birthdate must be in the format yyyy or yyyy-MM");
     }
     this.birthdate.setPrecision(precision);
+    return this;
+  }
+
+  public NotifiedPersonNonNominalDataBuilder addExtension(Extension extension) {
+    if (this.extensions == null) {
+      this.extensions = new ArrayList<>();
+    }
+    this.extensions.add(extension);
     return this;
   }
 }

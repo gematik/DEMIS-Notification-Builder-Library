@@ -69,7 +69,9 @@ class LaboratoryReportDataBuilderTest {
   @BeforeAll
   static void setUp() {
     notifiedPerson = new Patient();
+    notifiedPerson.setId("patientId");
     pathogenDetection = new Observation();
+    pathogenDetection.setId("observationId");
   }
 
   @BeforeEach
@@ -200,8 +202,10 @@ class LaboratoryReportDataBuilderTest {
   @Test
   void shouldGivenDataOnLaboratoryReportNotifiedPersonAndPathogenDetection() {
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+        laboratoryReportDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .addPathogenDetection(pathogenDetection)
+            .build();
 
     assertThat(diagnosticReport.getSubject().getResource()).isEqualTo(notifiedPerson);
     assertThat(diagnosticReport.getResult()).hasSize(1);
@@ -215,8 +219,10 @@ class LaboratoryReportDataBuilderTest {
     laboratoryReportDataBuilder.setCodeCode("codeCode");
 
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+        laboratoryReportDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .addPathogenDetection(pathogenDetection)
+            .build();
 
     assertThat(diagnosticReport.getCode().getCoding()).hasSize(1);
     assertThat(diagnosticReport.getCode().getCoding().get(0).getCode()).isEqualTo("codeCode");
@@ -231,8 +237,10 @@ class LaboratoryReportDataBuilderTest {
     laboratoryReportDataBuilder.setConclusionCodeSystem("concludSionCodeSystem");
 
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+        laboratoryReportDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .addPathogenDetection(pathogenDetection)
+            .build();
 
     assertThat(diagnosticReport.getConclusionCode()).hasSize(1);
     assertThat(diagnosticReport.getConclusionCode().get(0).getCoding()).hasSize(1);
@@ -249,8 +257,10 @@ class LaboratoryReportDataBuilderTest {
     laboratoryReportDataBuilder.setStatus(FINAL);
 
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+        laboratoryReportDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .addPathogenDetection(pathogenDetection)
+            .build();
 
     assertThat(diagnosticReport.getStatus()).isEqualTo(FINAL);
   }
@@ -258,8 +268,11 @@ class LaboratoryReportDataBuilderTest {
   @Test
   void shouldSetGeneratedDataForIssued() {
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+        laboratoryReportDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .addPathogenDetection(pathogenDetection)
+            .setDefaultData()
+            .build();
 
     assertThat(diagnosticReport.getIssued()).isNotNull();
     assertThat(diagnosticReport.getIssued()).isCloseTo(Date.from(Instant.now()), 1000L);
@@ -268,8 +281,11 @@ class LaboratoryReportDataBuilderTest {
   @Test
   void shouldSetMeta() {
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder.buildExampleCVDPLaboratoryReport(
-            notifiedPerson, pathogenDetection);
+        laboratoryReportDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .addPathogenDetection(pathogenDetection)
+            .setMetaProfileUrl(DemisConstants.PROFILE_LABORATORY_REPORT_CVDP)
+            .build();
 
     assertThat(diagnosticReport.getMeta().getProfile()).hasSize(1);
     assertThat(diagnosticReport.getMeta().getProfile().get(0).getValue())
@@ -288,8 +304,10 @@ class LaboratoryReportDataBuilderTest {
     observation2.setId("observation2");
 
     DiagnosticReport diagnosticReport =
-        laboratoryReportDataBuilder1.buildLaboratoryReport(
-            notifiedPerson, Arrays.asList(observation1, observation2));
+        laboratoryReportDataBuilder1
+            .setNotifiedPerson(notifiedPerson)
+            .setPathogenDetections(Arrays.asList(observation1, observation2))
+            .build();
 
     assertThat(diagnosticReport.getResult())
         .hasSize(2)

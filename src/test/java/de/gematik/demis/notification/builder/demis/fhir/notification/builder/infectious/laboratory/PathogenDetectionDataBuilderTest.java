@@ -161,7 +161,10 @@ class PathogenDetectionDataBuilderTest {
   @Test
   void shouldSetMandatoryFields() {
     Observation observation =
-        pathogenDetectionDataBuilder.buildExamplePathogenDetection(notifiedPerson, specimen);
+        pathogenDetectionDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .setSpecimen(specimen)
+            .build();
 
     assertThat(observation.getSubject().getResource()).isEqualTo(notifiedPerson);
     assertThat(observation.getSpecimen().getResource()).isEqualTo(specimen);
@@ -172,7 +175,10 @@ class PathogenDetectionDataBuilderTest {
     pathogenDetectionDataBuilder.setPathogenDetectionId("someId");
 
     Observation observation =
-        pathogenDetectionDataBuilder.buildExamplePathogenDetection(notifiedPerson, specimen);
+        pathogenDetectionDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .setSpecimen(specimen)
+            .build();
 
     assertThat(observation.getId()).isEqualTo("someId");
   }
@@ -184,7 +190,10 @@ class PathogenDetectionDataBuilderTest {
     pathogenDetectionDataBuilder.setObservationCodeDisplay("obvservationCodeDisplay");
 
     Observation observation =
-        pathogenDetectionDataBuilder.buildExamplePathogenDetection(notifiedPerson, specimen);
+        pathogenDetectionDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .setSpecimen(specimen)
+            .build();
 
     assertThat(observation.getCode().getCoding()).hasSize(1);
     assertThat(observation.getCode().getCoding().get(0).getCode())
@@ -202,7 +211,10 @@ class PathogenDetectionDataBuilderTest {
     pathogenDetectionDataBuilder.setMethodDisplay("methodDisplay");
 
     Observation observation =
-        pathogenDetectionDataBuilder.buildExamplePathogenDetection(notifiedPerson, specimen);
+        pathogenDetectionDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .setSpecimen(specimen)
+            .build();
 
     assertThat(observation.getMethod().getCoding()).hasSize(1);
     assertThat(observation.getMethod().getCoding().get(0).getCode()).isEqualTo("methodCode");
@@ -217,7 +229,10 @@ class PathogenDetectionDataBuilderTest {
     pathogenDetectionDataBuilder.setInterpretationDisplay("interpretationDisplay");
 
     Observation observation =
-        pathogenDetectionDataBuilder.buildExamplePathogenDetection(notifiedPerson, specimen);
+        pathogenDetectionDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .setSpecimen(specimen)
+            .build();
 
     assertThat(observation.getInterpretation()).hasSize(1);
     assertThat(observation.getInterpretation().get(0).getCoding()).hasSize(1);
@@ -236,7 +251,10 @@ class PathogenDetectionDataBuilderTest {
     pathogenDetectionDataBuilder.setCategoryDisplay("categoryDisplay");
 
     Observation observation =
-        pathogenDetectionDataBuilder.buildExamplePathogenDetection(notifiedPerson, specimen);
+        pathogenDetectionDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .setSpecimen(specimen)
+            .build();
 
     assertThat(observation.getCategory()).hasSize(1);
     assertThat(observation.getCategory().get(0).getCoding()).hasSize(1);
@@ -253,7 +271,10 @@ class PathogenDetectionDataBuilderTest {
     pathogenDetectionDataBuilder.setValue(new Quantity(500));
 
     Observation observation =
-        pathogenDetectionDataBuilder.buildExamplePathogenDetection(notifiedPerson, specimen);
+        pathogenDetectionDataBuilder
+            .setNotifiedPerson(notifiedPerson)
+            .setSpecimen(specimen)
+            .build();
 
     assertThat(observation.getValue()).isNotNull();
     Type value = observation.getValue();

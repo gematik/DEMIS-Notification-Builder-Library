@@ -26,18 +26,27 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_HOSPITALIZATION;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_FACILITY;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_ORGANIZATION;
+
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Compositions;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Conditions;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Patients;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.PractitionerRoles;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Provenances;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.QuestionnaireResponses;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Encounter;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Provenance;
@@ -49,8 +58,13 @@ record BundleBuilderContext(
     @Nonnull Patient subject,
     @Nonnull PractitionerRole notifier,
     @Nonnull Condition condition,
-    @Nonnull QuestionnaireResponse specificQuestionnaire,
-    @Nonnull Optional<Provenance> provenance) {
+    @Nonnull QuestionnaireResponse specificQuestionnaireResponse,
+    @Nonnull Optional<QuestionnaireResponse> commonQuestionnaireResponse,
+    @Nonnull Optional<Provenance> provenance,
+    @Nonnull List<Organization> notifiedPersonFacilities,
+    @Nonnull List<Encounter> encounters,
+    @Nonnull List<Organization> organizations,
+    @Nonnull List<Immunization> immunizations) {
 
   /**
    * @throws IllegalArgumentException if one of the required resources can't be extracted from the
@@ -74,9 +88,42 @@ record BundleBuilderContext(
         QuestionnaireResponses.specificFrom(composition)
             .orElseThrow(
                 illegalArgumentException("Can't find specific QuestionnaireResponse in Bundle"));
+    final Optional<QuestionnaireResponse> commonQuestionnaireResponse =
+        QuestionnaireResponses.commonForm(composition);
     final Optional<Provenance> provenance = Provenances.from(bundle.getEntry());
+
+    final List<Organization> notifiedPersonFacilities = new ArrayList<>();
+    final List<Encounter> encounters = new ArrayList<>();
+    final List<Organization> organizations = new ArrayList<>();
+    final List<Immunization> immunizations = new ArrayList<>();
+
+    for (Bundle.BundleEntryComponent bec : bundle.getEntry()) {
+      var res = bec.getResource();
+      if (res instanceof Organization organization
+          && res.getMeta().hasProfile(PROFILE_NOTIFIED_PERSON_FACILITY)) {
+        notifiedPersonFacilities.add(organization);
+      } else if (res instanceof Encounter encounter
+          && res.getMeta().hasProfile(PROFILE_HOSPITALIZATION)) {
+        encounters.add(encounter);
+      } else if (res instanceof Organization organization
+          && res.getMeta().hasProfile(PROFILE_ORGANIZATION)) {
+        organizations.add(organization);
+      } else if (res instanceof Immunization immunization) {
+        immunizations.add(immunization);
+      }
+    }
     return new BundleBuilderContext(
-        composition, patient, notifier, condition, specificQuestionnaire, provenance);
+        composition,
+        patient,
+        notifier,
+        condition,
+        specificQuestionnaire,
+        commonQuestionnaireResponse,
+        provenance,
+        notifiedPersonFacilities,
+        encounters,
+        organizations,
+        immunizations);
   }
 
   private static Supplier<IllegalArgumentException> illegalArgumentException(final String s) {

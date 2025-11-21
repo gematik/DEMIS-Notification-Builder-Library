@@ -56,10 +56,7 @@ class NotifiedPersonNominalDataBuilderTest {
   @Test
   void shouldSetHumanName() {
     HumanName humanName =
-        new HumanNameDataBuilder()
-            .setFamilyName("FAMILIENNAME")
-            .addGivenName("VORNAME")
-            .buildHumanName();
+        new HumanNameDataBuilder().setFamilyName("FAMILIENNAME").addGivenName("VORNAME").build();
     notifiedPersonDataBuilder.setHumanName(humanName);
 
     Patient patient = notifiedPersonDataBuilder.build();

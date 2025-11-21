@@ -35,13 +35,6 @@
           "display": "Infectious disease Note"
         } ]
       },
-      "category": [ {
-        "coding": [ {
-          "system": "http://loinc.org",
-          "code": "11502-2",
-          "display": "Laboratory report"
-        } ]
-      } ],
       "subject": {
         "reference": "Patient/555-42-23-7"
       },
