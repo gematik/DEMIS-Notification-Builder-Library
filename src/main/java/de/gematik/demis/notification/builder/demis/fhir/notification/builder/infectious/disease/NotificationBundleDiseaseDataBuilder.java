@@ -183,7 +183,9 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
 
     final Condition condition = DiseaseDataBuilder.deepCopy(ctx.condition(), notifiedPerson);
     final QuestionnaireResponse specificQuestionnaire =
-        deepCopy(ctx.specificQuestionnaireResponse(), notifiedPerson);
+        ctx.specificQuestionnaireResponse().isPresent()
+            ? deepCopy(ctx.specificQuestionnaireResponse().get(), notifiedPerson)
+            : null;
 
     final QuestionnaireResponse commonQuestionnaire =
         ctx.commonQuestionnaireResponse().isPresent()
@@ -194,7 +196,12 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
 
     final Composition composition =
         NotificationDiseaseDataBuilder.excerptCopy(
-            ctx.composition(), condition, notifiedPerson, notifierRole, specificQuestionnaire);
+            ctx.composition(),
+            condition,
+            notifiedPerson,
+            notifierRole,
+            Optional.of(specificQuestionnaire),
+            Optional.of(commonQuestionnaire));
 
     builder
         .setDisease(condition)

@@ -27,7 +27,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.SpecificInformationDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.QuestionnaireResponseBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import java.util.SequencedCollection;
@@ -69,8 +69,10 @@ public class NotificationBundleDiseaseNonNominalDataBuilder
     final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
     final Condition condition = DiseaseDataBuilder.deepCopy(ctx.condition(), notifiedPerson);
     final QuestionnaireResponse specificQuestionnaire =
-        SpecificInformationDataBuilder.deepCopy(
-            ctx.specificQuestionnaireResponse(), notifiedPerson);
+        ctx.specificQuestionnaireResponse().isPresent()
+            ? QuestionnaireResponseBuilder.deepCopy(
+                ctx.specificQuestionnaireResponse().get(), notifiedPerson)
+            : null;
     final Composition composition =
         NotificationDiseaseDataBuilder.deepCopy(
             ctx.composition(), condition, notifiedPerson, notifierRole, specificQuestionnaire);

@@ -58,7 +58,7 @@ record BundleBuilderContext(
     @Nonnull Patient subject,
     @Nonnull PractitionerRole notifier,
     @Nonnull Condition condition,
-    @Nonnull QuestionnaireResponse specificQuestionnaireResponse,
+    @Nonnull Optional<QuestionnaireResponse> specificQuestionnaireResponse,
     @Nonnull Optional<QuestionnaireResponse> commonQuestionnaireResponse,
     @Nonnull Optional<Provenance> provenance,
     @Nonnull List<Organization> notifiedPersonFacilities,
@@ -84,10 +84,8 @@ record BundleBuilderContext(
     final Condition condition =
         Conditions.from(composition)
             .orElseThrow(illegalArgumentException("Can't find Condition in Bundle"));
-    final QuestionnaireResponse specificQuestionnaire =
-        QuestionnaireResponses.specificFrom(composition)
-            .orElseThrow(
-                illegalArgumentException("Can't find specific QuestionnaireResponse in Bundle"));
+    final Optional<QuestionnaireResponse> specificQuestionnaire =
+        QuestionnaireResponses.specificFrom(composition);
     final Optional<QuestionnaireResponse> commonQuestionnaireResponse =
         QuestionnaireResponses.commonForm(composition);
     final Optional<Provenance> provenance = Provenances.from(bundle.getEntry());

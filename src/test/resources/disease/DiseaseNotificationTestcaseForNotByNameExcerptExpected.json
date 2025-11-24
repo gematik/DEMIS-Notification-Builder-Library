@@ -63,6 +63,18 @@
           "reference": "Condition/0b435ebe-a544-4a70-ada0-90bc5c9777df"
         } ]
       }, {
+        "title": "Meldetatbestandsübergreifende klinische und epidemiologische Angaben",
+        "code": {
+          "coding": [ {
+            "system": "https://demis.rki.de/fhir/CodeSystem/sectionCode",
+            "code": "generalClinAndEpiInformation",
+            "display": "Meldetatbestandsübergreifende klinische und epidemiologische Angaben"
+          } ]
+        },
+        "entry": [ {
+          "reference": "QuestionnaireResponse/6352a61f-d1d6-45d1-a15a-604b1c4b04f4"
+        } ]
+      }, {
         "title": "Meldetatbestandsspezifische klinische und epidemiologische Angaben",
         "code": {
           "coding": [ {

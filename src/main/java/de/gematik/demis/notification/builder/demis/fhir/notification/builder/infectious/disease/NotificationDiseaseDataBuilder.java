@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder.createDiseaseSpecificUrl;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_NOTIFICATION_TYPE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_SECTION_CODE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.DISEASE_COMPOSITION_TITLE;
@@ -92,9 +93,16 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
       @Nonnull final Condition condition,
       @Nonnull final Patient notifiedPerson,
       @Nonnull final PractitionerRole notifier,
-      @Nonnull final QuestionnaireResponse specificQuestionnaireResponse) {
+      @Nonnull final Optional<QuestionnaireResponse> specificQuestionnaireResponse,
+      @Nonnull final Optional<QuestionnaireResponse> commonQuestionnaireResponse) {
     Composition composition =
-        deepCopy(original, condition, notifiedPerson, notifier, specificQuestionnaireResponse);
+        deepCopy(
+            original,
+            condition,
+            notifiedPerson,
+            notifier,
+            specificQuestionnaireResponse,
+            commonQuestionnaireResponse);
     composition.setTitle(composition.getTitle() + NICHTNAMENTLICH);
     return composition;
   }
@@ -105,7 +113,24 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
       @Nonnull final Condition condition,
       @Nonnull final Patient notifiedPerson,
       @Nonnull final PractitionerRole notifier,
-      @Nonnull final QuestionnaireResponse specificQuestionnaireResponse) {
+      final QuestionnaireResponse specificQuestionnaireResponse) {
+    return deepCopy(
+        original,
+        condition,
+        notifiedPerson,
+        notifier,
+        Optional.of(specificQuestionnaireResponse),
+        Optional.empty());
+  }
+
+  @Nonnull
+  private static Composition deepCopy(
+      @Nonnull final Composition original,
+      @Nonnull final Condition condition,
+      @Nonnull final Patient notifiedPerson,
+      @Nonnull final PractitionerRole notifier,
+      @Nonnull final Optional<QuestionnaireResponse> specificQuestionnaireResponse,
+      @Nonnull final Optional<QuestionnaireResponse> commonQuestionnaireResponse) {
     final NotificationDiseaseDataBuilder builder =
         new NotificationDiseaseDataBuilder()
             .setCategory(original.getCategoryFirstRep().getCodingFirstRep().copy())
@@ -130,7 +155,8 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
             .setDisease(condition)
             .setNotifiedPerson(notifiedPerson)
             .setNotifierRole(notifier)
-            .setSpecificQuestionnaireResponse(specificQuestionnaireResponse)
+            .setSpecificQuestionnaireResponse(specificQuestionnaireResponse.orElse(null))
+            .setCommonQuestionnaireResponse(commonQuestionnaireResponse.orElse(null))
             .build();
     final List<Composition.CompositionRelatesToComponent> relatesTo =
         original.getRelatesTo().stream()
@@ -241,8 +267,7 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   }
 
   public NotificationDiseaseDataBuilder setProfileUrlByDisease(String disease) {
-    setProfileUrl(
-        NotificationBundleDiseaseDataBuilder.createDiseaseSpecificUrl(PROFILE_URL, disease));
+    setProfileUrl(createDiseaseSpecificUrl(PROFILE_URL, disease));
     return this;
   }
 
