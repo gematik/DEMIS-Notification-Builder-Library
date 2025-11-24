@@ -1,6 +1,11 @@
-<img align="right" width="250" height="47" src="media/Gematik_Logo_Flag.png"/> <br/>    
+<div style="text-align:right"><img src="media/Gematik_Logo_Flag_small.png" alt="gematik GmbH Logo"/> 
+ </div>
 
 # Release-Notes notification-builder-library
+
+## 9.0.1
+- fix missing section entry on disease excerpt creation
+- update dependencies for org.hl7.fhir.r4, org.hl7.fhir.utilities, commons-io, error_prone_annotations, commons-codec, jacoco-maven-plugin, commons-lang3.
 
 ## 9.0.0
 - fix laboratory nonnominal bundle deep copy to create excerpts for §6.1, §7.1 and §7.3
