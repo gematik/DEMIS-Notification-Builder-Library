@@ -3,6 +3,9 @@
 
 # Release-Notes notification-builder-library
 
+## 9.0.2
+- fix wrongly set id for disease excerpts
+
 ## 9.0.1
 - fix missing section entry on disease excerpt creation
 - update dependencies for org.hl7.fhir.r4, org.hl7.fhir.utilities, commons-io, error_prone_annotations, commons-codec, jacoco-maven-plugin, commons-lang3.

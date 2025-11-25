@@ -241,7 +241,6 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
         .setId(originalBundle.getId())
         .setProfileUrl(builder.getDefaultProfileUrl())
         .setIdentifier(newIdentifierForCopiedBundle)
-        .setIdentifierAsNotificationBundleId(originalBundle.getIdentifier().getValue())
         .setType(Bundle.BundleType.DOCUMENT)
         .setTimestamp(originalBundle.getTimestamp())
         .setLastUpdated(originalBundle.getMeta().getLastUpdated())

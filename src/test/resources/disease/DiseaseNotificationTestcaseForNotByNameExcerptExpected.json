@@ -11,7 +11,7 @@
   },
   "identifier": {
     "system": "https://demis.rki.de/fhir/NamingSystem/NotificationBundleId",
-    "value": "2d66a331-102a-4047-b666-1b2f18ee955e"
+    "value": "53"
   },
   "type": "document",
   "timestamp": "2022-03-10T14:57:51.377+01:00",
