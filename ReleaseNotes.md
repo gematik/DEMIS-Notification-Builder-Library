@@ -3,6 +3,9 @@
 
 # Release-Notes notification-builder-library
 
+## 9.0.3
+- fixed optional questionnaire response excerpt handling 
+
 ## 9.0.2
 - fix wrongly set id for disease excerpts
 
