@@ -200,8 +200,8 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
             condition,
             notifiedPerson,
             notifierRole,
-            Optional.of(specificQuestionnaire),
-            Optional.of(commonQuestionnaire));
+            Optional.ofNullable(specificQuestionnaire),
+            Optional.ofNullable(commonQuestionnaire));
 
     builder
         .setDisease(condition)
