@@ -3,6 +3,11 @@
 
 # Release-Notes notification-builder-library
 
+## 9.0.4
+- fixed immunization occurrence to also handle strings
+- fixed notified person address handling to keep address uses
+- fixed notified person gender extension handling to keep gender extension
+
 ## 9.0.3
 - fixed optional questionnaire response excerpt handling 
 

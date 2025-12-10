@@ -26,6 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder.createDiseaseSpecificUrl;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.InitializableFhirObjectBuilder;
@@ -37,11 +38,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Annotation;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Type;
 
 /** still missing are performer and reason code */
 @Setter
@@ -55,7 +56,7 @@ public class ImmunizationDataBuilder implements InitializableFhirObjectBuilder {
   private String profileUrl;
   private String status;
   private Coding vaccineCode;
-  private DateTimeType occurrence;
+  private Type occurrence;
   private String lotNumber;
   private Patient notifiedPerson;
 
@@ -95,8 +96,7 @@ public class ImmunizationDataBuilder implements InitializableFhirObjectBuilder {
   }
 
   public ImmunizationDataBuilder setProfileUrlByDisease(String disease) {
-    setProfileUrl(
-        NotificationBundleDiseaseDataBuilder.createDiseaseSpecificUrl(PROFILE_URL, disease));
+    setProfileUrl(createDiseaseSpecificUrl(PROFILE_URL, disease));
     return this;
   }
 
@@ -125,7 +125,7 @@ public class ImmunizationDataBuilder implements InitializableFhirObjectBuilder {
         .setStatus(originalImmunization.getStatus().toCode())
         .setVaccineCode(originalImmunization.getVaccineCode().getCodingFirstRep())
         .setNotifiedPerson(notifiedPerson)
-        .setOccurrence(originalImmunization.getOccurrenceDateTimeType())
+        .setOccurrence(originalImmunization.getOccurrence())
         .setNotes(originalImmunization.getNote().stream().map(Annotation::getText).toList());
 
     return immunizationDataBuilder.build();

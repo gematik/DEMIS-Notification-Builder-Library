@@ -26,7 +26,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
  * #L%
  */
 
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_ADDRESS_USE;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.ADDRESS_USE_URL;
 import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.truncate;
@@ -84,7 +84,7 @@ public class AddressDataBuilder implements FhirObjectBuilder {
         new AddressDataBuilder()
             .setPostalCode(shortenPostalCode(original))
             .setCountry(original.getCountry())
-            .withAddressUseExtension(original.getExtensionByUrl(CODE_SYSTEM_ADDRESS_USE));
+            .withAddressUseExtension(original.getExtensionByUrl(ADDRESS_USE_URL));
 
     return builder.build();
   }
