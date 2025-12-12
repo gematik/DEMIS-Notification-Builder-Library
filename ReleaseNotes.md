@@ -3,6 +3,9 @@
 
 # Release-Notes notification-builder-library
 
+## 9.0.5
+- Updated Plugins and Libraries
+
 ## 9.0.4
 - fixed immunization occurrence to also handle strings
 - fixed notified person address handling to keep address uses
