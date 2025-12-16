@@ -427,4 +427,65 @@ public final class CommonInformationDataBuilderTest {
         "{\"linkId\":\"additionalInformation\",\"answer\":[{\"valueString\":\"Zusatzinformationen zu den meldetatbestandsübergreifenden klinischen und epidemiologischen Angaben\"}]}";
     assertThat(s).contains(expected);
   }
+
+  @Test
+  void shouldCreateQuestionnaireResponseWithTwoEncountersSnomed() {
+    Encounter encounter1 = new Encounter();
+    encounter1.setId("123456");
+    Encounter encounter2 = new Encounter();
+    encounter2.setId("654321");
+    this.builder.addHospitalizationSnomed(encounter1);
+    this.builder.addHospitalizationSnomed(encounter2);
+    this.builder.setNotifiedPerson(this.emptyPatient);
+    QuestionnaireResponse questionnaireResponse = builder.build();
+
+    FhirParser parser = new FhirParser(FHIR_CONTEXT);
+    String s = parser.encodeToJson(questionnaireResponse);
+
+    assertThat(s).contains("Encounter/123456");
+    assertThat(s).contains("Encounter/654321");
+  }
+
+  @Test
+  void shouldCreateQuestionnaireResponseWithMultipleHospitalizationsSnomed() {
+    Encounter encounter1 = new Encounter();
+    encounter1.setId("111");
+    Encounter encounter2 = new Encounter();
+    encounter2.setId("222");
+    Encounter encounter3 = new Encounter();
+    encounter3.setId("333");
+
+    this.builder.addHospitalizationsSnomed(asList(encounter1, encounter2, encounter3));
+    this.builder.setNotifiedPerson(this.emptyPatient);
+    QuestionnaireResponse questionnaireResponse = builder.build();
+
+    FhirParser parser = new FhirParser(FHIR_CONTEXT);
+    String s = parser.encodeToJson(questionnaireResponse);
+
+    assertThat(s).contains("\"system\":\"http://snomed.info/sct\"");
+    assertThat(s).contains("\"code\":\"373066001\"");
+    assertThat(s).contains("Encounter/111");
+    assertThat(s).contains("Encounter/222");
+    assertThat(s).contains("Encounter/333");
+  }
+
+  @Test
+  void shouldNotMixSnomedAndRegularHospitalizations() {
+    Encounter encounter1 = new Encounter();
+    encounter1.setId("123");
+    Encounter encounter2 = new Encounter();
+    encounter2.setId("456");
+
+    this.builder.addHospitalization(encounter1);
+    this.builder.addHospitalizationSnomed(encounter2);
+    this.builder.setNotifiedPerson(this.emptyPatient);
+    QuestionnaireResponse questionnaireResponse = builder.build();
+
+    FhirParser parser = new FhirParser(FHIR_CONTEXT);
+    String s = parser.encodeToJson(questionnaireResponse);
+
+    // Both code systems should be present if mixed
+    assertThat(s).contains("Encounter/123");
+    assertThat(s).contains("Encounter/456");
+  }
 }

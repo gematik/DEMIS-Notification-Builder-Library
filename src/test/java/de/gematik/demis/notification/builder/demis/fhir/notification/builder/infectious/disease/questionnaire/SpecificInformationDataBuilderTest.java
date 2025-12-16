@@ -28,8 +28,11 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_DISEASE_INFORMATION_COMMON;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ca.uhn.fhir.context.FhirContext;
+import de.gematik.demis.fhirparserlibrary.FhirParser;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Patient;
@@ -37,6 +40,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse;
 import org.junit.jupiter.api.Test;
 
 public final class SpecificInformationDataBuilderTest {
+
+  private static final FhirContext FHIR_CONTEXT = FhirContext.forR4Cached();
 
   public static SpecificInformationDataBuilder createCvddBuilder() {
     return createCvddBuilder(null);
@@ -139,5 +144,66 @@ public final class SpecificInformationDataBuilderTest {
     this.builder.setStandardStatus(status);
     QuestionnaireResponse response = this.builder.setDefaults().build();
     assertThat(response.getStatus()).as("questionnaire response status").isSameAs(status);
+  }
+
+  @Test
+  void shouldAddSingleImmunizationSnomed() {
+    Immunization immunization = new Immunization();
+    immunization.setId("imm-123");
+
+    this.builder.addImmunizationSnomed(immunization);
+    this.builder.setNotifiedPerson(new Patient());
+    QuestionnaireResponse response = this.builder.build();
+
+    FhirParser parser = new FhirParser(FHIR_CONTEXT);
+    String json = parser.encodeToJson(response);
+
+    // Should use SNOMED code system for "yes" answer
+    assertThat(json).contains("\"system\":\"http://snomed.info/sct\"");
+    assertThat(json).contains("\"code\":\"373066001\"");
+    assertThat(json).contains("Immunization/imm-123");
+  }
+
+  @Test
+  void shouldAddMultipleImmunizationsSnomed() {
+    Immunization imm1 = new Immunization();
+    imm1.setId("imm-1");
+    Immunization imm2 = new Immunization();
+    imm2.setId("imm-2");
+    Immunization imm3 = new Immunization();
+    imm3.setId("imm-3");
+
+    this.builder.addImmunizationsSnomed(asList(imm1, imm2, imm3));
+    this.builder.setNotifiedPerson(new Patient());
+    QuestionnaireResponse response = this.builder.build();
+
+    FhirParser parser = new FhirParser(FHIR_CONTEXT);
+    String json = parser.encodeToJson(response);
+
+    assertThat(json).contains("\"system\":\"http://snomed.info/sct\"");
+    assertThat(json).contains("\"code\":\"373066001\"");
+    assertThat(json).contains("Immunization/imm-1");
+    assertThat(json).contains("Immunization/imm-2");
+    assertThat(json).contains("Immunization/imm-3");
+  }
+
+  @Test
+  void shouldNotMixRegularAndSnomedImmunizations() {
+    Immunization imm1 = new Immunization();
+    imm1.setId("regular-imm");
+    Immunization imm2 = new Immunization();
+    imm2.setId("snomed-imm");
+
+    this.builder.addImmunization(imm1);
+    this.builder.addImmunizationSnomed(imm2);
+    this.builder.setNotifiedPerson(new Patient());
+    QuestionnaireResponse response = this.builder.build();
+
+    FhirParser parser = new FhirParser(FHIR_CONTEXT);
+    String json = parser.encodeToJson(response);
+
+    // Both immunization references should be present
+    assertThat(json).contains("Immunization/regular-imm");
+    assertThat(json).contains("Immunization/snomed-imm");
   }
 }

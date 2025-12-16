@@ -103,10 +103,25 @@ public class CommonInformationDataBuilder extends QuestionnaireResponseBuilder
    * @param hospitalization hospitalization
    * @return builder
    */
+  @Deprecated(since = "9.0.7")
   public CommonInformationDataBuilder addHospitalization(Encounter hospitalization) {
     var hospitalizedEncounter = createHospitalizedEncounter(hospitalization);
     var hospitalizedGroup = createHospitalizedGroup(hospitalizedEncounter);
     var hospitalized = getInitializedHospitalized();
+    hospitalized.getAnswerFirstRep().addItem(hospitalizedGroup);
+    return this;
+  }
+
+  /**
+   * Add hospitalization
+   *
+   * @param hospitalization hospitalization
+   * @return builder
+   */
+  public CommonInformationDataBuilder addHospitalizationSnomed(Encounter hospitalization) {
+    var hospitalizedEncounter = createHospitalizedEncounter(hospitalization);
+    var hospitalizedGroup = createHospitalizedGroup(hospitalizedEncounter);
+    var hospitalized = getInitializedHospitalizedSnomed();
     hospitalized.getAnswerFirstRep().addItem(hospitalizedGroup);
     return this;
   }
@@ -117,8 +132,21 @@ public class CommonInformationDataBuilder extends QuestionnaireResponseBuilder
    * @param hospitalizations hospitalizations
    * @return builder
    */
+  @Deprecated(since = "9.0.7")
   public CommonInformationDataBuilder addHospitalizations(Collection<Encounter> hospitalizations) {
     hospitalizations.forEach(this::addHospitalization);
+    return this;
+  }
+
+  /**
+   * Adds given hospitalizations with SNOMED code
+   *
+   * @param hospitalizations hospitalizations
+   * @return builder
+   */
+  public CommonInformationDataBuilder addHospitalizationsSnomed(
+      Collection<Encounter> hospitalizations) {
+    hospitalizations.forEach(this::addHospitalizationSnomed);
     return this;
   }
 
@@ -128,8 +156,23 @@ public class CommonInformationDataBuilder extends QuestionnaireResponseBuilder
     return item.orElseGet(this::createHospitalized);
   }
 
+  private QuestionnaireResponse.QuestionnaireResponseItemComponent
+      getInitializedHospitalizedSnomed() {
+    Optional<QuestionnaireResponse.QuestionnaireResponseItemComponent> item =
+        getItems().stream().filter(i -> HOSPITALIZED_LINK_ID.equals(i.getLinkId())).findFirst();
+    return item.orElseGet(this::createHospitalizedSnomed);
+  }
+
   private QuestionnaireResponse.QuestionnaireResponseItemComponent createHospitalized() {
     var answerYes = new AnswerDataBuilder().setValueCodingYes().build();
+    var hospitalized =
+        new ItemDataBuilder().setLinkId(HOSPITALIZED_LINK_ID).addAnswer(answerYes).build();
+    addItem(hospitalized);
+    return hospitalized;
+  }
+
+  private QuestionnaireResponse.QuestionnaireResponseItemComponent createHospitalizedSnomed() {
+    var answerYes = new AnswerDataBuilder().setValueCodingYesSnomed().build();
     var hospitalized =
         new ItemDataBuilder().setLinkId(HOSPITALIZED_LINK_ID).addAnswer(answerYes).build();
     addItem(hospitalized);
