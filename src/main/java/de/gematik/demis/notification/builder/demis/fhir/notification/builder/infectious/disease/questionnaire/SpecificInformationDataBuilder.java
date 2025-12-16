@@ -82,8 +82,20 @@ public class SpecificInformationDataBuilder extends QuestionnaireResponseBuilder
    * @param immunization immunization
    * @return builder
    */
+  @Deprecated(since = "9.0.7")
   public final SpecificInformationDataBuilder addImmunization(Immunization immunization) {
     addImmunization(immunization, getInitializedImmunization());
+    return this;
+  }
+
+  /**
+   * Add immunization
+   *
+   * @param immunization immunization
+   * @return builder
+   */
+  public final SpecificInformationDataBuilder addImmunizationSnomed(Immunization immunization) {
+    addImmunization(immunization, getInitializedImmunizationSnomed());
     return this;
   }
 
@@ -93,9 +105,17 @@ public class SpecificInformationDataBuilder extends QuestionnaireResponseBuilder
    * @param immunizations immunizations
    * @return builder
    */
+  @Deprecated(since = "9.0.7")
   public final SpecificInformationDataBuilder addImmunizations(
       Collection<Immunization> immunizations) {
     var immunizationItem = getInitializedImmunization();
+    immunizations.forEach(i -> addImmunization(i, immunizationItem));
+    return this;
+  }
+
+  public final SpecificInformationDataBuilder addImmunizationsSnomed(
+      Collection<Immunization> immunizations) {
+    var immunizationItem = getInitializedImmunizationSnomed();
     immunizations.forEach(i -> addImmunization(i, immunizationItem));
     return this;
   }
@@ -118,8 +138,23 @@ public class SpecificInformationDataBuilder extends QuestionnaireResponseBuilder
     return item.orElseGet(this::createImmunization);
   }
 
+  private QuestionnaireResponse.QuestionnaireResponseItemComponent
+      getInitializedImmunizationSnomed() {
+    Optional<QuestionnaireResponse.QuestionnaireResponseItemComponent> item =
+        getItems().stream().filter(i -> IMMUNIZATION_LINK_ID.equals(i.getLinkId())).findFirst();
+    return item.orElseGet(this::createImmunizationSnomed);
+  }
+
   private QuestionnaireResponse.QuestionnaireResponseItemComponent createImmunization() {
     var answerYes = new AnswerDataBuilder().setValueCodingYes().build();
+    var immunization =
+        new ItemDataBuilder().setLinkId(IMMUNIZATION_LINK_ID).addAnswer(answerYes).build();
+    addItem(immunization);
+    return immunization;
+  }
+
+  private QuestionnaireResponse.QuestionnaireResponseItemComponent createImmunizationSnomed() {
+    var answerYes = new AnswerDataBuilder().setValueCodingYesSnomed().build();
     var immunization =
         new ItemDataBuilder().setLinkId(IMMUNIZATION_LINK_ID).addAnswer(answerYes).build();
     addItem(immunization);

@@ -116,14 +116,27 @@ public class AnswerDataBuilder implements FhirObjectBuilder {
     return this.valueDateTime;
   }
 
+  @Deprecated(since = "9.0.7")
   public AnswerDataBuilder setValueCodingYes() {
     return setValueCoding(
         new Coding("https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer", "yes", "Ja"));
   }
 
+  public AnswerDataBuilder setValueCodingYesSnomed() {
+    return setValueCoding(
+        new Coding("http://snomed.info/sct", "373066001", "Yes (qualifier value)"));
+  }
+
+  @Deprecated(since = "9.0.7")
   public AnswerDataBuilder setValueCodingNo() {
+
     return setValueCoding(
         new Coding("https://demis.rki.de/fhir/CodeSystem/yesOrNoAnswer", "no", "Nein"));
+  }
+
+  public AnswerDataBuilder setValueCodingNoSnomed() {
+    return setValueCoding(
+        new Coding("http://snomed.info/sct", "373067005", "No (qualifier value)"));
   }
 
   /**
