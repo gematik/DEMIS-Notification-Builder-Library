@@ -175,35 +175,6 @@ class LaboratoryExcerptBuilderTest {
     }
 
     @Test
-    void shouldCreateExcerptWithGenderExtension() throws IOException {
-      int[] idHelper = {50};
-      try (MockedStatic<Utils> utils = Mockito.mockStatic(Utils.class)) {
-        utils
-            .when(Utils::generateUuidString)
-            .thenAnswer(invocation -> Integer.toString(idHelper[0]++));
-
-        utils.when(() -> Utils.getShortReferenceOrUrnUuid(any())).thenCallRealMethod();
-
-        String json =
-            Files.readString(
-                Path.of(
-                    "src/test/resources/laboratory/LaboratoryNotificationTestcaseForNotByNameExcerpt_SpecialGenderCase.json"));
-        IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
-        Bundle bundle = iParser.parseResource(Bundle.class, json);
-
-        Bundle excerpt = LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByName(bundle);
-        String excerptJson = iParser.encodeResourceToString(excerpt);
-
-        String expected =
-            Files.readString(
-                Path.of(
-                    "src/test/resources/laboratory/LaboratoryNotificationTestcaseForNotByNameExcerpt_SpecialGenderCaseExpected.json"));
-
-        assertThat(excerptJson).isEqualTo(expected);
-      }
-    }
-
-    @Test
     void shouldCreateNewBundleFollowingSpecifications() throws IOException {
       int[] idHelper = {50};
       try (MockedStatic<Utils> utils = Mockito.mockStatic(Utils.class)) {

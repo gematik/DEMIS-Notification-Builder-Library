@@ -38,7 +38,6 @@ import java.util.Date;
 import java.util.List;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.DateType;
@@ -111,13 +110,6 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
     }
     if (gender != null) {
       patient.setGender(gender);
-      if (Enumerations.AdministrativeGender.OTHER.equals(gender)) {
-        var extension = new Extension("http://fhir.de/StructureDefinition/gender-amtlich-de");
-        extension.setValue(
-            new Coding("http://fhir.de/CodeSystem/gender-amtlich-de", "D", "divers"));
-
-        patient.getGenderElement().addExtension(extension);
-      }
     }
     if (id != null) {
       final IdType idType = new IdType(RESOURCE_TYPE, id);
