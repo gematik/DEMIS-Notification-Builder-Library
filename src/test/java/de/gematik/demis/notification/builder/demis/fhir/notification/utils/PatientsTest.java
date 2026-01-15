@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -30,12 +30,18 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class PatientsTest {
   @Nested
@@ -79,6 +85,38 @@ class PatientsTest {
       bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(composition)));
 
       assertThat(Patients.subjectFrom(bundle)).isEmpty();
+    }
+  }
+
+  @Nested
+  class CopyBirthdate {
+
+    private static Stream<Arguments> dateTypeArgs() {
+      return Stream.of(
+          Arguments.of("1980-01-01", "1980-01"),
+          Arguments.of("1980-01", "1980-01"),
+          Arguments.of("1980", "1980"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("dateTypeArgs")
+    void copyBirthdate_createsShortenedBirthdate(
+        final String birthdateToCopy, final String expectedShortenedBirthdate) {
+      final Patient patient = new Patient();
+      patient.setBirthDateElement(new DateType(birthdateToCopy));
+      AtomicReference<DateType> shortenedBirthdate = new AtomicReference<>();
+
+      Patients.copyBirthdateShortened(patient, shortenedBirthdate::set);
+      assertThat(shortenedBirthdate.get().getValueAsString()).isEqualTo(expectedShortenedBirthdate);
+    }
+
+    @Test
+    void copyBirthdate_noBirthdate() {
+      final Patient patient = new Patient();
+      AtomicReference<DateType> shortenedBirthdate = new AtomicReference<>();
+
+      Patients.copyBirthdateShortened(patient, shortenedBirthdate::set);
+      assertThat(shortenedBirthdate.get()).isNull();
     }
   }
 }

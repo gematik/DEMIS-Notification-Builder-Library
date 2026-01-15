@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.Test;
 
 class NotifiedPersonAnonymousDataBuilderTest {
@@ -122,5 +123,28 @@ class NotifiedPersonAnonymousDataBuilderTest {
     assertThat(actualPatient.getMeta().getProfile().getFirst().getValueAsString())
         .as("ProfileUrl sollte korrekt gesetzt werden")
         .isEqualTo(PROFILE_NOTIFIED_PERSON_ANONYMOUS);
+  }
+
+  @Test
+  void createAnonymousPatientForExcerpt() {
+    final Patient patient = new Patient();
+    patient.setId("67890");
+    patient.setGender(Enumerations.AdministrativeGender.MALE);
+    patient.setBirthDateElement(new DateType("1980-01-01"));
+    patient.addName().setFamily("Muster").addGiven("Max");
+    patient.addAddress().setCity("Berlin").setPostalCode("12345");
+    final String pseudonymExtensionUrl =
+        "https://demis.rki.de/fhir/StructureDefinition/PseudonymRecordType";
+    patient.addExtension().setUrl(pseudonymExtensionUrl).setValue(new StringType("SomeValue"));
+    final Patient anonymousPatient =
+        NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(patient);
+    assertThat(anonymousPatient.getMeta().getProfile().getFirst().getValueAsString())
+        .isEqualTo(PROFILE_NOTIFIED_PERSON_ANONYMOUS);
+    assertThat(anonymousPatient.getAddress().getFirst().getPostalCode()).isEqualTo("123");
+    assertThat(anonymousPatient.getAddress().getFirst().getCity()).isNull();
+    assertThat(anonymousPatient.getGender()).isEqualTo(Enumerations.AdministrativeGender.MALE);
+    assertThat(anonymousPatient.getName()).isEmpty();
+    assertThat(anonymousPatient.getBirthDateElement().getValueAsString()).isEqualTo("1980-01");
+    assertThat(anonymousPatient.getExtensionByUrl(pseudonymExtensionUrl)).isNull();
   }
 }

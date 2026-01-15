@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -110,9 +110,9 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
 
     final Bundle result =
         NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(originalBundle);
-    assertThat(result.getMeta().getTag().get(0).getSystem()).isEqualTo("system");
-    assertThat(result.getMeta().getTag().get(0).getCode()).isEqualTo("code");
-    assertThat(result.getMeta().getTag().get(0).getDisplay()).isEqualTo("display");
+    assertThat(result.getMeta().getTag().getFirst().getSystem()).isEqualTo("system");
+    assertThat(result.getMeta().getTag().getFirst().getCode()).isEqualTo("code");
+    assertThat(result.getMeta().getTag().getFirst().getDisplay()).isEqualTo("display");
   }
 
   @Test
@@ -178,10 +178,7 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
     final Bundle original = getBundle();
 
     assertThatNoException()
-        .isThrownBy(
-            () -> {
-              NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original);
-            });
+        .isThrownBy(() -> NotificationBundleLaboratoryNonNominalDataBuilder.deepCopy(original));
   }
 
   private static Stream<Arguments> copyTestCases() {

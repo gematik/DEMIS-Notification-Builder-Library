@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -30,6 +30,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_ANONYMOUS;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Patients;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.SequencedCollection;
 import javax.annotation.Nonnull;
@@ -55,6 +56,19 @@ public class NotifiedPersonAnonymousDataBuilder extends NotifiedPersonNominalDat
     builder.setGender(original.getGender());
     final IIdType idElement = original.getIdElement();
     builder.setId(idElement.getIdPart());
+
+    return builder.build();
+  }
+
+  @Nonnull
+  public static Patient createAnonymousPatientForExcerpt(@Nonnull final Patient patientToCopy) {
+    final NotifiedPersonAnonymousDataBuilder builder = new NotifiedPersonAnonymousDataBuilder();
+    builder
+        .setDefault()
+        .setGender(patientToCopy.getGender())
+        .setAddress(AddressDataBuilder.copyAllAddressesForExcerpt(patientToCopy.getAddress()));
+
+    Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);
 
     return builder.build();
   }
