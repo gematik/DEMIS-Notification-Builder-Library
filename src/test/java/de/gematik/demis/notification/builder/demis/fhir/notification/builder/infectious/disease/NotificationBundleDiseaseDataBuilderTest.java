@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -28,15 +28,8 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PatientBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import org.hl7.fhir.r4.model.Bundle;
@@ -48,8 +41,6 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.QuestionnaireResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 class NotificationBundleDiseaseDataBuilderTest {
 
@@ -186,83 +177,5 @@ class NotificationBundleDiseaseDataBuilderTest {
             .map(Organization.class::cast)
             .toList();
     assertThat(facilities).isEmpty();
-  }
-
-  @Test
-  void shouldCreateNewBundleFollowingSpecifications() throws IOException {
-    int[] idHelper = {50};
-    try (MockedStatic<Utils> utils = Mockito.mockStatic(Utils.class)) {
-      utils
-          .when(Utils::generateUuidString)
-          .thenAnswer(invocation -> Integer.toString(idHelper[0]++));
-      utils.when(() -> Utils.getShortReferenceOrUrnUuid(any())).thenCallRealMethod();
-
-      String json =
-          Files.readString(
-              Path.of(
-                  "src/test/resources/disease/DiseaseNotificationTestcaseForNotByNameExcerpt.json"));
-      IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
-      Bundle bundle = iParser.parseResource(Bundle.class, json);
-
-      Bundle excerpt = NotificationBundleDiseaseDataBuilder.createNonNominalExcerpt(bundle);
-      String excerptJson = iParser.encodeResourceToString(excerpt);
-
-      String expected =
-          Files.readString(
-              Path.of(
-                  "src/test/resources/disease/DiseaseNotificationTestcaseForNotByNameExcerptExpected.json"));
-
-      assertThat(excerptJson).isEqualTo(expected);
-    }
-  }
-
-  @Test
-  void shouldCreateExcerptWithGenderExtension() throws IOException {
-    int[] idHelper = {50};
-    try (MockedStatic<Utils> utils = Mockito.mockStatic(Utils.class)) {
-      utils
-          .when(Utils::generateUuidString)
-          .thenAnswer(invocation -> Integer.toString(idHelper[0]++));
-      utils.when(() -> Utils.getShortReferenceOrUrnUuid(any())).thenCallRealMethod();
-
-      String json =
-          Files.readString(
-              Path.of(
-                  "src/test/resources/disease/DiseaseNotificationTestcaseForNotByNameExcerpt_SpecialGenderCase.json"));
-      IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
-      Bundle bundle = iParser.parseResource(Bundle.class, json);
-
-      Bundle excerpt = NotificationBundleDiseaseDataBuilder.createNonNominalExcerpt(bundle);
-      String excerptJson = iParser.encodeResourceToString(excerpt);
-
-      String expected =
-          Files.readString(
-              Path.of(
-                  "src/test/resources/disease/DiseaseNotificationTestcaseForNotByNameExcerpt_SpecialGenderCaseExpected.json"));
-
-      assertThat(excerptJson).isEqualTo(expected);
-    }
-  }
-
-  @Test
-  void shouldCreateExcerptWithOccuranceAsStringCase() throws IOException {
-    int[] idHelper = {50};
-    try (MockedStatic<Utils> utils = Mockito.mockStatic(Utils.class)) {
-      utils
-          .when(Utils::generateUuidString)
-          .thenAnswer(invocationOnMock -> Integer.toString(idHelper[0]++));
-      utils.when(() -> Utils.getShortReferenceOrUrnUuid(any())).thenCallRealMethod();
-
-      String json =
-          Files.readString(Path.of("src/test/resources/disease/occuranceCaseExcerpt.json"));
-      IParser iParser = FhirContext.forR4Cached().newJsonParser().setPrettyPrint(true);
-
-      Bundle bundle = iParser.parseResource(Bundle.class, json);
-
-      Bundle excerpt = NotificationBundleDiseaseDataBuilder.createNonNominalExcerpt(bundle);
-
-      assertThat(((Immunization) excerpt.getEntry().get(8).getResource()).getOccurrence())
-          .hasToString("ASKU");
-    }
   }
 }

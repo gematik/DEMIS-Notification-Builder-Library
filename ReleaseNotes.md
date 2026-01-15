@@ -2,6 +2,8 @@
  </div>
 
 # Release-Notes notification-builder-library
+## 9.0.7
+- add method createAnonymousExcerpt for 7.3 notifications to NotificationBundleDiseaseNonNominalDataBuilder and NotificationBundleLaboratoryNonNominalDataBuilder
 
 ## 9.0.5
 - Updated Plugins and Libraries

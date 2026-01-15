@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -37,13 +37,12 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.builder.tec
 import de.gematik.demis.notification.builder.demis.fhir.notification.types.AddressUse;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Patients;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
-import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.SequencedCollection;
 import java.util.function.Predicate;
@@ -96,7 +95,7 @@ public class NotifiedPersonNonNominalDataBuilder {
         AddressDataBuilder.copyOfRedactedAddress(addressesToCopy);
     builder.setAddress(List.copyOf(addresses));
 
-    copyBirthdate(patientToCopy, builder);
+    Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);
 
     builder.setGender(patientToCopy.getGender());
     final IIdType idElement = patientToCopy.getIdElement();
@@ -118,27 +117,9 @@ public class NotifiedPersonNonNominalDataBuilder {
             .setAddress(AddressDataBuilder.copyAllAddressesForExcerpt(patientToCopy.getAddress()))
             .addExtension(patientToCopy.getExtensionByUrl(EXTENSION_URL_PSEUDONYM));
 
-    copyBirthdate(patientToCopy, builder);
+    Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);
 
     return builder.build();
-  }
-
-  private static void copyBirthdate(
-      final Patient patientToCopy, final NotifiedPersonNonNominalDataBuilder builder) {
-    if (patientToCopy.hasBirthDateElement()) {
-      final DateType birthDateElement = patientToCopy.getBirthDateElement();
-      final TemporalPrecisionEnum precision = birthDateElement.getPrecision();
-      if (TemporalPrecisionEnum.YEAR.equals(precision)
-          || TemporalPrecisionEnum.MONTH.equals(precision)) {
-        builder.setBirthdate(birthDateElement.getValueAsString());
-      } else {
-        final Date birthdate = birthDateElement.getValue();
-        // SonarQube prevents us from making this a static variable, and using it as instance
-        // variable
-        // breaks the code, so we just generate a new object for this case
-        builder.setBirthdate(new SimpleDateFormat("yyyy-MM").format(birthdate));
-      }
-    }
   }
 
   /** Return the addresses to copy. This method will remove forbidden AddressUse extensions. */
@@ -212,6 +193,11 @@ public class NotifiedPersonNonNominalDataBuilder {
         .setDeceased(deceased)
         .setExtensions(extensions)
         .build();
+  }
+
+  public NotifiedPersonNonNominalDataBuilder setBirthdate(DateType birthdate) {
+    this.birthdate = birthdate;
+    return this;
   }
 
   public NotifiedPersonNonNominalDataBuilder setBirthdate(Year year) {

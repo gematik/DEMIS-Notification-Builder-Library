@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -28,17 +28,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.mockito.ArgumentMatchers.any;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
-import de.gematik.demis.notification.builder.demis.fhir.testUtils.TestObjects;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -52,11 +42,7 @@ import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Specimen;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 /**
  * this class demonstrates how the builders for all the parts of a notification can be used to
@@ -180,205 +166,5 @@ class NotificationBundleLaboratoryDataBuilderTest {
             specimen,
             laboratoryReport,
             additionalEntry);
-  }
-
-  @Test
-  void shouldCreateNewBundleFollowingSpecifications() throws IOException {
-    int[] idHelper = {50};
-    try (MockedStatic<Utils> utils = Mockito.mockStatic(Utils.class)) {
-      utils
-          .when(Utils::generateUuidString)
-          .thenAnswer(invocation -> Integer.toString(idHelper[0]++));
-
-      utils.when(() -> Utils.getShortReferenceOrUrnUuid(any())).thenCallRealMethod();
-
-      String json =
-          Files.readString(
-              Path.of(
-                  "src/test/resources/laboratory/LaboratoryNotificationTestcaseForNotByNameExcerpt.json"));
-      IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
-      Bundle bundle = iParser.parseResource(Bundle.class, json);
-
-      Bundle excerpt = NotificationBundleLaboratoryDataBuilder.createNonNominalExcerpt(bundle);
-      String excerptJson = iParser.encodeResourceToString(excerpt);
-
-      String expected =
-          Files.readString(
-              Path.of(
-                  "src/test/resources/laboratory/LaboratoryNotificationTestcaseForNotByNameExcerptExpected.json"));
-
-      assertThat(excerptJson).isEqualTo(expected);
-    }
-  }
-
-  @Nested
-  @DisplayName("§7.1 not by name creation tests")
-  class NotByNameCreationTests {
-
-    private Bundle create71Bundle() {
-      try {
-        final String source =
-            Files.readString(Path.of("src/test/resources/laboratory/71-cvdp-erstmeldung.json"));
-        final IParser iParser = FhirContext.forR4().newJsonParser();
-        iParser.setPrettyPrint(true);
-        return (Bundle) iParser.parseResource(source);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    @Test
-    void shouldCopyMetaProfileUrl() {
-      Bundle originalBundle = create71Bundle();
-
-      final Bundle result =
-          NotificationBundleLaboratoryNonNominalDataBuilder.createNonNominalExcerpt(originalBundle);
-
-      assertThat(result.getMeta().getProfile().getFirst().getValue())
-          .isEqualTo(DemisConstants.PROFILE_NOTIFICATION_BUNDLE_LABORATORY);
-    }
-
-    @Test
-    void shouldCopyMetaTagsAndAddRelatedNotificationBundleTag() {
-      Bundle originalBundle = create71Bundle();
-
-      final Bundle result =
-          NotificationBundleLaboratoryNonNominalDataBuilder.createNonNominalExcerpt(originalBundle);
-      assertThat(result.getMeta().getTag().get(0).getSystem()).isEqualTo("system");
-      assertThat(result.getMeta().getTag().get(0).getCode()).isEqualTo("code");
-      assertThat(result.getMeta().getTag().get(0).getDisplay()).isEqualTo("display");
-
-      assertThat(result.getMeta().getTag().get(1).getSystem())
-          .isEqualTo("https://demis.rki.de/fhir/CodeSystem/RelatedNotificationBundle");
-      assertThat(result.getMeta().getTag().get(1).getCode())
-          .isEqualTo("925ccab9-b22c-3a95-b209-2cd46cabfa78");
-      assertThat(result.getMeta().getTag().get(1).getDisplay())
-          .isEqualTo("Relates to message with identifier: 925ccab9-b22c-3a95-b209-2cd46cabfa78");
-    }
-
-    @Test
-    void shouldCreateNewIdentifierAndUseIdentifierAsTag() {
-      try (MockedStatic<Utils> utils = Mockito.mockStatic(Utils.class)) {
-        utils.when(Utils::generateUuidString).thenReturn("555-42-23-6");
-        utils.when(() -> Utils.getShortReferenceOrUrnUuid(any())).thenCallRealMethod();
-        Bundle originalBundle = create71Bundle();
-
-        final Bundle result =
-            NotificationBundleLaboratoryNonNominalDataBuilder.createNonNominalExcerpt(
-                originalBundle);
-        assertThat(result.getIdentifier().getSystem())
-            .isEqualTo("https://demis.rki.de/fhir/NamingSystem/NotificationBundleId");
-        assertThat(result.getIdentifier().getValue()).isEqualTo("555-42-23-6");
-
-        assertThat(result.getMeta().getTag().get(1).getCode())
-            .isEqualTo("925ccab9-b22c-3a95-b209-2cd46cabfa78");
-      }
-    }
-
-    @Test
-    void shouldCopyType() {
-      Bundle originalBundle = create71Bundle();
-      final Bundle result =
-          NotificationBundleLaboratoryNonNominalDataBuilder.createNonNominalExcerpt(originalBundle);
-      assertThat(result.getType()).isEqualTo(Bundle.BundleType.DOCUMENT);
-    }
-
-    @Test
-    void shouldCopyLastUpdated() {
-      Bundle originalBundle = create71Bundle();
-      Date lastUpdated = originalBundle.getMeta().getLastUpdated();
-
-      final Bundle result =
-          NotificationBundleLaboratoryNonNominalDataBuilder.createNonNominalExcerpt(originalBundle);
-      assertThat(result.getMeta().getLastUpdated()).isEqualTo(lastUpdated);
-    }
-
-    @Test
-    void shouldCopyTimestamp() {
-      Bundle originalBundle = create71Bundle();
-      Date timestamp = originalBundle.getTimestamp();
-
-      final Bundle result =
-          NotificationBundleLaboratoryNonNominalDataBuilder.createNonNominalExcerpt(originalBundle);
-      assertThat(result.getTimestamp()).isEqualTo(timestamp);
-    }
-
-    @Test
-    void shouldCopyEntries() {
-      final Bundle original = getBundle();
-
-      final Bundle result =
-          NotificationBundleLaboratoryNonNominalDataBuilder.createNonNominalExcerpt(original);
-
-      assertThat(result.getEntry()).hasSize(original.getEntry().size());
-      // Equality is implemented on referencial equality. Ensure that no entry is present in either
-      // list,
-      // which means: we have copied the entries by creating a new object.
-      assertThat(result.getEntry()).doesNotContainAnyElementsOf(original.getEntry());
-      assertThat(original.getEntry()).doesNotContainAnyElementsOf(result.getEntry());
-    }
-
-    @Test
-    void thatCopyingWithMissingBirthdateWorks() {
-      final Specimen specimen = TestObjects.specimen();
-      TestObjects.pathogenDetection(specimen);
-      final Patient notifiedPerson = TestObjects.notifiedPerson();
-      notifiedPerson.setBirthDate(null);
-
-      final Bundle original = getBundle();
-
-      assertThatNoException()
-          .isThrownBy(
-              () -> {
-                NotificationBundleLaboratoryNonNominalDataBuilder.createNonNominalExcerpt(original);
-              });
-    }
-
-    @Test
-    void shouldCreateExcerptWithGenderExtension() throws IOException {
-      int[] idHelper = {50};
-      try (MockedStatic<Utils> utils = Mockito.mockStatic(Utils.class)) {
-        utils
-            .when(Utils::generateUuidString)
-            .thenAnswer(invocation -> Integer.toString(idHelper[0]++));
-
-        utils.when(() -> Utils.getShortReferenceOrUrnUuid(any())).thenCallRealMethod();
-
-        String json =
-            Files.readString(
-                Path.of(
-                    "src/test/resources/laboratory/LaboratoryNotificationTestcaseForNotByNameExcerpt_SpecialGenderCase.json"));
-        IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
-        Bundle bundle = iParser.parseResource(Bundle.class, json);
-
-        Bundle excerpt = NotificationBundleLaboratoryDataBuilder.createNonNominalExcerpt(bundle);
-        String excerptJson = iParser.encodeResourceToString(excerpt);
-
-        String expected =
-            Files.readString(
-                Path.of(
-                    "src/test/resources/laboratory/LaboratoryNotificationTestcaseForNotByNameExcerpt_SpecialGenderCaseExpected.json"));
-
-        assertThat(excerptJson).isEqualTo(expected);
-      }
-    }
-
-    private static Bundle getBundle() {
-      final Specimen specimen = TestObjects.specimen();
-      final Observation observation = TestObjects.pathogenDetection(specimen);
-      final DiagnosticReport diagnosticReport = TestObjects.laboratoryReport(observation);
-      final Patient patient = TestObjects.notifiedPerson();
-      final PractitionerRole submitter = TestObjects.submitter();
-      return new NotificationBundleLaboratoryNonNominalDataBuilder()
-          .setDefaults()
-          .setNotifierRole(TestObjects.notifier())
-          .setSubmitterRole(submitter)
-          .setNotifiedPerson(patient)
-          .setPathogenDetection(List.of(observation))
-          .setSpecimen(List.of(specimen))
-          .setLaboratoryReport(diagnosticReport)
-          .setNotificationLaboratory(TestObjects.composition(diagnosticReport, patient, submitter))
-          .build();
-    }
   }
 }

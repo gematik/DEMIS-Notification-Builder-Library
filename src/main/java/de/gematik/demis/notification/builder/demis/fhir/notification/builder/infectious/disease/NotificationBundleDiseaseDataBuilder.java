@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -27,38 +27,29 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
-import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.QuestionnaireResponseBuilder.deepCopy;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFICATION_BUNDLE_DISEASE;
 
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.BundleDataBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
-import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CanonicalType;
-import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.Encounter;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
-import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.QuestionnaireResponse;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -173,80 +164,6 @@ public class NotificationBundleDiseaseDataBuilder extends BundleDataBuilder {
     NotificationDiseaseDataBuilder compositionBuilder = new NotificationDiseaseDataBuilder();
     createCompositionHelper(compositionBuilder);
     return compositionBuilder;
-  }
-
-  @Nonnull
-  public static Bundle createNonNominalExcerpt(@Nonnull final Bundle originalBundle) {
-    final NotificationBundleDiseaseDataBuilder builder = new NotificationBundleDiseaseDataBuilder();
-    final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle);
-    final Patient notifiedPerson =
-        NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(ctx.subject());
-
-    final Condition condition = DiseaseDataBuilder.deepCopy(ctx.condition(), notifiedPerson);
-    final QuestionnaireResponse specificQuestionnaire =
-        ctx.specificQuestionnaireResponse().isPresent()
-            ? deepCopy(ctx.specificQuestionnaireResponse().get(), notifiedPerson)
-            : null;
-
-    final QuestionnaireResponse commonQuestionnaire =
-        ctx.commonQuestionnaireResponse().isPresent()
-            ? deepCopy(ctx.commonQuestionnaireResponse().get(), notifiedPerson)
-            : null;
-
-    final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
-
-    final Composition composition =
-        NotificationDiseaseDataBuilder.excerptCopy(
-            ctx.composition(),
-            condition,
-            notifiedPerson,
-            notifierRole,
-            Optional.ofNullable(specificQuestionnaire),
-            Optional.ofNullable(commonQuestionnaire));
-
-    builder
-        .setDisease(condition)
-        .setSpecificInformation(specificQuestionnaire)
-        .setCommonInformation(commonQuestionnaire)
-        .setNotificationDisease(composition)
-        .setNotifiedPerson(notifiedPerson)
-        .setNotifierRole(notifierRole)
-        .setHospitalizations(
-            ctx.encounters().stream()
-                .map(encounter -> EncounterDataBuilder.deepCopy(encounter, notifiedPerson))
-                .toList())
-        .setEncounterOrganizations(ctx.organizations())
-        .setImmunizations(
-            ctx.immunizations().stream()
-                .map(
-                    immunization -> ImmunizationDataBuilder.deepyCopy(immunization, notifiedPerson))
-                .toList());
-
-    originalBundle.getMeta().getTag().forEach(builder::addTag);
-
-    ctx.provenance().map(Provenance::copy).ifPresent(builder::addAdditionalEntry);
-
-    final Identifier newIdentifierForCopiedBundle =
-        new Identifier()
-            .setValue(Utils.generateUuidString())
-            .setSystem(DemisConstants.NAMING_SYSTEM_NOTIFICATION_BUNDLE_ID);
-
-    final String originalBundleIdentifier = originalBundle.getIdentifier().getValue();
-    final Coding referenceTagToOriginalBundle =
-        new Coding(
-            DemisConstants.RELATED_NOTIFICATION_CODING_SYSTEM,
-            originalBundleIdentifier,
-            "Relates to message with identifier: " + originalBundleIdentifier);
-
-    return builder
-        .setId(originalBundle.getId())
-        .setProfileUrl(builder.getDefaultProfileUrl())
-        .setIdentifier(newIdentifierForCopiedBundle)
-        .setType(Bundle.BundleType.DOCUMENT)
-        .setTimestamp(originalBundle.getTimestamp())
-        .setLastUpdated(originalBundle.getMeta().getLastUpdated())
-        .addTag(referenceTagToOriginalBundle)
-        .build();
   }
 
   void createCompositionHelper(NotificationDiseaseDataBuilder compositionBuilder) {

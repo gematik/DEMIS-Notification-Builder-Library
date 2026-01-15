@@ -4,7 +4,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  * #%L
  * notification-builder-library
  * %%
- * Copyright (C) 2025 gematik GmbH
+ * Copyright (C) 2025 - 2026 gematik GmbH
  * %%
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the
  * European Commission – subsequent versions of the EUPL (the "Licence").
@@ -27,11 +27,16 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  * #L%
  */
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Patient;
 
 public class Patients {
@@ -59,5 +64,20 @@ public class Patients {
 
               return null;
             });
+  }
+
+  public static void copyBirthdateShortened(
+      Patient patientToCopy, Consumer<DateType> setBirthdate) {
+    if (patientToCopy.hasBirthDateElement()) {
+      final DateType birthDateElement = patientToCopy.getBirthDateElement();
+      final TemporalPrecisionEnum precision = birthDateElement.getPrecision();
+      if (TemporalPrecisionEnum.YEAR.equals(precision)
+          || TemporalPrecisionEnum.MONTH.equals(precision)) {
+        setBirthdate.accept(birthDateElement);
+      } else {
+        final Date birthdate = birthDateElement.getValue();
+        setBirthdate.accept(new DateType(new SimpleDateFormat("yyyy-MM").format(birthdate)));
+      }
+    }
   }
 }
