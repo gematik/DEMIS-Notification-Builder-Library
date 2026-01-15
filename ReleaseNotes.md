@@ -2,6 +2,9 @@
  </div>
 
 # Release-Notes notification-builder-library
+## 9.0.8
+- remove gender extension handling for laboratory & disease as moved to gateway
+
 ## 9.0.7
 - add method createAnonymousExcerpt for 7.3 notifications to NotificationBundleDiseaseNonNominalDataBuilder and NotificationBundleLaboratoryNonNominalDataBuilder
 

@@ -29,10 +29,8 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.uhn.fhir.context.FhirContext;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
 
@@ -58,29 +56,5 @@ class PatientBuilderTest {
     LocalDate date = LocalDate.of(2023, 5, 15);
     YearMonth result = PatientBuilder.convertToYearMonth(date);
     assertThat(result).isEqualTo(YearMonth.of(2023, 5));
-  }
-
-  @Test
-  void shouldHandleGenderOtherAndAddExtension() {
-    final PatientBuilder patientBuilder = new PatientBuilder();
-    patientBuilder.setGender(Enumerations.AdministrativeGender.OTHER);
-
-    final Patient actual = patientBuilder.build();
-
-    FhirContext fhirContext = FhirContext.forR4Cached();
-    String actualAsString = fhirContext.newXmlParser().encodeResourceToString(actual);
-
-    assertThat(actualAsString)
-        .containsIgnoringWhitespaces(
-            """
-                  <gender value="other">
-                      <extension url="http://fhir.de/StructureDefinition/gender-amtlich-de">
-                          <valueCoding>
-                              <system value="http://fhir.de/CodeSystem/gender-amtlich-de"></system>
-                              <code value="D"></code>
-                                <display value="divers"></display>
-                          </valueCoding>
-                      </extension>
-                  </gender>""");
   }
 }
