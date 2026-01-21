@@ -27,6 +27,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.EXTENSION_URL_GENDER;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_ANONYMOUS;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
@@ -66,6 +67,8 @@ public class NotifiedPersonAnonymousDataBuilder extends NotifiedPersonNominalDat
     builder
         .setDefault()
         .setGender(patientToCopy.getGender())
+        .setGenderExtension(
+            patientToCopy.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
         .setAddress(AddressDataBuilder.copyAllAddressesForExcerpt(patientToCopy.getAddress()));
 
     Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);

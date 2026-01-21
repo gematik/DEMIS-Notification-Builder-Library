@@ -54,6 +54,7 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
   public static final String RESOURCE_TYPE = "Patient";
   private HumanName humanName;
   private Enumerations.AdministrativeGender gender;
+  private Extension genderExtension;
   private String id;
   private List<Address> address = new ArrayList<>();
   private DateType birthdate;
@@ -110,6 +111,9 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
     }
     if (gender != null) {
       patient.setGender(gender);
+    }
+    if (genderExtension != null) {
+      patient.getGenderElement().addExtension(genderExtension);
     }
     if (id != null) {
       final IdType idType = new IdType(RESOURCE_TYPE, id);

@@ -35,6 +35,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.CompositionBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.RelatesToBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -55,6 +56,7 @@ public class NotificationLaboratoryDataBuilder
   private String sectionComponentSystem;
   private String sectionComponentCode;
   private String sectionComponentDisplay;
+  private Date lastUpdated;
 
   @CheckForNull private DiagnosticReport laboratoryReport;
 
@@ -72,7 +74,7 @@ public class NotificationLaboratoryDataBuilder
     return this;
   }
 
-  protected void deepCopyFields(
+  public void deepCopyFields(
       @Nonnull final Composition original,
       @Nonnull final PractitionerRole author,
       @Nonnull final Patient subject,
@@ -85,10 +87,11 @@ public class NotificationLaboratoryDataBuilder
     setCompositionStatus(original.getStatus());
     setTitle(original.getTitle());
     setDateTimeType(original.getDateElement());
+    setLastUpdated(original.getMeta().getLastUpdated());
 
     List<Composition.CompositionRelatesToComponent> relatesTo = original.getRelatesTo();
     if (!relatesTo.isEmpty()) {
-      final Composition.CompositionRelatesToComponent relatesToElement = relatesTo.get(0);
+      final Composition.CompositionRelatesToComponent relatesToElement = relatesTo.getFirst();
       final Reference targetReference = relatesToElement.getTargetReference();
       final Identifier identifier = targetReference.getIdentifier();
 
@@ -111,6 +114,7 @@ public class NotificationLaboratoryDataBuilder
     Composition newComposition = super.build();
 
     newComposition.setTitle(getTitle());
+    newComposition.getMeta().setLastUpdated(lastUpdated);
     Identifier compositionIdentifier =
         new Identifier().setSystem(getIdentifierSystem()).setValue(getIdentifierValue());
     newComposition.setIdentifier(compositionIdentifier);

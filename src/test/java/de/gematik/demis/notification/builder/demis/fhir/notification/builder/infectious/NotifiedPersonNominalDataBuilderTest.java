@@ -27,6 +27,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.EXTENSION_URL_GENDER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,9 +36,11 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.builder.tec
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,10 +74,15 @@ class NotifiedPersonNominalDataBuilderTest {
   @Test
   void shouldSetGender() {
     notifiedPersonDataBuilder.setGender(Enumerations.AdministrativeGender.FEMALE);
+    final Extension genderExtension = new Extension(EXTENSION_URL_GENDER);
+    genderExtension.setValue(new Coding(EXTENSION_URL_GENDER, "X", "Kein Geschlechtseintrag"));
+    notifiedPersonDataBuilder.setGenderExtension(genderExtension);
 
     Patient patient = notifiedPersonDataBuilder.build();
 
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.FEMALE);
+    assertThat(patient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
+        .isEqualTo(genderExtension);
   }
 
   @Test

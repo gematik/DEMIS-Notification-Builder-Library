@@ -27,7 +27,9 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  * #L%
  */
 
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.EXTENSION_URL_GENDER;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.EXTENSION_URL_PSEUDONYM;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_NOT_BY_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -48,9 +50,11 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Element;
 import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Type;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -343,5 +347,34 @@ class NotifiedPersonNonNominalDataBuilderTest {
               return "";
             })
         .containsExactly("primary", "test-id-keep");
+  }
+
+  @Test
+  void createNonNominalPatientForExcerpt() {
+    final Patient patient = new Patient();
+    patient.setId("67890");
+    patient.setGender(Enumerations.AdministrativeGender.OTHER);
+    final Extension genderExtension = new Extension(EXTENSION_URL_GENDER);
+    genderExtension.setValue(new Coding(EXTENSION_URL_GENDER, "X", "Kein Geschlechtseintrag"));
+    patient.getGenderElement().addExtension(genderExtension);
+    patient.setBirthDateElement(new DateType("1980-01-01"));
+    patient.addName().setFamily("Muster").addGiven("Max");
+    patient.addAddress().setCity("Berlin").setPostalCode("12345");
+    final String pseudonymExtensionUrl =
+        "https://demis.rki.de/fhir/StructureDefinition/PseudonymRecordType";
+    patient.addExtension().setUrl(pseudonymExtensionUrl).setValue(new StringType("SomeValue"));
+    final Patient anonymousPatient =
+        NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(patient);
+    assertThat(anonymousPatient.getMeta().getProfile().getFirst().getValueAsString())
+        .isEqualTo(PROFILE_NOTIFIED_PERSON_NOT_BY_NAME);
+    assertThat(anonymousPatient.getAddress().getFirst().getPostalCode()).isEqualTo("123");
+    assertThat(anonymousPatient.getAddress().getFirst().getCity()).isNull();
+    assertThat(anonymousPatient.getGender()).isEqualTo(Enumerations.AdministrativeGender.OTHER);
+    assertThat(anonymousPatient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
+        .isEqualTo(genderExtension);
+    assertThat(anonymousPatient.getName()).isEmpty();
+    assertThat(anonymousPatient.getBirthDateElement().getValueAsString()).isEqualTo("1980-01");
+    assertThat(anonymousPatient.getExtensionByUrl(pseudonymExtensionUrl).getValue())
+        .hasToString("SomeValue");
   }
 }
