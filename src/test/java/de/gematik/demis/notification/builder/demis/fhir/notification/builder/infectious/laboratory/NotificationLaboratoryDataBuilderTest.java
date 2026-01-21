@@ -30,8 +30,11 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.gematik.demis.notification.builder.demis.fhir.testUtils.TestObjects;
+import java.time.OffsetDateTime;
+import java.util.Date;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Reference;
@@ -254,5 +257,37 @@ class NotificationLaboratoryDataBuilderTest {
     assertThat(composition.getMeta().getProfile())
         .extracting("value")
         .contains("https://demis.rki.de/fhir/StructureDefinition/NotificationLaboratory");
+  }
+
+  @Test
+  void deepCopyFields_shouldCopyLastUpdated() {
+    Composition composition;
+    PractitionerRole author;
+    Patient subject;
+
+    composition = new Composition();
+    composition.setMeta(new Meta().addProfile("foobarProfile"));
+    composition.setStatus(Composition.CompositionStatus.FINAL);
+
+    // relevant for test
+    final Date lastUpdated =
+        Date.from(OffsetDateTime.parse("2022-03-10T14:58:51.377+01:00").toInstant());
+    composition.getMeta().setLastUpdated(lastUpdated);
+
+    author = new PractitionerRole();
+    author.setId("author");
+
+    subject = new Patient();
+    subject.setId("subject");
+
+    DiagnosticReport diagnosticReport = new DiagnosticReport();
+    diagnosticReport.setId("reportId");
+
+    NotificationLaboratoryDataBuilder builder = new NotificationLaboratoryDataBuilder();
+
+    builder.deepCopyFields(composition, author, subject, diagnosticReport);
+    final Composition deepCopyComposition = builder.build();
+
+    assertThat(deepCopyComposition.getMeta().getLastUpdated()).isEqualTo(lastUpdated);
   }
 }

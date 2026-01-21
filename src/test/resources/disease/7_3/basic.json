@@ -16,6 +16,7 @@
       "resourceType": "Composition",
       "id": "9bb7aeba-581a-47ce-8791-5cdb319d6267",
       "meta": {
+        "lastUpdated": "2022-03-10T14:58:51.377+01:00",
         "profile": [ "https://demis.rki.de/fhir/StructureDefinition/NotificationDiseaseNonNominalHIVD" ]
       },
       "identifier": {
@@ -146,7 +147,19 @@
         "system": "email",
         "value": "bertha@betroffen.de"
       } ],
-      "gender": "female",
+      "gender": "other",
+      "_gender": {
+        "extension": [
+          {
+            "url": "http://fhir.de/StructureDefinition/gender-amtlich-de",
+            "valueCoding": {
+              "system": "http://fhir.de/CodeSystem/gender-amtlich-de",
+              "code": "D",
+              "display": "divers"
+            }
+          }
+        ]
+      },
       "birthDate": "1999-06",
       "address": [ {
         "extension": [ {

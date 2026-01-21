@@ -33,6 +33,7 @@ public final class DemisConstants {
 
   public static final String DEMIS_RKI_DE_FHIR = "https://demis.rki.de/fhir/";
   public static final String DEMIS_RKI_IGS_DE_FHIR = "https://demis.rki.de/fhir/igs/";
+  public static final String FHIR_DE = "http://fhir.de/";
   // profiles for laboratory notification (Labormeldung)
   public static final String PROFILE_NOTIFICATION_BUNDLE_LABORATORY =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationBundleLaboratory";
@@ -157,6 +158,8 @@ public final class DemisConstants {
       DEMIS_RKI_IGS_DE_FHIR + "StructureDefinition/Isolate";
   public static final String EXTENSION_URL_PSEUDONYM =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/PseudonymRecordType";
+  public static final String EXTENSION_URL_GENDER =
+      FHIR_DE + "StructureDefinition/gender-amtlich-de";
   // naming systems
   public static final String NAMING_SYSTEM_NOTIFICATION_BUNDLE_ID =
       DEMIS_RKI_DE_FHIR + "NamingSystem/NotificationBundleId";

@@ -35,6 +35,7 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.builder.tec
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
@@ -139,5 +140,36 @@ public final class NotificationDiseaseDataBuilderTest {
     assertThat(deepCopyComposition.getExtension())
         .extracting(Extension::getUrl, Extension::getValue)
         .contains(tuple(RECEPTION_TIME_STAMP_TYPE, value));
+  }
+
+  @Test
+  void deepCopy_shouldCopyLastUpdated() {
+    // set up data
+    Composition composition;
+    PractitionerRole author;
+    Patient subject;
+
+    composition = new Composition();
+    composition.setMeta(new Meta().addProfile("foobarProfile"));
+    composition.setStatus(Composition.CompositionStatus.FINAL);
+
+    // relevant for test
+    final Date lastUpdated =
+        Date.from(OffsetDateTime.parse("2022-03-10T14:58:51.377+01:00").toInstant());
+    composition.getMeta().setLastUpdated(lastUpdated);
+
+    author = new PractitionerRole();
+    author.setId("author");
+
+    subject = new Patient();
+    subject.setId("subject");
+
+    Condition condition = new Condition();
+    QuestionnaireResponse specificQuestionnaireResponse = new QuestionnaireResponse();
+    Composition deepCopyComposition =
+        NotificationDiseaseDataBuilder.deepCopy(
+            composition, condition, subject, author, specificQuestionnaireResponse);
+
+    assertThat(deepCopyComposition.getMeta().getLastUpdated()).isEqualTo(lastUpdated);
   }
 }

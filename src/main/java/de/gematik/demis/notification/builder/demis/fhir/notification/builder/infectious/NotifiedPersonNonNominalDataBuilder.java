@@ -28,6 +28,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PatientBuilder.yearMonthToString;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.EXTENSION_URL_GENDER;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.EXTENSION_URL_PSEUDONYM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_NOT_BY_NAME;
 
@@ -66,6 +67,7 @@ public class NotifiedPersonNonNominalDataBuilder {
   private String id;
   private DateType birthdate;
   private Enumerations.AdministrativeGender gender;
+  private Extension genderExtension;
   private List<Address> address = new ArrayList<>();
   private DateTimeType deceased;
   private List<Extension> extensions;
@@ -113,6 +115,8 @@ public class NotifiedPersonNonNominalDataBuilder {
         new NotifiedPersonNonNominalDataBuilder()
             .setId(Utils.generateUuidString())
             .setGender(patientToCopy.getGender())
+            .setGenderExtension(
+                patientToCopy.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
             .setDeceased(patientToCopy.getDeceasedDateTimeType())
             .setAddress(AddressDataBuilder.copyAllAddressesForExcerpt(patientToCopy.getAddress()))
             .addExtension(patientToCopy.getExtensionByUrl(EXTENSION_URL_PSEUDONYM));
@@ -187,6 +191,7 @@ public class NotifiedPersonNonNominalDataBuilder {
         .setId(id)
         .setBirthdate(birthdate)
         .setGender(gender)
+        .setGenderExtension(genderExtension)
         .setAddress(address)
         .setPseudonym(pseudonym)
         .setLastUpdated(Utils.getCurrentDate())

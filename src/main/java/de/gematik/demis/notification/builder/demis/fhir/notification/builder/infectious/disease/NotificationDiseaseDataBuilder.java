@@ -46,6 +46,7 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.builder.tec
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.CheckForNull;
@@ -77,6 +78,7 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   private Coding type;
   private String title;
   private DateTimeType date;
+  private Date lastUpdated;
   private Identifier identifier;
   private Coding category;
   private List<Extension> extensions;
@@ -136,6 +138,7 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
         new NotificationDiseaseDataBuilder()
             .setCategory(original.getCategoryFirstRep().getCodingFirstRep().copy())
             .setDate(original.getDateElement().copy())
+            .setLastUpdated(original.getMeta().getLastUpdated())
             .setId(original.getId())
             .setIdentifier(original.getIdentifier().copy())
             .setStatus(original.getStatus())
@@ -174,6 +177,7 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
     addDate(composition);
     addIdentifier(composition);
     addMetaProfile(composition);
+    addLastUpdated(composition);
     addStatus(composition);
     addType(composition);
     addCategory(composition);
@@ -313,6 +317,12 @@ public class NotificationDiseaseDataBuilder implements InitializableFhirObjectBu
   private void addDate(Composition composition) {
     if (date != null) {
       composition.setDate(date.getValue());
+    }
+  }
+
+  private void addLastUpdated(Composition composition) {
+    if (this.lastUpdated != null) {
+      composition.getMeta().setLastUpdated(lastUpdated);
     }
   }
 
