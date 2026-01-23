@@ -2,6 +2,13 @@
  </div>
 
 # Release-Notes notification-builder-library
+
+## 9.0.10
+- fix copying of patient addresses for anonymous $7.3 excerpts
+
+## 9.0.9
+- fix missing gender extension and lastUpdated for excerpt creation
+
 ## 9.0.8
 - remove gender extension handling for laboratory & disease as moved to gateway
 
