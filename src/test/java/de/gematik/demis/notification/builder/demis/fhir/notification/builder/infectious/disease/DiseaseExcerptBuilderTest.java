@@ -62,7 +62,8 @@ class DiseaseExcerptBuilderTest {
         IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
         Bundle bundle = iParser.parseResource(Bundle.class, json);
 
-        Bundle excerpt = DiseaseExcerptBuilder.createExcerptNotifiedPersonNotByName(bundle);
+        Bundle excerpt =
+            DiseaseExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(bundle);
         String excerptJson = iParser.encodeResourceToString(excerpt);
 
         String expected =
@@ -89,7 +90,8 @@ class DiseaseExcerptBuilderTest {
 
         Bundle bundle = iParser.parseResource(Bundle.class, json);
 
-        Bundle excerpt = DiseaseExcerptBuilder.createExcerptNotifiedPersonNotByName(bundle);
+        Bundle excerpt =
+            DiseaseExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(bundle);
 
         assertThat(((Immunization) excerpt.getEntry().get(8).getResource()).getOccurrence())
             .hasToString("ASKU");
@@ -112,7 +114,8 @@ class DiseaseExcerptBuilderTest {
         IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
         Bundle bundle = iParser.parseResource(Bundle.class, json);
 
-        Bundle excerpt = DiseaseExcerptBuilder.createExcerptNotifiedPersonAnonymous(bundle);
+        Bundle excerpt =
+            DiseaseExcerptBuilder.createExcerptNotifiedPersonAnonymousFromNonNominalBundle(bundle);
         String excerptJson = iParser.encodeResourceToString(excerpt);
 
         String expected =

@@ -33,6 +33,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Patients;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
+import java.util.List;
 import java.util.SequencedCollection;
 import javax.annotation.Nonnull;
 import lombok.Setter;
@@ -62,14 +63,15 @@ public class NotifiedPersonAnonymousDataBuilder extends NotifiedPersonNominalDat
   }
 
   @Nonnull
-  public static Patient createAnonymousPatientForExcerpt(@Nonnull final Patient patientToCopy) {
+  public static Patient createAnonymousPatientForExcerpt(
+      @Nonnull final Patient patientToCopy, final List<Address> addresses) {
     final NotifiedPersonAnonymousDataBuilder builder = new NotifiedPersonAnonymousDataBuilder();
     builder
         .setDefault()
         .setGender(patientToCopy.getGender())
         .setGenderExtension(
             patientToCopy.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
-        .setAddress(AddressDataBuilder.copyAllAddressesForExcerpt(patientToCopy.getAddress()));
+        .setAddress(addresses);
 
     Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);
 

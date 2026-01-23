@@ -33,9 +33,12 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.buil
 import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonAnonymousDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
+import java.util.List;
 import javax.annotation.Nonnull;
+import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
@@ -51,7 +54,8 @@ public final class LaboratoryExcerptBuilder {
 
   private LaboratoryExcerptBuilder() {}
 
-  public static Bundle createExcerptNotifiedPersonNotByName(@Nonnull final Bundle originalBundle) {
+  public static Bundle createExcerptNotifiedPersonNotByNameFromNominalBundle(
+      @Nonnull final Bundle originalBundle) {
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle.getEntry());
     final Patient notifiedPerson =
         NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(ctx.subject());
@@ -59,11 +63,15 @@ public final class LaboratoryExcerptBuilder {
         originalBundle, ctx, new NotificationBundleLaboratoryDataBuilder(), notifiedPerson);
   }
 
-  public static Bundle createExcerptNotifiedPersonAnonymous(
+  public static Bundle createExcerptNotifiedPersonAnonymousFromNonNominalBundle(
       @Nonnull final Bundle originalBundleNonNominal) {
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundleNonNominal.getEntry());
+    final List<Address> addresses =
+        AddressDataBuilder.copyAddressesForExcerpt(
+            List.copyOf(NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(ctx.subject())));
     final Patient notifiedPerson =
-        NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(ctx.subject());
+        NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(
+            ctx.subject(), addresses);
     return LaboratoryExcerptBuilder.createExcerpt(
         originalBundleNonNominal,
         ctx,

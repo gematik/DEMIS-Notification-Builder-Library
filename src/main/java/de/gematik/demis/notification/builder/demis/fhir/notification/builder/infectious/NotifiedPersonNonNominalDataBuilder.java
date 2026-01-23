@@ -118,7 +118,7 @@ public class NotifiedPersonNonNominalDataBuilder {
             .setGenderExtension(
                 patientToCopy.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
             .setDeceased(patientToCopy.getDeceasedDateTimeType())
-            .setAddress(AddressDataBuilder.copyAllAddressesForExcerpt(patientToCopy.getAddress()))
+            .setAddress(AddressDataBuilder.copyAddressesForExcerpt(patientToCopy.getAddress()))
             .addExtension(patientToCopy.getExtensionByUrl(EXTENSION_URL_PSEUDONYM));
 
     Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);

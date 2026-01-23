@@ -108,15 +108,6 @@
         } ],
         "postalCode": "123",
         "country": "20422"
-      }, {
-        "extension": [ {
-          "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",
-          "valueCoding": {
-            "system": "https://demis.rki.de/fhir/CodeSystem/addressUse",
-            "code": "current",
-            "display": "Derzeitiger Aufenthaltsort"
-          }
-        } ]
       } ]
     }
   }, {

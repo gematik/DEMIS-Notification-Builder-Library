@@ -31,12 +31,15 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.buil
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonAnonymousDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
+import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
@@ -52,7 +55,8 @@ public final class DiseaseExcerptBuilder {
   private DiseaseExcerptBuilder() {}
 
   @Nonnull
-  public static Bundle createExcerptNotifiedPersonNotByName(@Nonnull final Bundle originalBundle) {
+  public static Bundle createExcerptNotifiedPersonNotByNameFromNominalBundle(
+      @Nonnull final Bundle originalBundle) {
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle);
     final Patient notifiedPerson =
         NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(ctx.subject());
@@ -61,11 +65,15 @@ public final class DiseaseExcerptBuilder {
   }
 
   @Nonnull
-  public static Bundle createExcerptNotifiedPersonAnonymous(
+  public static Bundle createExcerptNotifiedPersonAnonymousFromNonNominalBundle(
       @Nonnull final Bundle originalBundleNonNominal) {
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundleNonNominal);
+    final List<Address> addresses =
+        AddressDataBuilder.copyAddressesForExcerpt(
+            List.copyOf(NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(ctx.subject())));
     final Patient notifiedPerson =
-        NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(ctx.subject());
+        NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(
+            ctx.subject(), addresses);
     return DiseaseExcerptBuilder.createExcerpt(
         originalBundleNonNominal,
         ctx,

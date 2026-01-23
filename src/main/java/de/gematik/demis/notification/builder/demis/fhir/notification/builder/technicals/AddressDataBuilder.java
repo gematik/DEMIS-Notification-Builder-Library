@@ -76,7 +76,7 @@ public class AddressDataBuilder implements FhirObjectBuilder {
     return truncate(originalAddress.getPostalCode(), 3);
   }
 
-  public static List<Address> copyAllAddressesForExcerpt(List<Address> addresses) {
+  public static List<Address> copyAddressesForExcerpt(List<Address> addresses) {
     return addresses.stream().map(AddressDataBuilder::copyAddressWithPostalCodeCountryUse).toList();
   }
 

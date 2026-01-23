@@ -31,6 +31,9 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIED_PERSON_ANONYMOUS;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
+import java.util.List;
+import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -138,14 +141,41 @@ class NotifiedPersonAnonymousDataBuilderTest {
     patient.getGenderElement().addExtension(genderExtension);
     patient.setBirthDateElement(new DateType("1980-01-01"));
     patient.addName().setFamily("Muster").addGiven("Max");
-    patient.addAddress().setCity("Berlin").setPostalCode("12345");
+
+    final Extension addressUseExtensionPrimary = new Extension();
+    addressUseExtensionPrimary.setUrl("https://demis.rki.de/fhir/StructureDefinition/AddressUse");
+    addressUseExtensionPrimary.setValue(
+        new Coding("https://demis.rki.de/fhir/CodeSystem/addressUse", "primary", "Hauptwohnsitz"));
+    patient
+        .addAddress()
+        .setCity("Berlin")
+        .setPostalCode("12345")
+        .addExtension(addressUseExtensionPrimary);
+
+    final Extension addressUseExtensionCurrent = new Extension();
+    addressUseExtensionCurrent.setUrl("https://demis.rki.de/fhir/StructureDefinition/AddressUse");
+    addressUseExtensionCurrent.setValue(
+        new Coding(
+            "https://demis.rki.de/fhir/CodeSystem/addressUse",
+            "current",
+            "Derzeitiger Aufenthaltsort"));
+    patient
+        .addAddress()
+        .setCountry("Hamburg")
+        .setPostalCode("20095")
+        .addExtension(addressUseExtensionCurrent);
+
     final String pseudonymExtensionUrl =
         "https://demis.rki.de/fhir/StructureDefinition/PseudonymRecordType";
     patient.addExtension().setUrl(pseudonymExtensionUrl).setValue(new StringType("SomeValue"));
+    final List<Address> addresses =
+        AddressDataBuilder.copyAddressesForExcerpt(
+            List.copyOf(NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(patient)));
     final Patient anonymousPatient =
-        NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(patient);
+        NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(patient, addresses);
     assertThat(anonymousPatient.getMeta().getProfile().getFirst().getValueAsString())
         .isEqualTo(PROFILE_NOTIFIED_PERSON_ANONYMOUS);
+    assertThat(anonymousPatient.getAddress()).hasSize(1);
     assertThat(anonymousPatient.getAddress().getFirst().getPostalCode()).isEqualTo("123");
     assertThat(anonymousPatient.getAddress().getFirst().getCity()).isNull();
     assertThat(anonymousPatient.getGender()).isEqualTo(Enumerations.AdministrativeGender.OTHER);
