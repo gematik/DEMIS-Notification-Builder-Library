@@ -70,6 +70,9 @@ public class OrganizationBuilder implements InitializableFhirObjectBuilder {
 
   private String organizationId;
 
+  @Setter(AccessLevel.PRIVATE)
+  private boolean isLaboratoryFacility;
+
   /**
    * Set default parameters. It's best to call this method before setting any values to avoid
    * overwriting your values.
@@ -102,6 +105,20 @@ public class OrganizationBuilder implements InitializableFhirObjectBuilder {
     return this;
   }
 
+  public OrganizationBuilder asLaboratoryFacility() {
+    setMetaProfileUrl(DemisConstants.PROFILE_LABORATORY_FACILITY);
+    isLaboratoryFacility = true;
+    isNotifierFacility = false;
+    return this;
+  }
+
+  public OrganizationBuilder asInfectProtectFacility() {
+    setMetaProfileUrl(DemisConstants.PROFILE_INFECT_PROTECT_FACILITY);
+    isLaboratoryFacility = false;
+    isNotifierFacility = false;
+    return this;
+  }
+
   /**
    * Add {@link DemisConstants#PROFILE_NOTIFIED_PERSON_FACILITY} to the existing meta.profileUrl.
    */
@@ -127,7 +144,7 @@ public class OrganizationBuilder implements InitializableFhirObjectBuilder {
 
     addProfileUrls(organization);
 
-    if (isNotifierFacility) {
+    if (isNotifierFacility || isLaboratoryFacility) {
       addBsnr(organization);
       addParticipantId(organization);
       addLaboratoryId(organization);
@@ -249,6 +266,9 @@ public class OrganizationBuilder implements InitializableFhirObjectBuilder {
   }
 
   private void addType(Organization organization) {
+    if (isLaboratoryFacility) {
+      setTypeCode("laboratory");
+    }
     if (this.type != null) {
       organization.addType(new CodeableConcept(this.type));
     }

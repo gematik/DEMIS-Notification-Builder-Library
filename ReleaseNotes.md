@@ -3,6 +3,9 @@
 
 # Release-Notes notification-builder-library
 
+## 9.1.0
+- added organization profiles LaboratoryFacility and InfectProtectFacility
+
 ## 9.0.10
 - fix copying of patient addresses for anonymous $7.3 excerpts
 
