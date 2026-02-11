@@ -109,7 +109,32 @@ class OrganizationBuilderTest {
     assertThat(organization.getIdentifier())
         .hasSize(1)
         .extracting("system")
-        .containsExactlyInAnyOrder("https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR");
+        .containsExactlyInAnyOrder(DemisConstants.NAMING_SYSTEM_BSNR);
+  }
+
+  @Test
+  void shouldCreateLaboratoryFacilityWithBSNR() {
+    OrganizationBuilder organizationBuilder = new OrganizationBuilder();
+    organizationBuilder.asLaboratoryFacility();
+    organizationBuilder.setBsnrValue("bsnr");
+    organizationBuilder.setTypeCode("bad-type-code-to-test-automatic-correction");
+    Organization laboratory = organizationBuilder.build();
+
+    assertThat(laboratory.getMeta().getProfile())
+        .hasSize(1)
+        .extracting("myStringValue")
+        .containsOnly(DemisConstants.PROFILE_LABORATORY_FACILITY);
+
+    assertThat(laboratory.getIdentifier())
+        .hasSize(1)
+        .extracting("system")
+        .containsExactlyInAnyOrder(DemisConstants.NAMING_SYSTEM_BSNR);
+
+    final List<CodeableConcept> types = laboratory.getType();
+    assertThat(types).hasSize(1);
+    final Coding type = types.getFirst().getCodingFirstRep();
+    assertThat(type.getSystem()).isEqualTo(DemisConstants.CODE_SYSTEM_ORGANIZATION_TYPE);
+    assertThat(type.getCode()).isEqualTo("laboratory");
   }
 
   @Test
@@ -129,13 +154,51 @@ class OrganizationBuilderTest {
         .hasSize(2)
         .extracting("system")
         .containsExactlyInAnyOrder(
-            "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR",
-            "https://demis.rki.de/fhir/NamingSystem/DemisParticipantId");
+            DemisConstants.NAMING_SYSTEM_BSNR, DemisConstants.NAMING_SYSTEM_PARTICIPANT_ID);
 
     assertThat(organization.getIdentifier())
         .hasSize(2)
         .extracting("value")
         .containsExactlyInAnyOrder("bsnrValue", "participantId");
+  }
+
+  @Test
+  void shouldCreateLaboratoryFacilityWithParticipantId() {
+    OrganizationBuilder organizationBuilder = new OrganizationBuilder();
+    organizationBuilder.asLaboratoryFacility();
+    organizationBuilder.setParticipantId("participantId");
+    organizationBuilder.setBsnrValue("bsnrValue");
+    Organization organization = organizationBuilder.build();
+
+    assertThat(organization.getMeta().getProfile())
+        .hasSize(1)
+        .extracting("myStringValue")
+        .containsOnly(DemisConstants.PROFILE_LABORATORY_FACILITY);
+
+    assertThat(organization.getIdentifier())
+        .hasSize(2)
+        .extracting("system")
+        .containsExactlyInAnyOrder(
+            DemisConstants.NAMING_SYSTEM_BSNR, DemisConstants.NAMING_SYSTEM_PARTICIPANT_ID);
+
+    assertThat(organization.getIdentifier())
+        .hasSize(2)
+        .extracting("value")
+        .containsExactlyInAnyOrder("bsnrValue", "participantId");
+  }
+
+  @Test
+  void shouldCreateInfectProtectFacility() {
+    OrganizationBuilder organizationBuilder = new OrganizationBuilder();
+    organizationBuilder.asInfectProtectFacility();
+    Organization organization = organizationBuilder.build();
+
+    assertThat(organization.getMeta().getProfile())
+        .hasSize(1)
+        .extracting("myStringValue")
+        .containsOnly(DemisConstants.PROFILE_INFECT_PROTECT_FACILITY);
+
+    assertThat(organization.getIdentifier()).isEmpty();
   }
 
   @Test

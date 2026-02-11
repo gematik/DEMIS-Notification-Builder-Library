@@ -76,7 +76,6 @@ public final class DemisConstants {
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationBundleDiseaseNonNominal";
   public static final String PROFILE_NOTIFICATION_DISEASE_NON_NOMINAL =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationDiseaseNonNominal";
-
   public static final String PROFILE_NOTIFICATION_DISEASE =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/NotificationDiseaseCVDD";
   public static final String PROFILE_DISEASE_CVDD =
@@ -129,6 +128,10 @@ public final class DemisConstants {
       DEMIS_RKI_DE_FHIR + "Questionnaire/DiseaseQuestionsCommon";
   public static final String QUESTIONNAIRE_DISEASE_QUESTIONS_CVDD =
       DEMIS_RKI_DE_FHIR + "Questionnaire/DiseaseQuestionsCVDD";
+  public static final String PROFILE_LABORATORY_FACILITY =
+      DEMIS_RKI_DE_FHIR + "StructureDefinition/LaboratoryFacility";
+  public static final String PROFILE_INFECT_PROTECT_FACILITY =
+      DEMIS_RKI_DE_FHIR + "StructureDefinition/InfectProtectFacility";
   // extensions
   public static final String STRUCTURE_DEFINITION_ADDRESS_USE =
       DEMIS_RKI_DE_FHIR + "StructureDefinition/AddressUse";
