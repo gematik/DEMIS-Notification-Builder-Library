@@ -38,7 +38,7 @@ This project includes:
   Caffeine cache under Apache License, Version 2.0
   dexx under MIT License
   error-prone annotations under Apache 2.0
-  fhir-parser-library under Licensed under the EUPL 1.2
+  fhir-parser-library under EUPL-1.2
   FindBugs-jsr305 under The Apache Software License, Version 2.0
   Gson under Apache-2.0
   Guava InternalFutureFailureAccess and InternalFutures under Apache License, Version 2.0
@@ -67,7 +67,7 @@ This project includes:
   JUnit Platform Engine API under Eclipse Public License v2.0
   mockito-core under MIT
   mockito-junit-jupiter under MIT
-  notification-builder-library under Licensed under the EUPL 1.2
+  notification-builder-library under EUPL-1.2
   Objenesis under Apache License, Version 2.0
   OpenTelemetry Instrumentation for Java under The Apache License, Version 2.0
   OpenTelemetry Java under The Apache License, Version 2.0
