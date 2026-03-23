@@ -30,6 +30,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hl7.fhir.r4.model.DocumentReference;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.junit.jupiter.api.Test;
 
 class DocumentReferenceBuilderTest {
@@ -58,6 +59,16 @@ class DocumentReferenceBuilderTest {
                 .getHashElement()
                 .getValueAsString()))
         .isEqualTo(HASH);
+    assertThat(documentReference.getMeta().getProfile())
+        .extracting(p -> p.getValue())
+        .contains(DocumentReferenceBuilder.SEQUENCE_DOCUMENT_PROFILE);
+    assertThat(documentReference.getType().getCodingFirstRep().getSystem())
+        .isEqualTo("http://snomed.info/sct");
+    assertThat(documentReference.getType().getCodingFirstRep().getCode()).isEqualTo("41482005");
+    assertThat(documentReference.getType().getCodingFirstRep().getDisplay())
+        .isEqualTo("Molecular sequence data (finding)");
+    assertThat(documentReference.getStatus())
+        .isEqualTo(Enumerations.DocumentReferenceStatus.CURRENT);
   }
 
   private DocumentReferenceBuilder configureBuilderWithTestData() {
