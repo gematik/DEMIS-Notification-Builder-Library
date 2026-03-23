@@ -31,11 +31,14 @@ import lombok.Builder;
 import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Base64BinaryType;
 import org.hl7.fhir.r4.model.DocumentReference;
+import org.hl7.fhir.r4.model.Enumerations;
 
 /** Builder for the entry DocumentReference in IGS. */
 @Builder(buildMethodName = "initialize")
 public class DocumentReferenceBuilder {
 
+  public static final String SEQUENCE_DOCUMENT_PROFILE =
+      "https://demis.rki.de/fhir/StructureDefinition/SequenceDocument";
   private String attachmentContentType;
   private String hash;
 
@@ -53,6 +56,14 @@ public class DocumentReferenceBuilder {
     attachment.setHashElement(new Base64BinaryType(hash));
     content.setAttachment(attachment);
     documentReference.addContent(content);
+    documentReference.getMeta().addProfile(SEQUENCE_DOCUMENT_PROFILE);
+    documentReference
+        .getType()
+        .addCoding()
+        .setSystem("http://snomed.info/sct")
+        .setCode("41482005")
+        .setDisplay("Molecular sequence data (finding)");
+    documentReference.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
     return documentReference;
   }
 }

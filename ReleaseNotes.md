@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## 9.2.1
+- DocumentReferenceBuilder build FHIR compliant
+
 ## 9.2.0
 - updated java version to 25
 
