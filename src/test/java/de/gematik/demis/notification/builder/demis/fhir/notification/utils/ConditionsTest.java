@@ -29,7 +29,9 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import java.util.List;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Condition;
@@ -73,5 +75,16 @@ class ConditionsTest {
     composition.addSection(new Composition.SectionComponent().setEntry(List.of(iBaseReference)));
 
     assertThat(Conditions.from(composition)).isEmpty();
+  }
+
+  @Test
+  void thatInvalidRefThrowsException() {
+    final Composition composition = new Composition();
+    composition.addSection(
+        new Composition.SectionComponent().setEntry(List.of(new Reference("invalid-ref"))));
+
+    assertThatThrownBy(() -> Conditions.from(composition))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Reference 'invalid-ref' is not resolvable");
   }
 }

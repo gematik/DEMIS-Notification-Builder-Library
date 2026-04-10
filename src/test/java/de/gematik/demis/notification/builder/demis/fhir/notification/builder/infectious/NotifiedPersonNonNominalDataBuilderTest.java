@@ -35,9 +35,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.OrganizationBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.types.AddressUse;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.time.Year;
 import java.time.YearMonth;
@@ -212,7 +214,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     final Patient patient =
         NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of(address));
     assertThat(patient.getAddress()).hasSize(1);
-    assertThat(patient.getAddress().get(0).getPostalCode()).isEqualTo("123");
+    assertThat(patient.getAddress().getFirst().getPostalCode()).isEqualTo("123");
   }
 
   @Test
@@ -376,5 +378,26 @@ class NotifiedPersonNonNominalDataBuilderTest {
     assertThat(anonymousPatient.getBirthDateElement().getValueAsString()).isEqualTo("1980-01");
     assertThat(anonymousPatient.getExtensionByUrl(pseudonymExtensionUrl).getValue())
         .hasToString("SomeValue");
+  }
+
+  @Test
+  void thatInvalidRefThrowsException_getAddressToCopy() {
+    final Extension organisationReference =
+        new Extension()
+            .setUrl(DemisConstants.STRUCTURE_DEFINITION_FACILITY_ADDRESS_NOTIFIED_PERSON)
+            .setValue(new Reference("invalid-ref"));
+
+    final Address mixedExtension =
+        new AddressDataBuilder()
+            .withAddressUseExtension(AddressUse.PRIMARY)
+            .setPostalCode("12345")
+            .addExtension(organisationReference)
+            .build();
+
+    final Patient toCopy = new Patient().addAddress(mixedExtension);
+
+    assertThatThrownBy(() -> NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(toCopy))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Reference 'invalid-ref' is not resolvable");
   }
 }

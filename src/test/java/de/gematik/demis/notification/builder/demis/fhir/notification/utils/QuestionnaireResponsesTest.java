@@ -28,7 +28,9 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -81,5 +83,22 @@ class QuestionnaireResponsesTest {
 
     final Optional<QuestionnaireResponse> actual = QuestionnaireResponses.specificFrom(composition);
     assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void thatInvalidRefThrowsException() {
+    final Composition composition = new Composition();
+    final Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
+    sectionComponent.setCode(
+        new CodeableConcept(
+            new Coding(
+                DemisConstants.CODE_SYSTEM_SECTION_CODE,
+                DemisConstants.DISEASE_SECTION_SPECIFIC_CODE,
+                "")));
+    composition.addSection(sectionComponent.setEntry(List.of(new Reference("invalid-ref"))));
+
+    assertThatThrownBy(() -> QuestionnaireResponses.specificFrom(composition))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Reference 'invalid-ref' is not resolvable");
   }
 }

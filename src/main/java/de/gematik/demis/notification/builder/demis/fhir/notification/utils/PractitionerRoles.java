@@ -51,6 +51,6 @@ public class PractitionerRoles {
       return Optional.empty();
     }
 
-    return Optional.of((PractitionerRole) author.getFirst().getResource());
+    return Optional.of((PractitionerRole) ReferenceUtils.getResource(author.getFirst()));
   }
 }

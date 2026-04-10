@@ -57,7 +57,7 @@ public class Patients {
                 return null;
               }
 
-              final IBaseResource candidate = c.getSubject().getResource();
+              final IBaseResource candidate = ReferenceUtils.getResource(c.getSubject());
               if (candidate instanceof Patient patient) {
                 return patient;
               }

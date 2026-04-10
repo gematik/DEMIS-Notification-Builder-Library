@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Provenances;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -64,9 +65,9 @@ record BundleBuilderContext(
     Optional<Provenance> provenance) {
   public static BundleBuilderContext from(final List<Bundle.BundleEntryComponent> entries) {
     final Composition composition = (Composition) entries.getFirst().getResource();
-    final Patient subject = (Patient) composition.getSubject().getResource();
+    final Patient subject = (Patient) ReferenceUtils.getResource(composition.getSubject());
     final PractitionerRole notifier =
-        (PractitionerRole) composition.getAuthorFirstRep().getResource();
+        (PractitionerRole) ReferenceUtils.getResource(composition.getAuthorFirstRep());
     final Optional<Bundle.BundleEntryComponent> submittingFacility =
         entries.stream()
             .filter(
@@ -75,10 +76,11 @@ record BundleBuilderContext(
     Preconditions.checkArgument(submittingFacility.isPresent());
     final PractitionerRole submitter = (PractitionerRole) submittingFacility.get().getResource();
     final DiagnosticReport diagnosticReport =
-        (DiagnosticReport) composition.getSection().getFirst().getEntry().getFirst().getResource();
+        (DiagnosticReport)
+            ReferenceUtils.getResource(composition.getSection().getFirst().getEntry().getFirst());
     final Set<Observation> observations =
         diagnosticReport.getResult().stream()
-            .map(reference -> (Observation) reference.getResource())
+            .map(reference -> (Observation) ReferenceUtils.getResource(reference))
             .collect(
                 ImmutableSet
                     .toImmutableSet()); // We want to keep the sequence so we prefer ImmutableSet!

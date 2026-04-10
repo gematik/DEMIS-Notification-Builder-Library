@@ -35,7 +35,6 @@ import javax.annotation.Nonnull;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.QuestionnaireResponse;
-import org.hl7.fhir.r4.model.Reference;
 
 public class QuestionnaireResponses {
   private QuestionnaireResponses() {}
@@ -62,7 +61,7 @@ public class QuestionnaireResponses {
                     DemisConstants.DISEASE_SECTION_SPECIFIC_CODE))
             .map(Composition.SectionComponent::getEntry)
             .flatMap(Collection::stream)
-            .map(Reference::getResource)
+            .map(ReferenceUtils::getResource)
             .filter(Predicate.not(IBase::isEmpty))
             .filter(QuestionnaireResponse.class::isInstance)
             .map(QuestionnaireResponse.class::cast)
@@ -90,7 +89,7 @@ public class QuestionnaireResponses {
                     DemisConstants.DISEASE_SECTION_COMMON_CODE))
             .map(Composition.SectionComponent::getEntry)
             .flatMap(Collection::stream)
-            .map(Reference::getResource)
+            .map(ReferenceUtils::getResource)
             .filter(Predicate.not(IBase::isEmpty))
             .filter(QuestionnaireResponse.class::isInstance)
             .map(QuestionnaireResponse.class::cast)

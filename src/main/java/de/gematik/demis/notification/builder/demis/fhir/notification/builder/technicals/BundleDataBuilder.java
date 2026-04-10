@@ -30,6 +30,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_NOTIFICATION_BUNDLE_ID;
 
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.ArrayList;
 import java.util.Date;
@@ -178,10 +179,10 @@ public abstract class BundleDataBuilder implements InitializableFhirObjectBuilde
     if (practitionerRole != null) {
       addEntry(practitionerRole);
       if (practitionerRole.hasPractitioner()) {
-        addEntry(practitionerRole.getPractitioner().getResource());
+        addEntry(ReferenceUtils.getResource(practitionerRole.getPractitioner()));
       }
       if (practitionerRole.hasOrganization()) {
-        addEntry(practitionerRole.getOrganization().getResource());
+        addEntry(ReferenceUtils.getResource(practitionerRole.getOrganization()));
       }
     }
   }

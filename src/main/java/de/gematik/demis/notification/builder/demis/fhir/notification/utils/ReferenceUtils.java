@@ -27,8 +27,11 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  * #L%
  */
 
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.NotImplementedException;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
@@ -69,5 +72,16 @@ public final class ReferenceUtils {
     }
     result.setResource(toReference);
     return result;
+  }
+
+  public static IBaseResource getResource(final Reference reference) {
+    if (reference == null || (!reference.hasReference() && reference.getResource() == null)) {
+      return null;
+    }
+    return Optional.ofNullable(reference.getResource())
+        .orElseThrow(
+            () ->
+                new UnprocessableEntityException(
+                    "Reference '" + reference.getReference() + "' is not resolvable"));
   }
 }
