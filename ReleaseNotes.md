@@ -2,202 +2,206 @@
 
 # Release-Notes notification-builder-library
 
-## 9.2.1
+## Release 9.2.2
+- added ReleaseNotes check to pipelines
+- added handling of unresolvable references to not throw NullPointerException
+
+## Release 9.2.1
 - DocumentReferenceBuilder build FHIR compliant
 
-## 9.2.0
+## Release 9.2.0
 - updated java version to 25
 
-## 9.1.0
+## Release 9.1.0
 - added organization profiles LaboratoryFacility and InfectProtectFacility
 
-## 9.0.10
+## Release 9.0.10
 - fix copying of patient addresses for anonymous $7.3 excerpts
 
-## 9.0.9
+## Release 9.0.9
 - fix missing gender extension and lastUpdated for excerpt creation
 
-## 9.0.8
+## Release 9.0.8
 - remove gender extension handling for laboratory & disease as moved to gateway
 
-## 9.0.7
+## Release 9.0.7
 - add method createAnonymousExcerpt for 7.3 notifications to NotificationBundleDiseaseNonNominalDataBuilder and NotificationBundleLaboratoryNonNominalDataBuilder
 
-## 9.0.5
+## Release 9.0.5
 - Updated Plugins and Libraries
 
-## 9.0.4
+## Release 9.0.4
 - fixed immunization occurrence to also handle strings
 - fixed notified person address handling to keep address uses
 - fixed notified person gender extension handling to keep gender extension
 
-## 9.0.3
+## Release 9.0.3
 - fixed optional questionnaire response excerpt handling 
 
-## 9.0.2
+## Release 9.0.2
 - fix wrongly set id for disease excerpts
 
-## 9.0.1
+## Release 9.0.1
 - fix missing section entry on disease excerpt creation
 - update dependencies for org.hl7.fhir.r4, org.hl7.fhir.utilities, commons-io, error_prone_annotations, commons-codec, jacoco-maven-plugin, commons-lang3.
 
-## 9.0.0
+## Release 9.0.0
 - fix laboratory nonnominal bundle deep copy to create excerpts for §6.1, §7.1 and §7.3
 - remove deprecated methods from laboratory/pathogen creation builder
 
-## 8.0.0
+## Release 8.0.0
 - Enforcing strict profiles for IGS notifications
 - IGS Patient Builder sets extension gender-amtlich when host sex is other
 
-## 7.3.1
+## Release 7.3.1
 - Handling of invalid input data for host birthdate and sex
 
-## 7.3.0
+## Release 7.3.0
 - Bumped dependencies
 
-## 7.2.0
+## Release 7.2.0
 - Added lastUpdate field to Patient and Notification Builders
 
-## 7.1.0
+## Release 7.1.0
 - Updated HAPI FHIR to 8.4.0
 
-## 7.0.0 
+## Release 7.0.0 
 - Updated libraries
 - 7.3 resources: don't copy current AddressUse Tag and NotifiedPersonFacility
 - 7.3 resources: copy symptoms for disease bundles
 
-## 6.3.10
+## Release 6.3.10
 - add relates-to method for NotificationDiseaseDataBuilder
 
-## 6.3.9
+## Release 6.3.9
 - update NotifiedPersonAnonymous Builder with default method
 - added setters to NotifiedPersonNomial Builder to be used in child classes
 - additional convenient extension addind in Address Builder
 
-## 6.3.8
+## Release 6.3.8
 - fix default title for laboratory anonymous composition resources.
 
-## 6.3.7
+## Release 6.3.7
 - fix for different spellings of titles for notifications according to IfSG
 
-## 6.3.6
+## Release 6.3.6
 - fix issues with copy process of PractitionerRole resources
 - fix issues with additional organization resources while copying a notification
 - refactoring and fix of code that copies NotifiedPersonFacility resources
 - fix missing bundle id in copy result for nonnominal disease notification
 - add default title for laboratory and disease composition resources.
 
-## 6.3.5
+## Release 6.3.5
 - fix millisecond data copying of compositions for non nominal laboratory cases
 - fix extension handling on deep copy for disease compositions
 
-## 6.3.4
+## Release 6.3.4
 - fixing missing clinicalStatus in deepCopy-method of DiseaseDataBuilder 
 
-## 6.3.3
+## Release 6.3.3
 - fix millisecond data copying of specimen and compositions
 
-## 6.3.2
+## Release 6.3.2
 - add missing version copy in laboratory notification deep copy logic
 - add version to notification category input possibility
 
-## 6.3.1
+## Release 6.3.1
 - remove default values for laboratory composition category
 
-## 6.3.0
+## Release 6.3.0
 - Fix missing tag copy function for non nominal disease bundle
 - New composition data builder for non nominal compositions
 - Remove not used constant
 
-## 6.2.0
+## Release 6.2.0
 - Upgrade HAPI FHIR to 8.2.0
 - Fix publishing to Maven Central
 
-## 6.1.1
+## Release 6.1.1
 - Fixing metaURL for non Nominal Laboratory reports
 
-## 6.1.0
+## Release 6.1.0
 - Introduced further classes for §7.3 disease notifications
 
-## 6.0.0
+## Release 6.0.0
 - Introduce copy mechanism for 7.3 disease
 - Introduce new utility classes
 - Breaking: remove Bundles class, now split into other utility classes
 
-## 5.8.0
+## Release 5.8.0
 - Added CustomEvaluationContext to be used by services through NBL library.
 - Update dependencies
 
-## 5.7.0
+## Release 5.7.0
 - Added Builder for LaboratoryReportNonNominal for §7.3 notifications.
 - Updated dependencies
 
-## 5.6.1
+## Release 5.6.1
 - Bugfix: reference utils now set resource for `urn:uuid:` references correctly
 
-## 5.6.0
+## Release 5.6.0
 - Allow processing resources using only `urn:uuid:` references
 
-## 5.5.1
+## Release 5.5.1
 - Updated ospo-resources for adding additional notes and disclaimer
 
-## 5.4.0
+## Release 5.4.0
 - Updated OSPO-Guidelines and checks
 - Add handling for Maven-Central release
 
-## 5.3.0
+## Release 5.3.0
 - Add new builder for multiple bundle and composition profile definitions
 
-## 5.2.0
+## Release 5.2.0
 - Fix Profile for NotifiedPersonByNameDataBuilder
 - Introduce NotificationCategory enum
 
-## 5.1.0
+## Release 5.1.0
 - Adding Reason For Testing in Laboratory Notification
 - Updated dependencies
 
-## 5.0.0
+## Release 5.0.0
 - Allow multiple speciment to be added to a laboratory notification
 
-## 4.0.0
+## Release 4.0.0
 - Updated dependencies
 - Updated bundle entry order
 
-## 3.6.0
+## Release 3.6.0
 - Update dependencies
 - Updated canonicals for IGS
 - Allow multiple profile urls
 
-## 3.5.0
+## Release 3.5.0
 - Add capability to add submitter details
 
-## 3.4.0
+## Release 3.4.0
 - Updated FHIR Parser Library (2.2.0)
 - Updated HAPI FHIR to new minor version (7.4.0)
 
-## 3.3.0
+## Release 3.3.0
 - Added Laboratory OrderId to LaboratoryReportDataBuilder
 - Patches
 
-## 3.2.1
+## Release 3.2.1
 - Disease Condition supports multiple notes
 - IGS Builder refactored
 - Patches
 
-## 3.2.0
+## Release 3.2.0
 - Updated FHIR Parser Library (2.1.0)
 - Updated HAPI FHIR to new minor version (7.2.0)
 
-## 3.1.0
+## Release 3.1.0
 - Method `setDefaults` does not change existing values
 
-## 3.0.0
+## Release 3.0.0
 - Added Disease Processing for Gateway
 
-## 2.0.0
+## Release 2.0.0
 - Added support for IfSG §6.1
 
-## 1.3.1
+## Release 1.3.1
 - Initial GitHub-Release of notification-builder-library
 
 ## Internal DEMIS-Releases before the open source deployment on GitHub

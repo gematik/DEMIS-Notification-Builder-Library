@@ -29,7 +29,9 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.Test;
@@ -64,5 +66,28 @@ class ReferenceUtilsTest {
     final Reference reference = ReferenceUtils.internalReference(resource);
     assertThat(reference.getReference()).isEqualTo("Patient/123");
     assertThat(reference.getResource()).isSameAs(resource);
+  }
+
+  @Test
+  void thatValidRefReturnsResource_getResource() {
+    final Patient patient = new Patient();
+    patient.setId("123");
+    final Reference reference = new Reference(patient);
+    final Patient referencedPatient = (Patient) ReferenceUtils.getResource(reference);
+    assertThat(referencedPatient.getId()).isEqualTo("123");
+  }
+
+  @Test
+  void thatInvalidRefThrowsException_getResource() {
+    final Reference reference = new Reference("Patient/invalid-ref");
+    assertThatThrownBy(() -> ReferenceUtils.getResource(reference))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Reference 'Patient/invalid-ref' is not resolvable");
+  }
+
+  @Test
+  void thatEmptyRefReturnsNull_getResource() {
+    final Reference reference = new Reference();
+    assertThat(ReferenceUtils.getResource(reference)).isNull();
   }
 }

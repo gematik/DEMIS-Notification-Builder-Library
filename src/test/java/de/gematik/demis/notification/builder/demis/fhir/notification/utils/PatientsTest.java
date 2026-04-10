@@ -28,7 +28,9 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -56,6 +58,18 @@ class PatientsTest {
       bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(composition)));
 
       assertThat(Patients.subjectFrom(bundle)).contains(subject);
+    }
+
+    @Test
+    void thatInvalidRefThrowsException() {
+      final Composition composition = new Composition();
+      composition.setSubject(new Reference("invalid-ref"));
+      final Bundle bundle = new Bundle();
+      bundle.setEntry(List.of(new Bundle.BundleEntryComponent().setResource(composition)));
+
+      assertThatThrownBy(() -> Patients.subjectFrom(bundle))
+          .isInstanceOf(UnprocessableEntityException.class)
+          .hasMessageContaining("Reference 'invalid-ref' is not resolvable");
     }
 
     @Test

@@ -35,6 +35,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.PractitionerType;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.List;
 import java.util.Objects;
@@ -66,8 +67,10 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
     PractitionerRole copy = new PractitionerRole();
     copy.setId(original.getId());
     copy.setMeta(original.getMeta());
-    Practitioner referencedPractitioner = (Practitioner) original.getPractitioner().getResource();
-    Organization referencedOrganization = (Organization) original.getOrganization().getResource();
+    Practitioner referencedPractitioner =
+        (Practitioner) ReferenceUtils.getResource(original.getPractitioner());
+    Organization referencedOrganization =
+        (Organization) ReferenceUtils.getResource(original.getOrganization());
     if (referencedPractitioner != null) {
       Practitioner copiedPractitioner = referencedPractitioner.copy();
       Reference newReference = new Reference(copiedPractitioner);
@@ -92,7 +95,7 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
     final PractitionerRole copy = new PractitionerRole();
     copy.setId(Utils.getShortReferenceOrUrnUuid(original));
     copy.setMeta(original.getMeta());
-    if (original.getPractitioner().getResource()
+    if (ReferenceUtils.getResource(original.getPractitioner())
         instanceof final Practitioner referencedPractitioner) {
       final Practitioner copiedPractitioner = referencedPractitioner.copy();
       final Reference newReference =
@@ -100,7 +103,7 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
               .setReference(getShortReferenceOrUrnUuid(copiedPractitioner));
       copy.setPractitioner(newReference);
     }
-    if (original.getOrganization().getResource()
+    if (ReferenceUtils.getResource(original.getOrganization())
         instanceof final Organization originalOrganization) {
       final Organization organization = removeNotifiedPersonFacilityProfile(originalOrganization);
       final Reference reference =

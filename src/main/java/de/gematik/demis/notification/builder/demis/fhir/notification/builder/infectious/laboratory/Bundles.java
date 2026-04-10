@@ -29,6 +29,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimaps;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import java.util.Collection;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
@@ -38,7 +39,7 @@ import org.hl7.fhir.r4.model.Specimen;
 /** Internal helper methods to avoid duplicating code and unnecessarily polluting the Builders. */
 class Bundles {
   static Specimen specimenFromObservation(final Observation observation) {
-    return (Specimen) observation.getSpecimen().getResource();
+    return (Specimen) ReferenceUtils.getResource(observation.getSpecimen());
   }
 
   record ObservationCopyResult(

@@ -28,7 +28,9 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.utils;
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Composition;
@@ -72,5 +74,15 @@ class PractitionerRolesTest {
 
     final Optional<PractitionerRole> actual = PractitionerRoles.authorFrom(composition);
     assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void thatInvalidRefThrowsException() {
+    final Composition composition = new Composition();
+    composition.setAuthor(List.of(new Reference("invalid-ref")));
+
+    assertThatThrownBy(() -> PractitionerRoles.authorFrom(composition))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Reference 'invalid-ref' is not resolvable");
   }
 }

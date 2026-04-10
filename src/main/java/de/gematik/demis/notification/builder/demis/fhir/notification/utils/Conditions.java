@@ -34,7 +34,6 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Condition;
-import org.hl7.fhir.r4.model.Reference;
 
 public class Conditions {
   private Conditions() {}
@@ -55,8 +54,8 @@ public class Conditions {
         section.stream()
             .map(Composition.SectionComponent::getEntry)
             .flatMap(Collection::stream)
-            .map(Reference::getResource)
-            .filter(Objects::nonNull) // Reference#getResource can return null
+            .map(ReferenceUtils::getResource)
+            .filter(Objects::nonNull) // ReferenceUtils#getResource can return null
             .filter(Condition.class::isInstance)
             .map(Condition.class::cast)
             .toList();

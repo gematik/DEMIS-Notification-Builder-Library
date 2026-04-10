@@ -39,6 +39,7 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.types.Addre
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Patients;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.ReferenceUtils;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.time.Year;
 import java.time.YearMonth;
@@ -157,7 +158,7 @@ public class NotifiedPersonNonNominalDataBuilder {
                             extension.getUrl());
                     if (hasProfile
                         && extension.getValue() instanceof Reference ref
-                        && ref.getResource() instanceof Resource resource) {
+                        && ReferenceUtils.getResource(ref) instanceof Resource resource) {
                       return !Metas.hasProfile(DemisConstants.PROFILE_NOTIFIED_PERSON_FACILITY)
                           .test(resource);
                     }
