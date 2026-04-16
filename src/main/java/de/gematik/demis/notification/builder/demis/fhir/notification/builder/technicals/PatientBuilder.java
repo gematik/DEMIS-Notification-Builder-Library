@@ -39,7 +39,6 @@ import java.util.List;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
@@ -62,34 +61,34 @@ public class PatientBuilder implements InitializableFhirObjectBuilder {
   private String profileUrl;
   private Type pseudonym;
   private Date lastUpdated;
-  private DateTimeType deceased;
+  private Type deceased;
   private List<Extension> extensions;
 
   /**
-   * allows to add additional profile url to a patient resource
+   * Adds an additional profile URL to the meta of a patient resource.
    *
-   * @param profileUrl
-   * @param patient
+   * @param profileUrl the canonical URL of the FHIR profile to add
+   * @param patient the patient resource to which the profile URL is added
    */
   public static void addProfileUrlToPatient(String profileUrl, Patient patient) {
     patient.getMeta().addProfile(profileUrl);
   }
 
   /**
-   * Converts a YearMonth to a string in the format "yyyy-MM"
+   * Converts a YearMonth to a string in the format "yyyy-MM".
    *
-   * @param yearMonth
-   * @return
+   * @param yearMonth the year-month value to format
+   * @return the formatted string, e.g. {@code "1975-10"}
    */
   public static String yearMonthToString(YearMonth yearMonth) {
     return yearMonth.format(DateTimeFormatter.ofPattern("yyyy-MM"));
   }
 
   /**
-   * Converts a LocalDate to a YearMonth
+   * Converts a LocalDate to a YearMonth, discarding the day component.
    *
-   * @param date
-   * @return
+   * @param date the local date to convert
+   * @return the corresponding {@link YearMonth}
    */
   public static YearMonth convertToYearMonth(LocalDate date) {
     return YearMonth.of(date.getYear(), date.getMonth());
