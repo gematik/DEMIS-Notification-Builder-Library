@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.2.3
+- fixed handling of deceased field on patients correctly (double type with date and boolean)
+
 ## Release 9.2.2
 - added ReleaseNotes check to pipelines
 - added handling of unresolvable references to not throw NullPointerException

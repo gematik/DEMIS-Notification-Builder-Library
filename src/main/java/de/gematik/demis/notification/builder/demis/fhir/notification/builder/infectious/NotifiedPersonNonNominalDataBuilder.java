@@ -53,6 +53,7 @@ import lombok.AccessLevel;
 import lombok.Setter;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -61,6 +62,7 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Type;
+import org.jspecify.annotations.NonNull;
 
 @Setter
 public class NotifiedPersonNonNominalDataBuilder {
@@ -70,11 +72,35 @@ public class NotifiedPersonNonNominalDataBuilder {
   private Enumerations.AdministrativeGender gender;
   private Extension genderExtension;
   private List<Address> address = new ArrayList<>();
-  private DateTimeType deceased;
+  private DateTimeType deceasedDateTimeType;
+  private BooleanType deceasedBooleanType;
   private List<Extension> extensions;
 
   @Setter(AccessLevel.PRIVATE)
   private Type pseudonym;
+
+  /**
+   * Sets the deceased date/time information for the notified person being built.
+   *
+   * @param deceasedDateTimeType the deceased date/time value to store in this builder
+   * @return this builder instance for fluent method chaining
+   * @deprecated Use {@link #setDeceased(Type)} instead, which accepts both {@link BooleanType} and
+   *     {@link DateTimeType} and avoids ambiguity between the two supported deceased value types.
+   */
+  @Deprecated(forRemoval = true)
+  public NotifiedPersonNonNominalDataBuilder setDeceased(DateTimeType deceasedDateTimeType) {
+    this.deceasedDateTimeType = deceasedDateTimeType;
+    return this;
+  }
+
+  public NotifiedPersonNonNominalDataBuilder setDeceased(Type deceased) {
+    if (deceased instanceof BooleanType booleanType) {
+      this.deceasedBooleanType = booleanType;
+    } else if (deceased instanceof DateTimeType dateTime) {
+      this.deceasedDateTimeType = dateTime;
+    }
+    return this;
+  }
 
   /**
    * Copy all required properties and resources attached to the given {@link Patient}.
@@ -107,6 +133,8 @@ public class NotifiedPersonNonNominalDataBuilder {
     final Type pseudonym = extensionByUrl == null ? null : extensionByUrl.getValue();
     builder.setPseudonym(pseudonym);
 
+    extractDeceasedValue(patientToCopy, builder);
+
     return builder.build();
   }
 
@@ -118,11 +146,12 @@ public class NotifiedPersonNonNominalDataBuilder {
             .setGender(patientToCopy.getGender())
             .setGenderExtension(
                 patientToCopy.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
-            .setDeceased(patientToCopy.getDeceasedDateTimeType())
             .setAddress(AddressDataBuilder.copyAddressesForExcerpt(patientToCopy.getAddress()))
             .addExtension(patientToCopy.getExtensionByUrl(EXTENSION_URL_PSEUDONYM));
 
     Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);
+
+    extractDeceasedValue(patientToCopy, builder);
 
     return builder.build();
   }
@@ -196,7 +225,7 @@ public class NotifiedPersonNonNominalDataBuilder {
         .setAddress(address)
         .setPseudonym(pseudonym)
         .setLastUpdated(Utils.getCurrentDate())
-        .setDeceased(deceased)
+        .setDeceased(deceasedBooleanType != null ? deceasedBooleanType : deceasedDateTimeType)
         .setExtensions(extensions)
         .build();
   }
@@ -255,5 +284,14 @@ public class NotifiedPersonNonNominalDataBuilder {
     }
     this.extensions.add(extension);
     return this;
+  }
+
+  private static void extractDeceasedValue(
+      @NonNull Patient patientToCopy, NotifiedPersonNonNominalDataBuilder builder) {
+    if (patientToCopy.hasDeceasedBooleanType()) {
+      builder.deceasedBooleanType = patientToCopy.getDeceasedBooleanType();
+    } else if (patientToCopy.hasDeceasedDateTimeType()) {
+      builder.deceasedDateTimeType = patientToCopy.getDeceasedDateTimeType();
+    }
   }
 }

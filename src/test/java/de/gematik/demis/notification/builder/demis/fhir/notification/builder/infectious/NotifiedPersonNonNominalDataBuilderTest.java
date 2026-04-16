@@ -43,12 +43,15 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Demis
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.time.Year;
 import java.time.YearMonth;
+import java.util.Date;
 import java.util.List;
 import java.util.SequencedCollection;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Base64BinaryType;
+import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Element;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -349,6 +352,122 @@ class NotifiedPersonNonNominalDataBuilderTest {
               return "";
             })
         .containsExactly("primary", "test-id-keep");
+  }
+
+  @Nested
+  class DeceasedHandling {
+
+    @Test
+    void shouldSetDeceasedBooleanTypeViaTypedSetter() {
+      notifiedPersonNonNominalDataBuilder.setDeceased(new BooleanType(true));
+
+      final Patient patient = notifiedPersonNonNominalDataBuilder.build();
+
+      assertThat(patient.getDeceasedBooleanType().booleanValue()).isTrue();
+    }
+
+    @Test
+    void shouldSetDeceasedDateTimeTypeViaTypedSetter() {
+      final Date deceasedDate = new Date(0);
+      notifiedPersonNonNominalDataBuilder.setDeceased(new DateTimeType(deceasedDate));
+
+      final Patient patient = notifiedPersonNonNominalDataBuilder.build();
+
+      assertThat(patient.getDeceasedDateTimeType().getValue()).isEqualTo(deceasedDate);
+    }
+
+    @Test
+    void shouldIgnoreUnknownDeceasedType() {
+      notifiedPersonNonNominalDataBuilder.setDeceased(
+          new org.hl7.fhir.r4.model.StringType("unknown"));
+
+      final Patient patient = notifiedPersonNonNominalDataBuilder.build();
+
+      assertThat(patient.hasDeceased()).isFalse();
+    }
+
+    @Test
+    void shouldPreferBooleanTypeOverDateTimeTypeInBuild() {
+      // force both fields by setting them individually is not possible via setDeceased(Type),
+      // but BooleanType takes precedence in build() when deceasedBooleanType is set
+      // We verify the general priority: BooleanType wins
+      final NotifiedPersonNonNominalDataBuilder builder = new NotifiedPersonNonNominalDataBuilder();
+      builder.setDeceased(new BooleanType(true));
+      Type deceasedDateTimeType = new DateTimeType(new Date(0));
+      builder.setDeceased(deceasedDateTimeType);
+
+      final Patient patient = builder.build();
+
+      assertThat(patient.hasDeceasedBooleanType()).isTrue();
+      assertThat(patient.hasDeceasedDateTimeType()).isFalse();
+      assertThat(patient.getDeceasedBooleanType().booleanValue()).isTrue();
+    }
+
+    @Test
+    void shouldCopyDeceasedBooleanTypeInExcerpt() {
+      final Patient source = new Patient();
+      source.setDeceased(new BooleanType(true));
+
+      final Patient result =
+          NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(source);
+
+      assertThat(result.getDeceasedBooleanType().booleanValue()).isTrue();
+    }
+
+    @Test
+    void shouldCopyDeceasedDateTimeTypeInExcerpt() {
+      final Date deceasedDate = new Date(0);
+      final Patient source = new Patient();
+      source.setDeceased(new DateTimeType(deceasedDate));
+
+      final Patient result =
+          NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(source);
+
+      assertThat(result.getDeceasedDateTimeType().getValue()).isEqualTo(deceasedDate);
+    }
+
+    @Test
+    void shouldNotSetDeceasedWhenAbsentInExcerpt() {
+      final Patient source = new Patient();
+
+      final Patient result =
+          NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(source);
+
+      assertThat(result.hasDeceased()).isFalse();
+    }
+
+    @Test
+    void shouldCopyDeceasedBooleanTypeInDeepCopy() {
+      final Patient patientToCopy = new Patient();
+      patientToCopy.setId("12345");
+      patientToCopy.setDeceased(new BooleanType(true));
+
+      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+
+      assertThat(result.getDeceasedBooleanType().booleanValue()).isTrue();
+    }
+
+    @Test
+    void shouldCopyDeceasedDateTimeTypeInDeepCopy() {
+      final Date deceasedDate = new Date(0);
+      final Patient patientToCopy = new Patient();
+      patientToCopy.setId("12345");
+      patientToCopy.setDeceased(new DateTimeType(deceasedDate));
+
+      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+
+      assertThat(result.getDeceasedDateTimeType().getValue()).isEqualTo(deceasedDate);
+    }
+
+    @Test
+    void shouldNotSetDeceasedWhenAbsentInDeepCopy() {
+      final Patient patientToCopy = new Patient();
+      patientToCopy.setId("12345");
+
+      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+
+      assertThat(result.hasDeceased()).isFalse();
+    }
   }
 
   @Test
