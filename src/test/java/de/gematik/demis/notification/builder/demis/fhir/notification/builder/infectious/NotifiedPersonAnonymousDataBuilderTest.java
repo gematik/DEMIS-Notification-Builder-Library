@@ -68,6 +68,8 @@ class NotifiedPersonAnonymousDataBuilderTest {
 
     final Patient patient = NotifiedPersonAnonymousDataBuilder.deepCopy(patientToCopy);
 
+    assertThat(patient.getMeta().getProfile().getFirst().getValueAsString())
+        .isEqualTo(PROFILE_NOTIFIED_PERSON_ANONYMOUS);
     assertThat(patient.getId()).isEqualTo("Patient/67890");
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.FEMALE);
     assertThat(patient.getBirthDateElement()).usingRecursiveComparison().isEqualTo(new DateType());
