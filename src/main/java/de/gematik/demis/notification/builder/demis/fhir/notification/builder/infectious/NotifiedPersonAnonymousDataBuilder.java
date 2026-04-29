@@ -51,7 +51,7 @@ public class NotifiedPersonAnonymousDataBuilder extends NotifiedPersonNominalDat
   @Nonnull
   public static Patient deepCopy(@Nonnull final Patient original) {
     final NotifiedPersonAnonymousDataBuilder builder = new NotifiedPersonAnonymousDataBuilder();
-
+    builder.setDefault();
     final SequencedCollection<Address> copiedAddresses =
         AddressDataBuilder.copyOfRedactedAddress(original.getAddress());
     builder.setAddress(copiedAddresses.stream().toList());

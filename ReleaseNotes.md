@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.2.4
+- fixed missing Patient.meta for copy of anonymous §7.3 notifications
+
 ## Release 9.2.3
 - fixed handling of deceased field on patients correctly (double type with date and boolean)
 
