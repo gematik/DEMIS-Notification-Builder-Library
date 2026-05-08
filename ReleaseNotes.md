@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.2.5
+- fixed missing Quantity.system, Quantity.code and Quantity.comparator in deep copy
+
 ## Release 9.2.4
 - fixed missing Patient.meta for copy of anonymous §7.3 notifications
 
