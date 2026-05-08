@@ -269,7 +269,8 @@ class PathogenDetectionDataBuilderTest {
 
   @Test
   void shouldSetValueData() {
-    pathogenDetectionDataBuilder.setValue(new Quantity(500));
+    pathogenDetectionDataBuilder.setValue(
+        new Quantity(null, 500, "http://unitsofmeasure.org", "[iU]/mL", "iU/ml"));
 
     Observation observation =
         pathogenDetectionDataBuilder
@@ -281,6 +282,9 @@ class PathogenDetectionDataBuilderTest {
     Type value = observation.getValue();
     assertThat(value).isInstanceOf(Quantity.class);
     assertThat(((Quantity) value).getValue()).isEqualTo(BigDecimal.valueOf(500));
+    assertThat(((Quantity) value).getSystem()).isEqualTo("http://unitsofmeasure.org");
+    assertThat(((Quantity) value).getCode()).isEqualTo("[iU]/mL");
+    assertThat(((Quantity) value).getUnit()).isEqualTo("iU/ml");
   }
 
   @Nested
@@ -377,7 +381,13 @@ class PathogenDetectionDataBuilderTest {
           new Coding("observationCodeSystem", "observationCodeCode", "observationCodeDisplay");
       code.setVersion("1.0.0");
       observation.setCode(new CodeableConcept(code));
-      observation.setValue(new Quantity().setValue(500).setUnit("unit"));
+      observation.setValue(
+          new Quantity()
+              .setValue(500)
+              .setUnit("unit")
+              .setCode("[iU]/mL")
+              .setSystem("http://unitsofmeasure.org")
+              .setComparator(Quantity.QuantityComparator.GREATER_THAN));
       observation.addInterpretation(
           new CodeableConcept()
               .addCoding(
@@ -444,6 +454,10 @@ class PathogenDetectionDataBuilderTest {
           PathogenDetectionDataBuilder.deepCopy(originalObservation, notifiedPerson, specimen);
       assertThat(result.getValueQuantity().getValue().intValue()).isEqualTo(500);
       assertThat(result.getValueQuantity().getUnit()).isEqualTo("unit");
+      assertThat(result.getValueQuantity().getSystem()).isEqualTo("http://unitsofmeasure.org");
+      assertThat(result.getValueQuantity().getCode()).isEqualTo("[iU]/mL");
+      assertThat(result.getValueQuantity().getComparator())
+          .isEqualTo(Quantity.QuantityComparator.GREATER_THAN);
     }
 
     @Test

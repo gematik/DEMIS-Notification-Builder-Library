@@ -73,9 +73,6 @@ public class PathogenDetectionDataBuilder {
   private String categorySystem;
   private String categoryCode;
   private String categoryDisplay;
-  private String valueSystem;
-  private String valueCode;
-  private String valueDisplay;
   private Observation.ObservationStatus status;
   private Type value;
   private String profileUrl;
@@ -108,7 +105,12 @@ public class PathogenDetectionDataBuilder {
     final Type copiedValue =
         switch (observation.getValue()) {
           case Quantity quantity ->
-              new Quantity().setValue(quantity.getValue()).setUnit(quantity.getUnit());
+              new Quantity()
+                  .setValue(quantity.getValue())
+                  .setUnit(quantity.getUnit())
+                  .setSystem(quantity.getSystem())
+                  .setCode(quantity.getCode())
+                  .setComparator(quantity.getComparator());
           case CodeableConcept codeableConcept ->
               new CodeableConcept().addCoding(codeableConcept.getCodingFirstRep());
           case StringType stringType -> new StringType(stringType.getValue());
