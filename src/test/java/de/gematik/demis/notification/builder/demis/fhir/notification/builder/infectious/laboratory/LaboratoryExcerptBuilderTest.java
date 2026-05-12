@@ -216,7 +216,8 @@ class LaboratoryExcerptBuilderTest {
     private static Bundle getBundle() {
       final Specimen specimen = TestObjects.specimen();
       final Observation observation = TestObjects.pathogenDetection(specimen);
-      final DiagnosticReport diagnosticReport = TestObjects.laboratoryReport(observation);
+      final DiagnosticReport diagnosticReport =
+          TestObjects.laboratoryReport(new Observation[] {observation});
       final Patient patient = TestObjects.notifiedPerson();
       final PractitionerRole submitter = TestObjects.submitter();
       return new NotificationBundleLaboratoryNonNominalDataBuilder()

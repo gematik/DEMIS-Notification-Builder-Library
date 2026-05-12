@@ -308,8 +308,11 @@ class NotificationBundleLaboratoryNonNominalDataBuilderTest {
   }
 
   private static Bundle getBundle() {
-    final Specimen specimen = TestObjects.specimen();
-    final Observation observation = TestObjects.pathogenDetection(specimen);
+    final Specimen[] specimen = new Specimen[] {TestObjects.specimen(), TestObjects.specimen()};
+    final Observation[] observation =
+        new Observation[] {
+          TestObjects.pathogenDetection(specimen[0]), TestObjects.pathogenDetection(specimen[1])
+        };
     final DiagnosticReport diagnosticReport = TestObjects.laboratoryReport(observation);
     final Patient patient = TestObjects.notifiedPerson();
     final PractitionerRole submitter = TestObjects.submitter();
