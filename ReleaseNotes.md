@@ -2,7 +2,11 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.2.7
+- missing release notes added 
+
 ## Release 9.2.6
+- testcases for multiple Observations added
 
 ## Release 9.2.5
 - fixed missing Quantity.system, Quantity.code and Quantity.comparator in deep copy
