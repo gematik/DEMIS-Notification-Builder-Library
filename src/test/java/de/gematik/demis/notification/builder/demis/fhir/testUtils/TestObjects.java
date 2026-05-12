@@ -127,11 +127,13 @@ public class TestObjects {
     return diagnosticReport;
   }
 
-  public static DiagnosticReport laboratoryReport(final Observation observation) {
+  public static DiagnosticReport laboratoryReport(final Observation[] observations) {
     DiagnosticReport diagnosticReport = new DiagnosticReport();
     diagnosticReport.setId("laboratoryReportId");
     diagnosticReport.setMeta(new Meta().addProfile("anything"));
-    diagnosticReport.addResult(new Reference(observation));
+    for (Observation obs : observations) {
+      diagnosticReport.addResult(new Reference(obs));
+    }
     return diagnosticReport;
   }
 }
