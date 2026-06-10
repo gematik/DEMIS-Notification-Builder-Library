@@ -195,6 +195,21 @@ class NotifiedPersonNonNominalDataBuilderTest {
 
     final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.MALE);
+    assertThat(patient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER)).isNull();
+  }
+
+  @Test
+  void deepCopy_shouldCopyGenderExtension() {
+    Patient patientToCopy = new Patient();
+    patientToCopy.setGender(Enumerations.AdministrativeGender.OTHER);
+    final Extension genderExtension = new Extension(EXTENSION_URL_GENDER);
+    genderExtension.setValue(new Coding(EXTENSION_URL_GENDER, "X", "Kein Geschlechtseintrag"));
+    patientToCopy.getGenderElement().addExtension(genderExtension);
+
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+    assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.OTHER);
+    assertThat(patient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
+        .isEqualTo(genderExtension);
   }
 
   @Test

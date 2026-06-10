@@ -72,10 +72,25 @@ class NotifiedPersonAnonymousDataBuilderTest {
         .isEqualTo(PROFILE_NOTIFIED_PERSON_ANONYMOUS);
     assertThat(patient.getId()).isEqualTo("Patient/67890");
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.FEMALE);
+    assertThat(patient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER)).isNull();
     assertThat(patient.getBirthDateElement()).usingRecursiveComparison().isEqualTo(new DateType());
     assertThat(patient.getName()).hasSize(0);
     assertThat(patient.getTelecom()).hasSize(0);
     assertThat(patient.getAddress()).hasSize(0);
+  }
+
+  @Test
+  void deepCopy_shouldCopyGenderExtension() {
+    Patient patientToCopy = new Patient();
+    patientToCopy.setGender(Enumerations.AdministrativeGender.OTHER);
+    final Extension genderExtension = new Extension(EXTENSION_URL_GENDER);
+    genderExtension.setValue(new Coding(EXTENSION_URL_GENDER, "X", "Kein Geschlechtseintrag"));
+    patientToCopy.getGenderElement().addExtension(genderExtension);
+
+    final Patient patient = NotifiedPersonAnonymousDataBuilder.deepCopy(patientToCopy);
+    assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.OTHER);
+    assertThat(patient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
+        .isEqualTo(genderExtension);
   }
 
   @Test

@@ -126,7 +126,10 @@ public class NotifiedPersonNonNominalDataBuilder {
 
     Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);
 
-    builder.setGender(patientToCopy.getGender());
+    builder
+        .setGender(patientToCopy.getGender())
+        .setGenderExtension(
+            patientToCopy.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER));
     final IIdType idElement = patientToCopy.getIdElement();
     builder.setId(idElement.getIdPart());
     final Extension extensionByUrl = patientToCopy.getExtensionByUrl(EXTENSION_URL_PSEUDONYM);
