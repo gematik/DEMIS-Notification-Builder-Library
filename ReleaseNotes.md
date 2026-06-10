@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.2.8
+- added copy of gender extension to deepCopy function of NotifiedPersonAnonymousDataBuilder and NotifiedPersonNonNominalDataBuilder
+
 ## Release 9.2.7
 - missing release notes added 
 

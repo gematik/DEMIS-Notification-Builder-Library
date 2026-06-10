@@ -54,8 +54,10 @@ public class NotifiedPersonAnonymousDataBuilder extends NotifiedPersonNominalDat
     builder.setDefault();
     final SequencedCollection<Address> copiedAddresses =
         AddressDataBuilder.copyOfRedactedAddress(original.getAddress());
-    builder.setAddress(copiedAddresses.stream().toList());
-    builder.setGender(original.getGender());
+    builder
+        .setAddress(copiedAddresses.stream().toList())
+        .setGender(original.getGender())
+        .setGenderExtension(original.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER));
     final IIdType idElement = original.getIdElement();
     builder.setId(idElement.getIdPart());
 
