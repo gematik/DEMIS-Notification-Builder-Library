@@ -71,6 +71,18 @@ public class IgsBuilderUtils {
   }
 
   /**
+   * Generate a CodeableConcept from a text
+   *
+   * @param text - the text that has to be set
+   * @return the generated CodeableConcept
+   */
+  public static CodeableConcept generateCodeableConcept(String text) {
+    CodeableConcept codeableConcept = new CodeableConcept();
+    codeableConcept.setText(text);
+    return codeableConcept;
+  }
+
+  /**
    * Generate a CodeableConcept with a single Coding
    *
    * @param codingSystem - the system of the coding
