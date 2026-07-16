@@ -31,10 +31,12 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_ADAPTER_SUBSTANCE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_PRIMER_SUBSTANCE;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Substance;
 
 /** Builder for the entry Patient/NotificationId in an IGS NotificationBundleSequence. */
@@ -57,10 +59,13 @@ public class SubstanceBuilder extends AbstractIgsResourceBuilder<Substance> {
         if (StringUtils.isBlank(data.getPrimerSchemeSubstance())) {
           return Optional.empty();
         }
-        substance.setDescription(data.getPrimerSchemeSubstance());
-        substance.setCode(
+        substance.setCode(IgsBuilderUtils.generateCodeableConcept(data.getPrimerSchemeSubstance()));
+
+        CodeableConcept coding =
             IgsBuilderUtils.generateCodeableConcept(
-                CODE_SYSTEM_SEQUENCING_SUBSTANCES, "primer", "Primer-Scheme"));
+                CODE_SYSTEM_SEQUENCING_SUBSTANCES, "primer", "Primer-Scheme");
+        substance.setCategory(List.of(coding));
+
         substance.setMeta(
             MetaBuilder.builder().metaProfile(PROFILE_PRIMER_SUBSTANCE).initialize().build());
       }
@@ -68,10 +73,13 @@ public class SubstanceBuilder extends AbstractIgsResourceBuilder<Substance> {
         if (StringUtils.isBlank(data.getAdapterSubstance())) {
           return Optional.empty();
         }
-        substance.setDescription(data.getAdapterSubstance());
-        substance.setCode(
+        substance.setCode(IgsBuilderUtils.generateCodeableConcept(data.getAdapterSubstance()));
+
+        CodeableConcept coding =
             IgsBuilderUtils.generateCodeableConcept(
-                CODE_SYSTEM_SEQUENCING_SUBSTANCES, "adapter", "Adapter"));
+                CODE_SYSTEM_SEQUENCING_SUBSTANCES, "adapter", "Adapter");
+        substance.setCategory(List.of(coding));
+
         substance.setMeta(
             MetaBuilder.builder().metaProfile(PROFILE_ADAPTER_SUBSTANCE).initialize().build());
       }

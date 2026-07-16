@@ -6,14 +6,18 @@
       "https://demis.rki.de/fhir/igs/StructureDefinition/PrimerSubstance"
     ]
   },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "https://demis.rki.de/fhir/igs/CodeSystem/sequencingSubstances",
+          "code": "primer",
+          "display": "Primer-Scheme"
+        }
+      ]
+    }
+  ],
   "code": {
-    "coding": [
-      {
-        "system": "https://demis.rki.de/fhir/igs/CodeSystem/sequencingSubstances",
-        "code": "primer",
-        "display": "Primer-Scheme"
-      }
-    ]
-  },
-  "description": "TAGCGAGT"
+    "text": "TAGCGAGT"
+  }
 }

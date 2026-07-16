@@ -6,14 +6,18 @@
       "https://demis.rki.de/fhir/igs/StructureDefinition/AdapterSubstance"
     ]
   },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "https://demis.rki.de/fhir/igs/CodeSystem/sequencingSubstances",
+          "code": "adapter",
+          "display": "Adapter"
+        }
+      ]
+    }
+  ],
   "code": {
-    "coding": [
-      {
-        "system": "https://demis.rki.de/fhir/igs/CodeSystem/sequencingSubstances",
-        "code": "adapter",
-        "display": "Adapter"
-      }
-    ]
-  },
-  "description": "TAGCGAGT"
+    "text": "TAGCGAGT"
+  }
 }

@@ -194,4 +194,88 @@ class ReceiptBuilderTest {
       FhirJsonTestsUtil.assertEqualJson(bundle, expectedJson, "Built receipt bundle as JSON");
     }
   }
+
+  @Test
+  void shouldCreateNotificationReceiptBundle() {
+
+    Organization gaOrganization = new Organization();
+    gaOrganization.setId("GA");
+    Organization custodianOrganization = new Organization();
+    custodianOrganization.setId("CUSTODIAN");
+    Bundle receiptBundle =
+        new ReceiptBuilder()
+            .setNotificationBundleId("notification-bundle-id")
+            .setRelatesToId("relates-to-id")
+            .setGaOrganization(gaOrganization)
+            .setCustodianOrganization(custodianOrganization)
+            .setPdfQuittung(new Binary())
+            .createNotificationReceiptBundle();
+    assertThat(receiptBundle).isNotNull();
+    assertThat(receiptBundle.getEntry()).hasSize(5);
+
+    Composition composition = (Composition) receiptBundle.getEntryFirstRep().getResource();
+    Coding coding = composition.getType().getCodingFirstRep();
+    assertThat(coding.getSystem()).isEqualTo("http://loinc.org");
+    assertThat(coding.getCode()).isEqualTo("77999-1");
+    assertThat(coding.getDisplay()).isEqualTo("Case notification comment");
+
+    Extension extension = composition.getExtension().getFirst();
+    Identifier extensionValue = (Identifier) extension.getValue();
+    assertThat(extensionValue.getValue()).isEqualTo("notification-bundle-id");
+
+    Composition.CompositionRelatesToComponent relatesTo = composition.getRelatesToFirstRep();
+    Reference relatesToTarget = (Reference) relatesTo.getTarget();
+    assertThat(relatesTo.getCode()).isEqualTo(Composition.DocumentRelationshipType.APPENDS);
+    assertThat(relatesToTarget.getType()).isEqualTo("Composition");
+    assertThat(relatesToTarget.getIdentifier().getValue()).isEqualTo("relates-to-id");
+
+    List<Reference> authorList = composition.getAuthor();
+    assertThat(authorList).hasSize(1);
+    Organization demisOrganization = (Organization) authorList.getFirst().getResource();
+    assertThat(demisOrganization.getId()).isEqualTo("DEMIS");
+    assertThat(receiptBundle.getEntry().get(1).getResource()).isEqualTo(demisOrganization);
+
+    Composition.SectionComponent sectionComponent = composition.getSectionFirstRep();
+    assertThat(sectionComponent.getTitle()).isEqualTo("Zuständiges Gesundheitsamt");
+    assertThat(sectionComponent.getCode().getText()).isEqualTo("Zuständiges Gesundheitsamt");
+    Organization organization = (Organization) sectionComponent.getEntryFirstRep().getResource();
+    assertThat(organization.getId()).isEqualTo("GA");
+    assertThat(receiptBundle.getEntry().get(2).getResource()).isEqualTo(organization);
+
+    Organization custodianOrg = (Organization) composition.getCustodian().getResource();
+    assertThat(custodianOrg.getId()).isEqualTo("CUSTODIAN");
+    assertThat(receiptBundle.getEntry().get(3).getResource()).isEqualTo(custodianOrg);
+
+    assertThat(receiptBundle.getEntry().get(4).getResource()).isInstanceOf(Binary.class);
+  }
+
+  @Test
+  void shouldCreateNotificationReceiptBundle_withoutSpecificOrganizations() {
+    Bundle receiptBundle = new ReceiptBuilder().createNotificationReceiptBundle();
+
+    assertThat(receiptBundle).isNotNull();
+    assertThat(receiptBundle.getEntry()).hasSize(2);
+
+    Composition composition = (Composition) receiptBundle.getEntryFirstRep().getResource();
+    Coding coding = composition.getType().getCodingFirstRep();
+    assertThat(coding.getSystem()).isEqualTo("http://loinc.org");
+    assertThat(coding.getCode()).isEqualTo("77999-1");
+    assertThat(coding.getDisplay()).isEqualTo("Case notification comment");
+
+    Extension extension = composition.getExtension().getFirst();
+    Identifier extensionValue = (Identifier) extension.getValue();
+    assertThat(extensionValue.getValue()).isEqualTo(null);
+
+    Composition.CompositionRelatesToComponent relatesTo = composition.getRelatesToFirstRep();
+    Reference relatesToTarget = (Reference) relatesTo.getTarget();
+    assertThat(relatesTo.getCode()).isEqualTo(Composition.DocumentRelationshipType.APPENDS);
+    assertThat(relatesToTarget.getType()).isEqualTo("Composition");
+    assertThat(relatesToTarget.getIdentifier().getValue()).isEqualTo(null);
+
+    List<Reference> authorList = composition.getAuthor();
+    assertThat(authorList).hasSize(1);
+    Organization demisOrganization = (Organization) authorList.getFirst().getResource();
+    assertThat(demisOrganization.getId()).isEqualTo("DEMIS");
+    assertThat(receiptBundle.getEntry().get(1).getResource()).isEqualTo(demisOrganization);
+  }
 }

@@ -2,8 +2,12 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.2.9
+- adapted igs notifications to profile version 5.0.1
+
 ## Release 9.2.8
 - added copy of gender extension to deepCopy function of NotifiedPersonAnonymousDataBuilder and NotifiedPersonNonNominalDataBuilder
+- added creation of notification receipts to ReceiptBuilder
 
 ## Release 9.2.7
 - missing release notes added 

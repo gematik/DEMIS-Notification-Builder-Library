@@ -30,9 +30,10 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.re
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.DEMIS_RKI_DE_FHIR;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_NOTIFICATION_BUNDLE_ID;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.generateUuidString;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils.getCurrentDate;
 
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import lombok.Data;
+import lombok.Getter;
 import org.hl7.fhir.r4.model.Binary;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -56,18 +57,26 @@ public class ReceiptBuilder {
       "https://demis.rki.de/fhir/StructureDefinition/ReceivedNotification";
   private static final String NOTIFICATION_ID_SYSTEM =
       "https://demis.rki.de/fhir/NamingSystem/NotificationId";
-  private static final String REPORT_TYPE_CODE = "80563-0";
-  private static final String REPORT_TYPE_DISPLAY = "Report";
   private static final String REPORT_TYPE_SYSTEM = "http://loinc.org";
   private static final String PDF_CONTENT_TYPE = "application/pdf";
   private static final String PDF_QUITTUNG_TITLE = "PDF Quittung";
-  private static final String RECEIVER_TITLE = "Empfänger";
+  private static final String RESPONSE_COMPOSITION_TITLE = "Meldevorgangsquittung";
+
+  private static final String REPORT_TYPE_CODE = "80563-0";
+  private static final String REPORT_TYPE_DISPLAY = "Report";
+  private static final String REPORT_RECEIVER_TITLE = "Empfänger";
+
+  private static final String NOTIFICATION_TYPE_CODE = "77999-1";
+  private static final String NOTIFICATION_TYPE_DISPLAY = "Case notification comment";
+  private static final String NOTIFICATION_RECEIVER_TITLE = "Zuständiges Gesundheitsamt";
 
   private Organization rkiOrganization;
 
-  private Organization demisOrg;
+  private Organization gaOrganization;
 
-  private Composition notificationReceiptComposition;
+  private Organization custodianOrganization;
+
+  private Organization demisOrg;
 
   private String notificationBundleId;
 
@@ -80,23 +89,66 @@ public class ReceiptBuilder {
     demisOrg = new DemisOrganizationBuilder().createDemisOrg();
     rkiOrganization = new RkiOrganizationBuilder().createRkiOrganization();
 
-    return createReceiptBundle();
+    return createReceiptBundle(ReceiptType.REPORT);
   }
 
-  public Bundle createReceiptBundle() {
-    Bundle receiptBundle = new Bundle();
+  public Bundle createNotificationReceiptBundle() {
 
+    demisOrg = new DemisOrganizationBuilder().createDemisOrg();
+
+    return createReceiptBundle(ReceiptType.NOTIFICATION);
+  }
+
+  private Bundle createReceiptBundle() {
+    return createReceiptBundle(ReceiptType.DEFAULT);
+  }
+
+  private Bundle createReceiptBundle(final ReceiptType receiptType) {
+    Bundle receiptBundle = new Bundle();
+    Composition notificationReceiptComposition = new Composition();
     //    Bundle specific
-    receiptBundle.setMeta(new Meta().addProfile(RECEIPT_BUNDLE_PROFILE));
-    receiptBundle.setType(Bundle.BundleType.COLLECTION);
+    setupBundle(receiptBundle);
 
     // Composition
-    notificationReceiptComposition = new Composition();
-    notificationReceiptComposition.setId(generateUuidString());
-    notificationReceiptComposition.setTitle("Meldevorgangsquittung");
+    setupComposition(notificationReceiptComposition, receiptType);
 
+    // add to Composition
+    addNotificationBundleId(notificationReceiptComposition);
+    addRelatesToTargetData(notificationReceiptComposition);
+    addOrganizationReferences(notificationReceiptComposition, receiptType);
+
+    // add to receiptBundle
+    addCompositionEntry(receiptBundle, notificationReceiptComposition);
+    addOrganizationEntries(receiptBundle, receiptType);
+
+    if (pdfQuittung != null) {
+      addPdf(notificationReceiptComposition, pdfQuittung, receiptBundle);
+    }
+
+    return receiptBundle;
+  }
+
+  private void setupBundle(final Bundle receiptBundle) {
+    receiptBundle.setMeta(new Meta().addProfile(RECEIPT_BUNDLE_PROFILE));
+    receiptBundle.setType(Bundle.BundleType.COLLECTION);
+  }
+
+  private void setupComposition(
+      final Composition notificationReceiptComposition, final ReceiptType receiptType) {
     notificationReceiptComposition.setMeta(new Meta().addProfile(NOTIFICATION_RECEIPT_PROFILE));
+    notificationReceiptComposition.setType(
+        new CodeableConcept(
+            new Coding(
+                REPORT_TYPE_SYSTEM, receiptType.getTypeCode(), receiptType.getTypeDisplay())));
 
+    notificationReceiptComposition.setId(Utils.generateUuidString());
+    notificationReceiptComposition.setDate(Utils.getCurrentDate());
+
+    notificationReceiptComposition.setStatus(Composition.CompositionStatus.FINAL);
+    notificationReceiptComposition.setTitle(RESPONSE_COMPOSITION_TITLE);
+  }
+
+  private void addNotificationBundleId(final Composition notificationReceiptComposition) {
     Identifier value = new Identifier();
     value.setSystem(NAMING_SYSTEM_NOTIFICATION_BUNDLE_ID);
     value.setValue(notificationBundleId);
@@ -105,40 +157,9 @@ public class ReceiptBuilder {
     extension.setUrl(RECEIVED_NOTIFICATION_EXTENSION);
     extension.setValue(value);
     notificationReceiptComposition.addExtension(extension);
-
-    notificationReceiptComposition.setStatus(Composition.CompositionStatus.FINAL);
-
-    notificationReceiptComposition.setType(
-        new CodeableConcept(new Coding(REPORT_TYPE_SYSTEM, REPORT_TYPE_CODE, REPORT_TYPE_DISPLAY)));
-    notificationReceiptComposition.setDate(getCurrentDate());
-
-    notificationReceiptComposition.addRelatesTo(createRelatesToTargetData());
-
-    addDemisOrgWhenSet();
-    addRkiOrgWhenSet();
-
-    receiptBundle.addEntry(
-        new Bundle.BundleEntryComponent()
-            .setResource(notificationReceiptComposition)
-            .setFullUrl(
-                DEMIS_RKI_DE_FHIR + "Composition/" + notificationReceiptComposition.getId()));
-    receiptBundle.addEntry(
-        new Bundle.BundleEntryComponent()
-            .setResource(demisOrg)
-            .setFullUrl(DEMIS_RKI_DE_FHIR + "Organization/" + demisOrg.getId()));
-    receiptBundle.addEntry(
-        new Bundle.BundleEntryComponent()
-            .setResource(rkiOrganization)
-            .setFullUrl(DEMIS_RKI_DE_FHIR + "Organization/" + rkiOrganization.getId()));
-
-    if (pdfQuittung != null) {
-      addPdf(pdfQuittung, receiptBundle);
-    }
-
-    return receiptBundle;
   }
 
-  private Composition.CompositionRelatesToComponent createRelatesToTargetData() {
+  private void addRelatesToTargetData(final Composition notificationReceiptComposition) {
     Composition.CompositionRelatesToComponent component =
         new Composition.CompositionRelatesToComponent();
 
@@ -151,29 +172,78 @@ public class ReceiptBuilder {
         new Identifier().setSystem(NOTIFICATION_ID_SYSTEM).setValue(relatesToId));
 
     component.setTarget(relatesToTarget);
-    return component;
+    notificationReceiptComposition.addRelatesTo(component);
   }
 
-  private void addRkiOrgWhenSet() {
-    if (rkiOrganization != null) {
+  private void addOrganizationReferences(
+      final Composition notificationReceiptComposition, final ReceiptType receiptType) {
+    addDemisOrgWhenSet(notificationReceiptComposition);
+    if (ReceiptType.REPORT.equals(receiptType)) {
+      addOrgWhenSet(notificationReceiptComposition, rkiOrganization, REPORT_RECEIVER_TITLE);
+    } else {
+      addOrgWhenSet(notificationReceiptComposition, gaOrganization, NOTIFICATION_RECEIVER_TITLE);
+      addCustodianOrgWhenSet(notificationReceiptComposition);
+    }
+  }
+
+  private void addOrgWhenSet(
+      final Composition notificationReceiptComposition,
+      Organization organization,
+      String receiverTitle) {
+    if (organization != null) {
       Composition.SectionComponent section = new Composition.SectionComponent();
-      section.setTitle(RECEIVER_TITLE);
-      section.setCode(new CodeableConcept().setText(RECEIVER_TITLE));
-      Reference receiverRef = new Reference(rkiOrganization);
+      section.setTitle(receiverTitle);
+      section.setCode(new CodeableConcept().setText(receiverTitle));
+      Reference receiverRef = new Reference(organization);
       section.addEntry(receiverRef);
       notificationReceiptComposition.addSection(section);
     }
   }
 
-  private void addDemisOrgWhenSet() {
+  private void addDemisOrgWhenSet(final Composition notificationReceiptComposition) {
     if (demisOrg != null) {
       Reference organizationReference = new Reference(demisOrg);
       notificationReceiptComposition.addAuthor(organizationReference);
     }
   }
 
-  private void addPdf(Binary pdfBinary, Bundle receiptBundle) {
+  private void addCustodianOrgWhenSet(final Composition notificationReceiptComposition) {
+    if (custodianOrganization != null) {
+      Reference organizationReference = new Reference(custodianOrganization);
+      notificationReceiptComposition.setCustodian(organizationReference);
+    }
+  }
 
+  private void addOrganizationEntries(final Bundle receiptBundle, final ReceiptType receiptType) {
+    addOrganizationEntry(receiptBundle, demisOrg);
+    if (ReceiptType.REPORT.equals(receiptType)) {
+      addOrganizationEntry(receiptBundle, rkiOrganization);
+    } else {
+      addOrganizationEntry(receiptBundle, gaOrganization);
+      addOrganizationEntry(receiptBundle, custodianOrganization);
+    }
+  }
+
+  private void addOrganizationEntry(final Bundle receiptBundle, final Organization organization) {
+    if (organization != null) {
+      receiptBundle.addEntry(
+          new Bundle.BundleEntryComponent()
+              .setResource(organization)
+              .setFullUrl(DEMIS_RKI_DE_FHIR + "Organization/" + organization.getId()));
+    }
+  }
+
+  private void addCompositionEntry(
+      final Bundle receiptBundle, final Composition notificationReceiptComposition) {
+    receiptBundle.addEntry(
+        new Bundle.BundleEntryComponent()
+            .setResource(notificationReceiptComposition)
+            .setFullUrl(
+                DEMIS_RKI_DE_FHIR + "Composition/" + notificationReceiptComposition.getId()));
+  }
+
+  private void addPdf(
+      final Composition notificationReceiptComposition, Binary pdfBinary, Bundle receiptBundle) {
     pdfBinary.setId(generateUuidString());
     pdfBinary.setContentType(PDF_CONTENT_TYPE);
     Composition.SectionComponent t1 = new Composition.SectionComponent();
@@ -186,5 +256,22 @@ public class ReceiptBuilder {
         new Bundle.BundleEntryComponent()
             .setResource(pdfBinary)
             .setFullUrl(DEMIS_RKI_DE_FHIR + "Binary/" + pdfBinary.getId()));
+  }
+
+  @Getter
+  public enum ReceiptType {
+    REPORT(REPORT_TYPE_CODE, REPORT_TYPE_DISPLAY, REPORT_RECEIVER_TITLE),
+    NOTIFICATION(NOTIFICATION_TYPE_CODE, NOTIFICATION_TYPE_DISPLAY, NOTIFICATION_RECEIVER_TITLE),
+    DEFAULT(REPORT_TYPE_CODE, REPORT_TYPE_DISPLAY, REPORT_RECEIVER_TITLE);
+
+    private final String typeCode;
+    private final String typeDisplay;
+    private final String receiverTitle;
+
+    ReceiptType(String typeCode, String typeDisplay, String receiverTitle) {
+      this.typeCode = typeCode;
+      this.typeDisplay = typeDisplay;
+      this.receiverTitle = receiverTitle;
+    }
   }
 }

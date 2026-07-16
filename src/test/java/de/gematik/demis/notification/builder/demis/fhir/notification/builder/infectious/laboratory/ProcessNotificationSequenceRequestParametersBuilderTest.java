@@ -205,25 +205,41 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertAll(
         () -> assertThat(entry.getResource()).isNotNull().isInstanceOf(Substance.class),
         () -> assertThat(substance.getId()).isEqualTo(id),
-        () -> assertThat(substance.getDescription()).isEqualTo("TAGCGAGT"),
+        () -> assertThat(substance.getCode()).isNotNull(),
+        () -> assertThat(substance.getCode().getText()).isEqualTo("TAGCGAGT"),
         () -> assertThat(meta.getProfile()).isNotNull().hasSize(1),
         () ->
             assertThat(meta.getProfile().getFirst().getValue())
                 .isEqualTo(PROFILE_ADAPTER_SUBSTANCE),
-        () -> assertThat(substance.getCode()).isNotNull(),
-        () -> assertThat(substance.getCode().getCoding()).isNotNull().hasSize(1),
+        () -> assertThat(substance.getCategory()).isNotNull().hasSize(1),
+        () -> assertThat(substance.getCategory().getFirst().getCoding()).isNotNull().hasSize(1),
         () ->
-            assertThat(substance.getCode().getCoding().getFirst().getSystem())
-                .isNotNull()
-                .isEqualTo(CODE_SYSTEM_SEQUENCING_SUBSTANCES),
+            assertThat(
+                substance
+                    .getCategory()
+                    .getFirst()
+                    .getCoding()
+                    .getFirst()
+                    .getSystem()
+                    .equals(CODE_SYSTEM_SEQUENCING_SUBSTANCES)),
         () ->
-            assertThat(substance.getCode().getCoding().getFirst().getCode())
-                .isNotNull()
-                .isEqualTo("adapter"),
+            assertThat(
+                substance
+                    .getCategory()
+                    .getFirst()
+                    .getCoding()
+                    .getFirst()
+                    .getCode()
+                    .equals("adapter")),
         () ->
-            assertThat(substance.getCode().getCoding().getFirst().getDisplay())
-                .isNotNull()
-                .isEqualTo("Adapter"));
+            assertThat(
+                substance
+                    .getCategory()
+                    .getFirst()
+                    .getCoding()
+                    .getFirst()
+                    .getDisplay()
+                    .equals("Adapter")));
   }
 
   private void assertCompositionNotificationId(BundleEntryComponent entry) {
