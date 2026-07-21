@@ -44,8 +44,8 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.DOCUMENT_REFERENCE_BASE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.LOINC_ORG_SYSTEM;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.MOLECULAR_SEQUENCE_BASE;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_LABORATORY_ID;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_NOTIFICATION_ID;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_PARTICIPANT_ID;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.ORGANIZATION_BASE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PARTICIPANT_BASE;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PRACTITIONER_ROLE_BASE;
@@ -168,7 +168,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertCompositionNotificationId(entries.get(0));
     assertPatient(entries.get(1));
     assertNotifierRole(entries.get(2));
-    assertDemisLaboratoryIdOrganization(entries.get(3));
+    assertDemisParticipantIdOrganization(entries.get(3));
     assertSubmittingRole(entries.get(4));
     assertSubmittingFacilityOrganization(entries.get(5));
     assertLaboratoryReportSequenceDiagnosticReport(entries.get(6));
@@ -184,7 +184,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
     assertCompositionNotificationId(entries.get(0));
     assertPatient(entries.get(1));
     assertNotifierRole(entries.get(2));
-    assertDemisLaboratoryIdOrganization(entries.get(3));
+    assertDemisParticipantIdOrganization(entries.get(3));
     assertLaboratoryReportSequenceDiagnosticReport(entries.get(4));
     assertSequencingDevice(entries.get(5));
     assertSpecimenSequence(entries.get(6), !WITH_PRIME_DIAGNOSTIC_LAB);
@@ -434,7 +434,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
         .matches(PREFIX_OBSERVATION + REGULAR_EXPRESSION_UUID_SUFFIX);
   }
 
-  private void assertDemisLaboratoryIdOrganization(BundleEntryComponent entry) {
+  private void assertDemisParticipantIdOrganization(BundleEntryComponent entry) {
     assertThat(entry).isNotNull();
     assertThat(entry.getFullUrl())
         .isNotNull()
@@ -453,7 +453,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
 
     assertThat(demisLaboratoryId.getIdentifier()).isNotNull().hasSize(1);
     Identifier identifier = demisLaboratoryId.getIdentifier().getFirst();
-    assertThat(identifier.getSystem()).isNotNull().isEqualTo(NAMING_SYSTEM_LABORATORY_ID);
+    assertThat(identifier.getSystem()).isNotNull().isEqualTo(NAMING_SYSTEM_PARTICIPANT_ID);
     assertThat(identifier.getValue()).isNotNull().isEqualTo("10285");
 
     assertThat(demisLaboratoryId.getType()).isNotNull().hasSize(1);
@@ -502,7 +502,7 @@ class ProcessNotificationSequenceRequestParametersBuilderTest {
 
     assertThat(submittingFacility.getIdentifier()).isNotNull().hasSize(1);
     Identifier identifier = submittingFacility.getIdentifier().getFirst();
-    assertThat(identifier.getSystem()).isNotNull().isEqualTo(DemisConstants.NAMING_SYSTEM_BSNR);
+    assertThat(identifier.getSystem()).isNotNull().isEqualTo(NAMING_SYSTEM_PARTICIPANT_ID);
     assertThat(identifier.getValue()).isNotNull().isEqualTo("987654321");
 
     assertThat(submittingFacility.getName()).isNotNull().isEqualTo("Primärlabor");

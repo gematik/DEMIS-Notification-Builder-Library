@@ -8,7 +8,7 @@
   },
   "identifier": [
     {
-      "system": "https://demis.rki.de/fhir/NamingSystem/DemisLaboratoryId",
+      "system": "https://demis.rki.de/fhir/NamingSystem/DemisParticipantId",
       "value": "10285"
     }
   ],
