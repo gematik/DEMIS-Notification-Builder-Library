@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.3.0
+- for igs notifications the demis participant id is set according to https://wiki.gematik.de/spaces/DSKB/pages/659360260/Metadaten+f%C3%BCr+Upload+via+csv+oder+LIS-Schnittstelle
+
 ## Release 9.2.9
 - adapted igs notifications to profile version 5.0.1
 

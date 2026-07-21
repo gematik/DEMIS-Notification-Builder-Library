@@ -30,8 +30,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.te
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsBuilderUtils.generateCodeableConcept;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.igs.IgsBuilderUtils.generateIdentifier;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.CODE_SYSTEM_ORGANIZATION_TYPE;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_BSNR;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_LABORATORY_ID;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.NAMING_SYSTEM_PARTICIPANT_ID;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_NOTIFIER_FACILITY;
 import static de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants.PROFILE_SUBMITTING_FACILITY;
 import static org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.EMAIL;
@@ -68,9 +67,7 @@ public class OrganizationBuilder extends AbstractIgsResourceBuilder<Organization
   private Optional<Organization> buildLabOrg(Organization organization) {
     organization.setMeta(
         MetaBuilder.builder().metaProfile(PROFILE_NOTIFIER_FACILITY).initialize().build());
-    organization.setIdentifier(
-        List.of(
-            generateIdentifier(NAMING_SYSTEM_LABORATORY_ID, data.getSequencingLabDemisLabId())));
+    initializeIdentifier(organization, data.getSequencingLabDemisLabId());
     organization.setType(
         List.of(
             generateCodeableConcept(CODE_SYSTEM_ORGANIZATION_TYPE, CODING_CODE, CODING_DISPLAY)));
@@ -96,6 +93,13 @@ public class OrganizationBuilder extends AbstractIgsResourceBuilder<Organization
     return Optional.of(organization);
   }
 
+  private void initializeIdentifier(final Organization organization, final String identifierValue) {
+    if (identifierValue != null && !identifierValue.isEmpty()) {
+      organization.setIdentifier(
+          List.of(generateIdentifier(NAMING_SYSTEM_PARTICIPANT_ID, identifierValue)));
+    }
+  }
+
   private Optional<Organization> buildSubmitterOrg(Organization organization) {
     if (!hasSubmittingFacility()) {
       return Optional.empty();
@@ -103,8 +107,7 @@ public class OrganizationBuilder extends AbstractIgsResourceBuilder<Organization
     validateSubmittingFacilityData();
     organization.setMeta(
         MetaBuilder.builder().metaProfile(PROFILE_SUBMITTING_FACILITY).initialize().build());
-    organization.setIdentifier(
-        List.of(generateIdentifier(NAMING_SYSTEM_BSNR, data.getPrimeDiagnosticLabDemisLabId())));
+    initializeIdentifier(organization, data.getPrimeDiagnosticLabDemisLabId());
     organization.setName(data.getPrimeDiagnosticLabName());
     organization.setTelecom(
         List.of(
