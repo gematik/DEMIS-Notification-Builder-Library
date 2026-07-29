@@ -55,8 +55,7 @@ public final class DiseaseExcerptBuilder {
   private DiseaseExcerptBuilder() {}
 
   @Nonnull
-  public static Bundle createExcerptNotifiedPersonNotByNameFromNominalBundle(
-      @Nonnull final Bundle originalBundle) {
+  public static Bundle createExcerptFrom61Bundle(@Nonnull final Bundle originalBundle) {
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle);
     final Patient notifiedPerson =
         NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(ctx.subject());
@@ -65,9 +64,8 @@ public final class DiseaseExcerptBuilder {
   }
 
   @Nonnull
-  public static Bundle createExcerptNotifiedPersonAnonymousFromNonNominalBundle(
-      @Nonnull final Bundle originalBundleNonNominal) {
-    final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundleNonNominal);
+  public static Bundle createExcerptFrom73Bundle(@Nonnull final Bundle originalBundle) {
+    final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle);
     final List<Address> addresses =
         AddressDataBuilder.copyAddressesForExcerpt(
             List.copyOf(NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(ctx.subject())));
@@ -75,10 +73,7 @@ public final class DiseaseExcerptBuilder {
         NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(
             ctx.subject(), addresses);
     return DiseaseExcerptBuilder.createExcerpt(
-        originalBundleNonNominal,
-        ctx,
-        new NotificationBundleDiseaseNonNominalDataBuilder(),
-        notifiedPerson);
+        originalBundle, ctx, new NotificationBundleDiseaseNonNominalDataBuilder(), notifiedPerson);
   }
 
   private static Bundle createExcerpt(

@@ -32,9 +32,7 @@ import static de.gematik.demis.notification.builder.demis.fhir.notification.util
 import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
-import java.util.SequencedCollection;
 import javax.annotation.Nonnull;
-import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
@@ -68,11 +66,7 @@ public class NotificationBundleLaboratoryNonNominalDataBuilder
    */
   public static Bundle deepCopy(@Nonnull final Bundle originalBundle) {
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle.getEntry());
-
-    final SequencedCollection<Address> addresses =
-        NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(ctx.subject());
-    final Patient notifiedPerson =
-        NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject(), addresses);
+    final Patient notifiedPerson = NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject());
 
     final PractitionerRole submitter = PractitionerRoleBuilder.deepCopy73(ctx.submitter());
     final PractitionerRole notifier = PractitionerRoleBuilder.deepCopy73(ctx.notifier());

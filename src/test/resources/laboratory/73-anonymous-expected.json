@@ -78,11 +78,11 @@
           "url": "https://demis.rki.de/fhir/StructureDefinition/AddressUse",
           "valueCoding": {
             "system": "https://demis.rki.de/fhir/CodeSystem/addressUse",
-            "code": "current",
-            "display": "Derzeitiger Aufenthaltsort"
+            "code": "primary",
+            "display": "Hauptwohnsitz"
           }
         } ],
-        "postalCode": "123"
+        "postalCode": "158"
       } ]
     }
   }, {
