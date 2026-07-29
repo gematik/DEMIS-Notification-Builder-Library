@@ -35,8 +35,10 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.builder.inf
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonNonNominalDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.AddressDataBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
+import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Metas;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.Utils;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Bundle;
@@ -54,8 +56,7 @@ public final class LaboratoryExcerptBuilder {
 
   private LaboratoryExcerptBuilder() {}
 
-  public static Bundle createExcerptNotifiedPersonNotByNameFromNominalBundle(
-      @Nonnull final Bundle originalBundle) {
+  public static Bundle createExcerptFrom71Bundle(@Nonnull final Bundle originalBundle) {
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle.getEntry());
     final Patient notifiedPerson =
         NotifiedPersonNonNominalDataBuilder.createExcerptNotByNamePatient(ctx.subject());
@@ -63,20 +64,27 @@ public final class LaboratoryExcerptBuilder {
         originalBundle, ctx, new NotificationBundleLaboratoryDataBuilder(), notifiedPerson);
   }
 
-  public static Bundle createExcerptNotifiedPersonAnonymousFromNonNominalBundle(
-      @Nonnull final Bundle originalBundleNonNominal) {
-    final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundleNonNominal.getEntry());
+  public static Bundle createExcerptFrom73Bundle(@Nonnull final Bundle originialBundle) {
+    final BundleBuilderContext ctx = BundleBuilderContext.from(originialBundle.getEntry());
     final List<Address> addresses =
         AddressDataBuilder.copyAddressesForExcerpt(
             List.copyOf(NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(ctx.subject())));
     final Patient notifiedPerson =
         NotifiedPersonAnonymousDataBuilder.createAnonymousPatientForExcerpt(
             ctx.subject(), addresses);
+
     return LaboratoryExcerptBuilder.createExcerpt(
-        originalBundleNonNominal,
-        ctx,
-        new NotificationBundleLaboratoryNonNominalDataBuilder(),
-        notifiedPerson);
+        originialBundle, ctx, getLaboratoryDataBuilderFor73Bundle(originialBundle), notifiedPerson);
+  }
+
+  private static NotificationBundleLaboratoryDataBuilder getLaboratoryDataBuilderFor73Bundle(
+      final Bundle originalBundle) {
+    final Optional<String> profileUrl = Metas.profilesFrom(originalBundle).stream().findFirst();
+    return profileUrl.isPresent()
+            && DemisConstants.PROFILE_NOTIFICATION_BUNDLE_LABORATORY_ANONYMOUS.equals(
+                profileUrl.get())
+        ? new NotificationBundleLaboratoryAnonymousDataBuilder()
+        : new NotificationBundleLaboratoryNonNominalDataBuilder();
   }
 
   private static Bundle createExcerpt(
@@ -123,6 +131,7 @@ public final class LaboratoryExcerptBuilder {
             DemisConstants.RELATED_NOTIFICATION_CODING_SYSTEM,
             originalBundleIdentifier,
             "Relates to message with identifier: " + originalBundleIdentifier);
+
     return builder
         .setId(originalBundle.getId())
         .setProfileUrl(builder.getDefaultProfileUrl())

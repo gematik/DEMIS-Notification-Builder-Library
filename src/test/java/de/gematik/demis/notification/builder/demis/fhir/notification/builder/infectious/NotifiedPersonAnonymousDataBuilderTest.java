@@ -73,10 +73,31 @@ class NotifiedPersonAnonymousDataBuilderTest {
     assertThat(patient.getId()).isEqualTo("Patient/67890");
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.FEMALE);
     assertThat(patient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER)).isNull();
-    assertThat(patient.getBirthDateElement()).usingRecursiveComparison().isEqualTo(new DateType());
+    assertThat(patient.getBirthDateElement())
+        .usingRecursiveComparison()
+        .isEqualTo(new DateType("1980-01"));
     assertThat(patient.getName()).hasSize(0);
     assertThat(patient.getTelecom()).hasSize(0);
     assertThat(patient.getAddress()).hasSize(0);
+  }
+
+  @Test
+  void shouldCopyPatientDetails_withoutBirthdate() {
+    Patient patientToCopy = new Patient();
+
+    final Patient patient = NotifiedPersonAnonymousDataBuilder.deepCopy(patientToCopy);
+
+    assertThat(patient.getBirthDate()).isNull();
+  }
+
+  @Test
+  void shouldCopyPatientDetails_emptyBirthdate() {
+    Patient patientToCopy = new Patient();
+    patientToCopy.setBirthDateElement(new DateType());
+
+    final Patient patient = NotifiedPersonAnonymousDataBuilder.deepCopy(patientToCopy);
+
+    assertThat(patient.getBirthDate()).isNull();
   }
 
   @Test

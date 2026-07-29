@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.SequencedCollection;
 import javax.annotation.Nonnull;
 import lombok.Setter;
-import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Patient;
 
@@ -51,15 +50,20 @@ public class NotifiedPersonAnonymousDataBuilder extends NotifiedPersonNominalDat
   @Nonnull
   public static Patient deepCopy(@Nonnull final Patient original) {
     final NotifiedPersonAnonymousDataBuilder builder = new NotifiedPersonAnonymousDataBuilder();
-    builder.setDefault();
+
+    final SequencedCollection<Address> addressesToCopy =
+        NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(original);
     final SequencedCollection<Address> copiedAddresses =
-        AddressDataBuilder.copyOfRedactedAddress(original.getAddress());
+        AddressDataBuilder.copyOfRedactedAddress(addressesToCopy);
+
     builder
+        .setDefault()
+        .setId(original.getIdElement().getIdPart())
         .setAddress(copiedAddresses.stream().toList())
         .setGender(original.getGender())
         .setGenderExtension(original.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER));
-    final IIdType idElement = original.getIdElement();
-    builder.setId(idElement.getIdPart());
+
+    Patients.copyBirthdateShortened(original, builder::setBirthdate);
 
     return builder.build();
   }

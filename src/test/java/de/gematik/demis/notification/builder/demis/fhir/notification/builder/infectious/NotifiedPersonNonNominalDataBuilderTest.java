@@ -184,7 +184,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     Patient patientToCopy = new Patient();
     patientToCopy.setId("12345");
 
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
     assertThat(patient.getId()).isEqualTo("Patient/12345");
   }
 
@@ -193,7 +193,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     Patient patientToCopy = new Patient();
     patientToCopy.setGender(Enumerations.AdministrativeGender.MALE);
 
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.MALE);
     assertThat(patient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER)).isNull();
   }
@@ -206,7 +206,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     genderExtension.setValue(new Coding(EXTENSION_URL_GENDER, "X", "Kein Geschlechtseintrag"));
     patientToCopy.getGenderElement().addExtension(genderExtension);
 
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
     assertThat(patient.getGender()).isEqualTo(Enumerations.AdministrativeGender.OTHER);
     assertThat(patient.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
         .isEqualTo(genderExtension);
@@ -217,7 +217,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     Patient patientToCopy = new Patient();
     patientToCopy.setBirthDateElement(new DateType("1975-10"));
 
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
     assertThat(patient.getBirthDateElement().getValueAsString()).isEqualTo("1975-10");
     assertThat(patient.getBirthDateElement().getPrecision()).isEqualTo(TemporalPrecisionEnum.MONTH);
   }
@@ -225,26 +225,24 @@ class NotifiedPersonNonNominalDataBuilderTest {
   @Test
   void shouldCopyAddress() {
     Patient patientToCopy = new Patient();
-    Address address = new Address();
-    address.setPostalCode("12345");
-    patientToCopy.addAddress(address);
 
-    final Patient patient =
-        NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of(address));
+    final Extension addressUseExtensionPrimary = new Extension();
+    addressUseExtensionPrimary.setUrl("https://demis.rki.de/fhir/StructureDefinition/AddressUse");
+    addressUseExtensionPrimary.setValue(
+        new Coding("https://demis.rki.de/fhir/CodeSystem/addressUse", "primary", "Hauptwohnsitz"));
+
+    final Address address = new Address();
+    address.setPostalCode("12345").setCity("Berlin").addExtension(addressUseExtensionPrimary);
+
+    final Address addressWithoutExtension = new Address();
+    addressWithoutExtension.setPostalCode("15831");
+
+    patientToCopy.setAddress(List.of(address, addressWithoutExtension));
+
+    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
     assertThat(patient.getAddress()).hasSize(1);
     assertThat(patient.getAddress().getFirst().getPostalCode()).isEqualTo("123");
-  }
-
-  @Test
-  void thatOnlyAddressesPassedAsParameterAreCopied() {
-    // GIVEN a patient with an assigned address
-    final Patient patientToCopy = new Patient().addAddress(new Address().setPostalCode("12345"));
-
-    // WHEN we copy without passing the address
-    final Patient patient = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
-
-    // THEN no address is present
-    assertThat(patient.getAddress()).isEmpty();
+    assertThat(patient.getAddress().getFirst().getCity()).isNull();
   }
 
   @Test
@@ -253,7 +251,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
     Base64BinaryType actualPseudonym = new Base64BinaryType("pseudonym");
     patientToCopy.addExtension(EXTENSION_URL_PSEUDONYM, actualPseudonym);
 
-    final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+    final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
     assertThat(result.getExtensionByUrl(EXTENSION_URL_PSEUDONYM).getValue())
         .isEqualTo(actualPseudonym);
   }
@@ -457,7 +455,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
       patientToCopy.setId("12345");
       patientToCopy.setDeceased(new BooleanType(true));
 
-      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
 
       assertThat(result.getDeceasedBooleanType().booleanValue()).isTrue();
     }
@@ -469,7 +467,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
       patientToCopy.setId("12345");
       patientToCopy.setDeceased(new DateTimeType(deceasedDate));
 
-      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
 
       assertThat(result.getDeceasedDateTimeType().getValue()).isEqualTo(deceasedDate);
     }
@@ -479,7 +477,7 @@ class NotifiedPersonNonNominalDataBuilderTest {
       final Patient patientToCopy = new Patient();
       patientToCopy.setId("12345");
 
-      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy, List.of());
+      final Patient result = NotifiedPersonNonNominalDataBuilder.deepCopy(patientToCopy);
 
       assertThat(result.hasDeceased()).isFalse();
     }

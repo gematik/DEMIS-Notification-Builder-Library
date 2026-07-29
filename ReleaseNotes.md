@@ -2,6 +2,12 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.4.0
+- added shortened copy of birthdate to deepCopy function of NotifiedPersonAnonymousDataBuilder
+- renamed function createExcerptNotifiedPersonNotByNameFromNominalBundle of DiseaseExcerptBuilder to createExcerptFrom61Bundle
+- renamed function createExcerptNotifiedPersonNotByNameFromNominalBundle of DiseaseExcerptBuilder to createExcerptFrom71Bundle
+- renamed function createExcerptNotifiedPersonAnonymousFromNonNominalBundle of DiseaseExcerptBuilder and LaboratoryExcerptBuilder to createExcerptFrom73Bundle
+
 ## Release 9.3.0
 - for igs notifications the demis participant id is set according to https://wiki.gematik.de/spaces/DSKB/pages/659360260/Metadaten+f%C3%BCr+Upload+via+csv+oder+LIS-Schnittstelle
 

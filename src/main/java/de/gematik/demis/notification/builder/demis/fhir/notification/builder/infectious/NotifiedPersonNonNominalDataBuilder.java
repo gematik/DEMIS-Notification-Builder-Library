@@ -51,7 +51,6 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import lombok.AccessLevel;
 import lombok.Setter;
-import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.DateTimeType;
@@ -111,32 +110,30 @@ public class NotifiedPersonNonNominalDataBuilder {
    * AddressDataBuilder#copyOfRedactedAddress(Collection)}. The caller MUST pass only addresses that
    * should be copied. No considerations are made for specific AddressUse extensions.
    *
-   * @param addressesToCopy Addresses to copy to the new Patient resource. Existing addresses on the
-   *     Patient are ignored.
+   * @param patientToCopy patient to copy to the new Patient resource.
    */
   @Nonnull
-  public static Patient deepCopy(
-      @Nonnull final Patient patientToCopy,
-      @Nonnull final SequencedCollection<Address> addressesToCopy) {
+  public static Patient deepCopy(@Nonnull final Patient patientToCopy) {
     final NotifiedPersonNonNominalDataBuilder builder = new NotifiedPersonNonNominalDataBuilder();
 
+    final SequencedCollection<Address> addressesToCopy = getAddressesToCopy(patientToCopy);
     final SequencedCollection<Address> addresses =
         AddressDataBuilder.copyOfRedactedAddress(addressesToCopy);
-    builder.setAddress(List.copyOf(addresses));
 
-    Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);
-
-    builder
-        .setGender(patientToCopy.getGender())
-        .setGenderExtension(
-            patientToCopy.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER));
-    final IIdType idElement = patientToCopy.getIdElement();
-    builder.setId(idElement.getIdPart());
     final Extension extensionByUrl = patientToCopy.getExtensionByUrl(EXTENSION_URL_PSEUDONYM);
     final Type pseudonym = extensionByUrl == null ? null : extensionByUrl.getValue();
-    builder.setPseudonym(pseudonym);
+
+    builder
+        .setId(patientToCopy.getIdElement().getIdPart())
+        .setAddress(List.copyOf(addresses))
+        .setGender(patientToCopy.getGender())
+        .setGenderExtension(
+            patientToCopy.getGenderElement().getExtensionByUrl(EXTENSION_URL_GENDER))
+        .setPseudonym(pseudonym);
 
     extractDeceasedValue(patientToCopy, builder);
+
+    Patients.copyBirthdateShortened(patientToCopy, builder::setBirthdate);
 
     return builder.build();
   }

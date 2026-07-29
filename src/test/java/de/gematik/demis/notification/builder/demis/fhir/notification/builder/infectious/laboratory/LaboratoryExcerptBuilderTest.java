@@ -75,9 +75,7 @@ class LaboratoryExcerptBuilderTest {
     void shouldCopyMetaProfileUrl() {
       Bundle originalBundle = create71Bundle();
 
-      final Bundle result =
-          LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(
-              originalBundle);
+      final Bundle result = LaboratoryExcerptBuilder.createExcerptFrom71Bundle(originalBundle);
 
       assertThat(result.getMeta().getProfile().getFirst().getValue())
           .isEqualTo(DemisConstants.PROFILE_NOTIFICATION_BUNDLE_LABORATORY);
@@ -87,9 +85,7 @@ class LaboratoryExcerptBuilderTest {
     void shouldCopyMetaTagsAndAddRelatedNotificationBundleTag() {
       Bundle originalBundle = create71Bundle();
 
-      final Bundle result =
-          LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(
-              originalBundle);
+      final Bundle result = LaboratoryExcerptBuilder.createExcerptFrom71Bundle(originalBundle);
       assertThat(result.getMeta().getTag().getFirst().getSystem()).isEqualTo("system");
       assertThat(result.getMeta().getTag().getFirst().getCode()).isEqualTo("code");
       assertThat(result.getMeta().getTag().getFirst().getDisplay()).isEqualTo("display");
@@ -109,9 +105,7 @@ class LaboratoryExcerptBuilderTest {
         utils.when(() -> Utils.getShortReferenceOrUrnUuid(any())).thenCallRealMethod();
         Bundle originalBundle = create71Bundle();
 
-        final Bundle result =
-            LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(
-                originalBundle);
+        final Bundle result = LaboratoryExcerptBuilder.createExcerptFrom71Bundle(originalBundle);
         assertThat(result.getIdentifier().getSystem())
             .isEqualTo("https://demis.rki.de/fhir/NamingSystem/NotificationBundleId");
         assertThat(result.getIdentifier().getValue()).isEqualTo("555-42-23-6");
@@ -124,9 +118,7 @@ class LaboratoryExcerptBuilderTest {
     @Test
     void shouldCopyType() {
       Bundle originalBundle = create71Bundle();
-      final Bundle result =
-          LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(
-              originalBundle);
+      final Bundle result = LaboratoryExcerptBuilder.createExcerptFrom71Bundle(originalBundle);
       assertThat(result.getType()).isEqualTo(Bundle.BundleType.DOCUMENT);
     }
 
@@ -135,9 +127,7 @@ class LaboratoryExcerptBuilderTest {
       Bundle originalBundle = create71Bundle();
       Date lastUpdated = originalBundle.getMeta().getLastUpdated();
 
-      final Bundle result =
-          LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(
-              originalBundle);
+      final Bundle result = LaboratoryExcerptBuilder.createExcerptFrom71Bundle(originalBundle);
       assertThat(result.getMeta().getLastUpdated()).isEqualTo(lastUpdated);
     }
 
@@ -146,9 +136,7 @@ class LaboratoryExcerptBuilderTest {
       Bundle originalBundle = create71Bundle();
       Date timestamp = originalBundle.getTimestamp();
 
-      final Bundle result =
-          LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(
-              originalBundle);
+      final Bundle result = LaboratoryExcerptBuilder.createExcerptFrom71Bundle(originalBundle);
       assertThat(result.getTimestamp()).isEqualTo(timestamp);
     }
 
@@ -156,8 +144,7 @@ class LaboratoryExcerptBuilderTest {
     void shouldCopyEntries() {
       final Bundle original = getBundle();
 
-      final Bundle result =
-          LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(original);
+      final Bundle result = LaboratoryExcerptBuilder.createExcerptFrom71Bundle(original);
 
       assertThat(result.getEntry()).hasSize(original.getEntry().size());
       // Equality is implemented on referencial equality. Ensure that no entry is present in either
@@ -177,10 +164,7 @@ class LaboratoryExcerptBuilderTest {
       final Bundle original = getBundle();
 
       assertThatNoException()
-          .isThrownBy(
-              () ->
-                  LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(
-                      original));
+          .isThrownBy(() -> LaboratoryExcerptBuilder.createExcerptFrom71Bundle(original));
     }
 
     @Test
@@ -200,8 +184,7 @@ class LaboratoryExcerptBuilderTest {
         IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
         Bundle bundle = iParser.parseResource(Bundle.class, json);
 
-        Bundle excerpt =
-            LaboratoryExcerptBuilder.createExcerptNotifiedPersonNotByNameFromNominalBundle(bundle);
+        Bundle excerpt = LaboratoryExcerptBuilder.createExcerptFrom71Bundle(bundle);
         String excerptJson = iParser.encodeResourceToString(excerpt);
 
         String expected =
@@ -249,9 +232,7 @@ class LaboratoryExcerptBuilderTest {
         IParser iParser = FhirContext.forR4().newJsonParser().setPrettyPrint(true);
         Bundle bundle = iParser.parseResource(Bundle.class, json);
 
-        Bundle excerpt =
-            LaboratoryExcerptBuilder.createExcerptNotifiedPersonAnonymousFromNonNominalBundle(
-                bundle);
+        Bundle excerpt = LaboratoryExcerptBuilder.createExcerptFrom73Bundle(bundle);
         String excerptJson = iParser.encodeResourceToString(excerpt);
 
         String expected =

@@ -31,11 +31,9 @@ import de.gematik.demis.notification.builder.demis.fhir.notification.builder.inf
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.disease.questionnaire.QuestionnaireResponseBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder;
 import de.gematik.demis.notification.builder.demis.fhir.notification.utils.DemisConstants;
-import java.util.SequencedCollection;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
-import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Condition;
@@ -62,10 +60,7 @@ public class NotificationBundleDiseaseNonNominalDataBuilder
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle);
     // in case the subject references an organization as address we do copy the address entry, but
     // we then need to manually copy the organization as well
-    final SequencedCollection<Address> addresses =
-        NotifiedPersonNonNominalDataBuilder.getAddressesToCopy(ctx.subject());
-    final Patient notifiedPerson =
-        NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject(), addresses);
+    final Patient notifiedPerson = NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject());
 
     final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
     final Condition condition = DiseaseDataBuilder.deepCopy(ctx.condition(), notifiedPerson);
