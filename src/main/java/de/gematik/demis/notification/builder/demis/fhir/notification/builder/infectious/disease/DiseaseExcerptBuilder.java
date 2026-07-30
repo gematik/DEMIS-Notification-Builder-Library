@@ -93,7 +93,7 @@ public final class DiseaseExcerptBuilder {
             ? deepCopy(ctx.commonQuestionnaireResponse().get(), notifiedPerson)
             : null;
 
-    final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
+    final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy(ctx.notifier());
 
     final Composition composition =
         NotificationDiseaseDataBuilder.excerptCopy(

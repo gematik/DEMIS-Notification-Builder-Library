@@ -62,7 +62,7 @@ public class NotificationBundleDiseaseNonNominalDataBuilder
     // we then need to manually copy the organization as well
     final Patient notifiedPerson = NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject());
 
-    final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
+    final PractitionerRole notifierRole = PractitionerRoleBuilder.deepCopy(ctx.notifier());
     final Condition condition = DiseaseDataBuilder.deepCopy(ctx.condition(), notifiedPerson);
     final QuestionnaireResponse specificQuestionnaire =
         ctx.specificQuestionnaireResponse().isPresent()

@@ -28,7 +28,7 @@ package de.gematik.demis.notification.builder.demis.fhir.notification.builder.in
  */
 
 import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.laboratory.Bundles.copyObservations;
-import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder.deepCopy73;
+import static de.gematik.demis.notification.builder.demis.fhir.notification.builder.technicals.PractitionerRoleBuilder.deepCopy;
 
 import com.google.common.collect.ImmutableSet;
 import de.gematik.demis.notification.builder.demis.fhir.notification.builder.infectious.NotifiedPersonAnonymousDataBuilder;
@@ -92,8 +92,8 @@ public final class LaboratoryExcerptBuilder {
       final BundleBuilderContext ctx,
       final NotificationBundleLaboratoryDataBuilder builder,
       final Patient notifiedPerson) {
-    final PractitionerRole submitter = deepCopy73(ctx.submitter());
-    final PractitionerRole notifier = deepCopy73(ctx.notifier());
+    final PractitionerRole submitter = deepCopy(ctx.submitter());
+    final PractitionerRole notifier = deepCopy(ctx.notifier());
 
     final Bundles.ObservationCopyResult observationCopyResult =
         copyObservations(ctx.observations(), notifiedPerson, submitter);

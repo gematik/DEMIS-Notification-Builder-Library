@@ -106,7 +106,7 @@ class PractitionerRoleBuilderTest {
     practitionerRole.setOrganization(new Reference(organization));
     PractitionerRole copy = PractitionerRoleBuilder.deepCopy(practitionerRole);
     assertThat(copy).isNotSameAs(practitionerRole);
-    assertThat(copy.getId()).isEqualTo(practitionerRoleID);
+    assertThat(copy.getId()).contains(practitionerRoleID);
     assertThat(copy.getPractitioner().getReference()).isEqualTo("Practitioner/123-456-789");
     assertThat(copy.getOrganization().getReference()).isEqualTo("Organization/234-567-890");
   }
@@ -119,37 +119,6 @@ class PractitionerRoleBuilderTest {
     practitionerRole.setPractitioner(new Reference("invalid-ref"));
     practitionerRole.setOrganization(new Reference("invalid-ref"));
     assertThatThrownBy(() -> PractitionerRoleBuilder.deepCopy(practitionerRole))
-        .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessageContaining("Reference 'invalid-ref' is not resolvable");
-  }
-
-  @Test
-  void thatValidRefsGetCopied_deepCopy73() {
-    final Practitioner practitioner = new Practitioner();
-    practitioner.setId("123-456-789");
-    final Organization organization = new Organization();
-    organization.setId("234-567-890");
-
-    final String practitionerRoleID = UUID.randomUUID().toString();
-    final PractitionerRole practitionerRole =
-        new PractitionerRoleBuilder().setId(practitionerRoleID).setDefaults().build();
-    practitionerRole.setPractitioner(new Reference(practitioner));
-    practitionerRole.setOrganization(new Reference(organization));
-    PractitionerRole copy = PractitionerRoleBuilder.deepCopy73(practitionerRole);
-    assertThat(copy).isNotSameAs(practitionerRole);
-    assertThat(copy.getId()).contains(practitionerRoleID);
-    assertThat(copy.getPractitioner().getReference()).isEqualTo("Practitioner/123-456-789");
-    assertThat(copy.getOrganization().getReference()).isEqualTo("Organization/234-567-890");
-  }
-
-  @Test
-  void thatInvalidRefThrowsException_deepCopy73() {
-    final String practitionerRoleID = UUID.randomUUID().toString();
-    final PractitionerRole practitionerRole =
-        new PractitionerRoleBuilder().setId(practitionerRoleID).setDefaults().build();
-    practitionerRole.setPractitioner(new Reference("invalid-ref"));
-    practitionerRole.setOrganization(new Reference("invalid-ref"));
-    assertThatThrownBy(() -> PractitionerRoleBuilder.deepCopy73(practitionerRole))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Reference 'invalid-ref' is not resolvable");
   }
