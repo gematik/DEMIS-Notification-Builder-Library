@@ -68,8 +68,8 @@ public class NotificationBundleLaboratoryNonNominalDataBuilder
     final BundleBuilderContext ctx = BundleBuilderContext.from(originalBundle.getEntry());
     final Patient notifiedPerson = NotifiedPersonNonNominalDataBuilder.deepCopy(ctx.subject());
 
-    final PractitionerRole submitter = PractitionerRoleBuilder.deepCopy73(ctx.submitter());
-    final PractitionerRole notifier = PractitionerRoleBuilder.deepCopy73(ctx.notifier());
+    final PractitionerRole submitter = PractitionerRoleBuilder.deepCopy(ctx.submitter());
+    final PractitionerRole notifier = PractitionerRoleBuilder.deepCopy(ctx.notifier());
 
     final Bundles.ObservationCopyResult observationCopyResult =
         Bundles.copyObservations(ctx.observations(), notifiedPerson, submitter);

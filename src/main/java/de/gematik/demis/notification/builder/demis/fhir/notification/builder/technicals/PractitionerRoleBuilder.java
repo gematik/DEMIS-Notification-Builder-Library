@@ -60,41 +60,14 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
 
   /**
    * @return a copy of the given {@link PractitionerRole} and the contained resources (e.g. the
-   *     organization)
+   *     organization) with specific modifications
    */
   @Nonnull
   public static PractitionerRole deepCopy(@Nonnull final PractitionerRole original) {
-    PractitionerRole copy = new PractitionerRole();
-    copy.setId(original.getId());
-    copy.setMeta(original.getMeta());
-    Practitioner referencedPractitioner =
-        (Practitioner) ReferenceUtils.getResource(original.getPractitioner());
-    Organization referencedOrganization =
-        (Organization) ReferenceUtils.getResource(original.getOrganization());
-    if (referencedPractitioner != null) {
-      Practitioner copiedPractitioner = referencedPractitioner.copy();
-      Reference newReference = new Reference(copiedPractitioner);
-      newReference.setReference(getShortReferenceOrUrnUuid(copiedPractitioner));
-      copy.setPractitioner(newReference);
-    }
-    if (referencedOrganization != null) {
-      Organization copiedOrganization = referencedOrganization.copy();
-      Reference value = new Reference(copiedOrganization);
-      value.setReference(getShortReferenceOrUrnUuid(copiedOrganization));
-      copy.setOrganization(value);
-    }
-    return copy;
-  }
-
-  /**
-   * @return a copy of the given {@link PractitionerRole} and the contained resources (e.g. the
-   *     organization) with 7.3 specific modifications
-   */
-  @Nonnull
-  public static PractitionerRole deepCopy73(@Nonnull final PractitionerRole original) {
     final PractitionerRole copy = new PractitionerRole();
     copy.setId(Utils.getShortReferenceOrUrnUuid(original));
     copy.setMeta(original.getMeta());
+
     if (ReferenceUtils.getResource(original.getPractitioner())
         instanceof final Practitioner referencedPractitioner) {
       final Practitioner copiedPractitioner = referencedPractitioner.copy();
@@ -103,6 +76,7 @@ public class PractitionerRoleBuilder implements InitializableFhirObjectBuilder {
               .setReference(getShortReferenceOrUrnUuid(copiedPractitioner));
       copy.setPractitioner(newReference);
     }
+
     if (ReferenceUtils.getResource(original.getOrganization())
         instanceof final Organization originalOrganization) {
       final Organization organization = removeNotifiedPersonFacilityProfile(originalOrganization);

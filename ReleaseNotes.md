@@ -2,6 +2,9 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.4.1
+- removed profile NotifiedPersonFacility from Organization referenced in PractitionerRole for copy of anonymous §7.3 notification
+
 ## Release 9.4.0
 - added shortened copy of birthdate to deepCopy function of NotifiedPersonAnonymousDataBuilder
 - renamed function createExcerptNotifiedPersonNotByNameFromNominalBundle of DiseaseExcerptBuilder to createExcerptFrom61Bundle
