@@ -14,33 +14,16 @@ See the Licence for the specific language governing permissions and limitations 
 
 This project includes:
   Apache Commons Codec under Apache-2.0
-  Apache Commons Collections under Apache-2.0
-  Apache Commons Compress under Apache-2.0
-  Apache Commons CSV under Apache-2.0
   Apache Commons IO under Apache-2.0
   Apache Commons Lang under Apache-2.0
   Apache Commons Net under Apache License, Version 2.0
   Apache Commons Text under Apache License, Version 2.0
-  Apache HttpClient under Apache License, Version 2.0
-  Apache HttpComponents Core HTTP/1.1 under Apache License, Version 2.0
-  Apache HttpComponents Core HTTP/2 under Apache License, Version 2.0
-  Apache Jena - ARQ under The Apache Software License, Version 2.0
-  Apache Jena - Base under The Apache Software License, Version 2.0
-  Apache Jena - Core under The Apache Software License, Version 2.0
-  Apache Jena - IRI under The Apache Software License, Version 2.0
-  Apache Jena - IRI3986 under The Apache Software License, Version 2.0
-  Apache Jena - Language tags under The Apache Software License, Version 2.0
-  Apache Jena - ShEx under The Apache Software License, Version 2.0
-  Apache Thrift under The Apache Software License, Version 2.0
   AssertJ Core under Apache-2.0
   Byte Buddy (without dependencies) under Apache License, Version 2.0
   Byte Buddy agent under Apache License, Version 2.0
-  Caffeine cache under Apache License, Version 2.0
-  dexx under MIT License
   error-prone annotations under Apache 2.0
   fhir-parser-library under EUPL-1.2
   FindBugs-jsr305 under The Apache Software License, Version 2.0
-  Gson under Apache-2.0
   Guava InternalFutureFailureAccess and InternalFutures under Apache License, Version 2.0
   Guava ListenableFuture only under The Apache Software License, Version 2.0
   Guava: Google Core Libraries for Java under Apache License, Version 2.0
@@ -58,30 +41,26 @@ This project includes:
   jackson-databind under The Apache Software License, Version 2.0
   Jakarta Annotations API under EPL 2.0 or GPL2 w/ CPE
   JCL 1.2 implemented over SLF4J under Apache-2.0
-  JSON-P Default Provider under Eclipse Public License 2.0 or GNU General Public License, version 2 with the GNU Classpath Exception
   JSpecify annotations under The Apache License, Version 2.0
   JUnit Jupiter API under Eclipse Public License v2.0
   JUnit Jupiter Engine under Eclipse Public License v2.0
   JUnit Jupiter Params under Eclipse Public License v2.0
   JUnit Platform Commons under Eclipse Public License v2.0
   JUnit Platform Engine API under Eclipse Public License v2.0
+  Kotlin Stdlib under Apache-2.0
   mockito-core under MIT
   mockito-junit-jupiter under MIT
   notification-builder-library under EUPL-1.2
   Objenesis under Apache License, Version 2.0
+  okhttp under The Apache Software License, Version 2.0
+  okio under The Apache Software License, Version 2.0
   OpenTelemetry Instrumentation for Java under The Apache License, Version 2.0
   OpenTelemetry Java under The Apache License, Version 2.0
   org.apiguardian:apiguardian-api under The Apache License, Version 2.0
   org.opentest4j:opentest4j under The Apache License, Version 2.0
-  org.roaringbitmap:RoaringBitmap under Apache 2
   Project Lombok under The MIT License
-  Protocol Buffers [Core] under BSD-3-Clause
   Saxon-HE under Mozilla Public License Version 2.0
   SLF4J API Module under MIT
-  Titanium JCS under Apache License, Version 2.0
-  Titanium JSON-LD 1.1 (JRE11) under Apache License, Version 2.0
-  Titanium RDF API under Apache License, Version 2.0
-  Titanium RDF N-QUADS under Apache License, Version 2.0
   Ucum-java under BSD 3 Clause
   XML Resolver under Apache License version 2.0
 

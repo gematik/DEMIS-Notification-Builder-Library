@@ -2,6 +2,10 @@
 
 # Release-Notes notification-builder-library
 
+## Release 9.5.0
+- updated dependencies to fhir-parser-library 2.7.1, hapi.fhir 8.10.3 and hl7 6.9.12
+- fixed dependency convergence issues with hapi.fhir and hl7 versions by pinning open telemetry versions to 2.27.0 and 1.61.0
+
 ## Release 9.4.1
 - removed profile NotifiedPersonFacility from Organization referenced in PractitionerRole for copy of anonymous §7.3 notification
 
